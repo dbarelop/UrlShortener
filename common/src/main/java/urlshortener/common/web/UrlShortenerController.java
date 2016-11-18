@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
@@ -77,29 +76,13 @@ public class UrlShortenerController {
 											  @RequestParam(value = "sponsor", required = false) String sponsor,
 											  HttpServletRequest request) {
 		
-		ShortURL su = null;
-		
-		try {
-			RestTemplate restTemplate = new RestTemplate();
-			ResponseEntity<String> result = restTemplate.exchange(url, HttpMethod.GET, 
-					null, String.class);
-			
-			if ( result.getStatusCodeValue() == 200 ) {
-				System.out.println(result.getStatusCodeValue() + " Link en linea");
-				su = createAndSaveIfValid(url, sponsor, UUID
-						.randomUUID().toString(), extractIP(request));
-			}
-		} catch (HttpClientErrorException e) {
-			System.out.println("404 Link fuera de linea");
-		}
-		
+		ShortURL su = createAndSaveIfValid(url, sponsor, UUID
+				.randomUUID().toString(), extractIP(request));
 		if (su != null) {
 			HttpHeaders h = new HttpHeaders();
 			h.setLocation(su.getUri());
-			System.out.println("URL acortada");
 			return new ResponseEntity<>(su, h, HttpStatus.CREATED);
 		} else {
-			System.out.println("URL no acortada");
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
@@ -109,17 +92,31 @@ public class UrlShortenerController {
 		UrlValidator urlValidator = new UrlValidator(new String[] { "http",
 				"https" });
 		if (urlValidator.isValid(url)) {
-			String id = Hashing.murmur3_32()
-					.hashString(url, StandardCharsets.UTF_8).toString();
-			ShortURL su = new ShortURL(id, url,
-					linkTo(
-							methodOn(UrlShortenerController.class).redirectTo(
-									id, null)).toUri(), sponsor, new Date(
-							System.currentTimeMillis()), owner,
-					HttpStatus.TEMPORARY_REDIRECT.value(), true, ip, null);
-			return shortURLRepository.save(su);
+			try {
+				RestTemplate restTemplate = new RestTemplate();
+				ResponseEntity<String> result = restTemplate.exchange(url, HttpMethod.GET, 
+						null, String.class);
+				
+				if ( result.getStatusCodeValue() == 200 ){
+					String id = Hashing.murmur3_32()
+							.hashString(url, StandardCharsets.UTF_8).toString();
+					ShortURL su = new ShortURL(id, url,
+							linkTo(
+									methodOn(UrlShortenerController.class).redirectTo(
+											id, null)).toUri(), sponsor, new Date(
+									System.currentTimeMillis()), owner,
+							HttpStatus.TEMPORARY_REDIRECT.value(), true, ip, null);
+					System.out.println(result.getStatusCodeValue() + " link inline and valid");
+					return shortURLRepository.save(su);
+				}
+				
+			} catch (Exception e) {
+				System.out.println("link outline");
+			}
 		} else {
+			System.out.println("link invalid");
 			return null;
 		}
+		return null;
 	}
 }
