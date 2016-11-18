@@ -15,8 +15,15 @@ $(document).ready(
                             + msg.uri
                             + "</a></div>");
                         $("#resultQR").html(
-                            "<button class='btn btn-lg btn-primary' type='submit'>QR Code</button>"
+                            "<button id='buttonQR' class='btn btn-lg btn-primary' type='submit'>QR Code</button>"
                             );
+
+                        $('#buttonQR').click(function() {
+                             $("#QRImage").html(
+                                 "<img src='https://chart.googleapis.com/chart?cht=qr&chl="+msg.uri+"&choe=UTF-8&chs=177x177'></img>"
+                                 );
+                        });
+
                     },
                     error : function() {
                         $("#result").html(
