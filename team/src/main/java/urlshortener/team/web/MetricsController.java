@@ -10,10 +10,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import urlshortener.common.domain.ShortURL;
-import urlshortener.common.repository.ClickRepository;
 import urlshortener.common.repository.ShortURLRepository;
 import urlshortener.common.web.UrlShortenerController;
 import urlshortener.team.domain.Metrics;
+import urlshortener.team.repository.ClickRepository;
 
 import javax.servlet.http.HttpServletResponse;
 import java.net.URI;
@@ -41,7 +41,8 @@ public class MetricsController {
         }
         Long clicks = clickRepository.clicksByHash(hash);
         URI uri = linkTo(methodOn(UrlShortenerController.class).redirectTo(hash, null)).toUri();
-        Metrics metrics = new Metrics(uri, shortURL, clicks);
+        Long uniqueVisitors = clickRepository.uniqueVisitorsByHash(hash);
+        Metrics metrics = new Metrics(uri, shortURL, clicks, uniqueVisitors);
         model.addAttribute("metrics", metrics);
         return "metrics";
     }
@@ -56,7 +57,8 @@ public class MetricsController {
         }
         Long clicks = clickRepository.clicksByHash(hash);
         URI uri = linkTo(methodOn(UrlShortenerController.class).redirectTo(hash, null)).toUri();
-        Metrics metrics = new Metrics(uri, shortURL, clicks);
+        Long uniqueVisitors = clickRepository.uniqueVisitorsByHash(hash);
+        Metrics metrics = new Metrics(uri, shortURL, clicks, uniqueVisitors);
         return metrics;
     }
 }
