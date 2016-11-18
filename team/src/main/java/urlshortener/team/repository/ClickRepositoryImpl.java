@@ -4,6 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
+
 @Repository
 public class ClickRepositoryImpl extends urlshortener.common.repository.ClickRepositoryImpl implements ClickRepository {
 
@@ -13,6 +15,66 @@ public class ClickRepositoryImpl extends urlshortener.common.repository.ClickRep
     public Long uniqueVisitorsByHash(String hash) {
         try {
             return jdbc.queryForObject("select count(distinct ip) from click where hash = ?", new Object[]{hash}, Long.class);
+        } catch (Exception e) {
+            log.debug("When counting unique visitors for hash" + hash, e);
+        }
+        return -1L;
+    }
+
+    @Override
+    public Long uniqueVisitorsByHashBefore(String hash, Date endDate) {
+        try {
+            return jdbc.queryForObject("select count(distinct ip) from click where hash = ? and created <= ?", new Object[]{hash, endDate}, Long.class);
+        } catch (Exception e) {
+            log.debug("When counting unique visitors for hash" + hash, e);
+        }
+        return -1L;
+    }
+
+    @Override
+    public Long uniqueVisitorsByHashAfter(String hash, Date startDate) {
+        try {
+            return jdbc.queryForObject("select count(distinct ip) from click where hash = ? and created >= ?", new Object[]{hash, startDate}, Long.class);
+        } catch (Exception e) {
+            log.debug("When counting unique visitors for hash" + hash, e);
+        }
+        return -1L;
+    }
+
+    @Override
+    public Long uniqueVisitorsByHashBetween(String hash, Date startDate, Date endDate) {
+        try {
+            return jdbc.queryForObject("select count(distinct ip) from click where hash = ? and created >= ? and created <= ?", new Object[]{hash, startDate, endDate}, Long.class);
+        } catch (Exception e) {
+            log.debug("When counting unique visitors for hash" + hash, e);
+        }
+        return -1L;
+    }
+
+    @Override
+    public Long clicksByHashBefore(String hash, Date endDate) {
+        try {
+            return jdbc.queryForObject("select count(*) from click where hash = ? and created <= ?", new Object[]{hash, endDate}, Long.class);
+        } catch (Exception e) {
+            log.debug("When counting unique visitors for hash" + hash, e);
+        }
+        return -1L;
+    }
+
+    @Override
+    public Long clicksByHashAfter(String hash, Date startDate) {
+        try {
+            return jdbc.queryForObject("select count(*) from click where hash = ? and created >= ?", new Object[]{hash, startDate}, Long.class);
+        } catch (Exception e) {
+            log.debug("When counting unique visitors for hash" + hash, e);
+        }
+        return -1L;
+    }
+
+    @Override
+    public Long clicksByHashBetween(String hash, Date startDate, Date endDate) {
+        try {
+            return jdbc.queryForObject("select count(*) from click where hash = ? and created >= ? and created <= ?", new Object[]{hash, startDate, endDate}, Long.class);
         } catch (Exception e) {
             log.debug("When counting unique visitors for hash" + hash, e);
         }
