@@ -8,6 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import urlshortener.common.domain.ShortURL;
 import urlshortener.common.repository.ClickRepository;
 import urlshortener.common.repository.ShortURLRepository;
@@ -43,5 +44,19 @@ public class MetricsController {
         Metrics metrics = new Metrics(uri, shortURL, clicks);
         model.addAttribute("metrics", metrics);
         return "metrics";
+    }
+
+    @RequestMapping(value = "/metrics/{hash}", method = RequestMethod.GET, produces = "application/json")
+    public @ResponseBody Metrics getMetricsJson(@PathVariable String hash, HttpServletResponse response) {
+        logger.info("Requested JSON metrics for link with hash " + hash);
+        ShortURL shortURL = shortURLRepository.findByKey(hash);
+        if (shortURL == null) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            return null;
+        }
+        Long clicks = clickRepository.clicksByHash(hash);
+        URI uri = linkTo(methodOn(UrlShortenerController.class).redirectTo(hash, null)).toUri();
+        Metrics metrics = new Metrics(uri, shortURL, clicks);
+        return metrics;
     }
 }
