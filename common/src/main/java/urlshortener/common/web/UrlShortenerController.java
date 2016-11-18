@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
@@ -73,8 +76,23 @@ public class UrlShortenerController {
 	public ResponseEntity<ShortURL> shortener(@RequestParam("url") String url,
 											  @RequestParam(value = "sponsor", required = false) String sponsor,
 											  HttpServletRequest request) {
-		ShortURL su = createAndSaveIfValid(url, sponsor, UUID
-				.randomUUID().toString(), extractIP(request));
+		
+		ShortURL su = null;
+		
+		try {
+			RestTemplate restTemplate = new RestTemplate();
+			ResponseEntity<String> result = restTemplate.exchange(url, HttpMethod.GET, 
+					null, String.class);
+			
+			if ( result.getStatusCodeValue() == 200 ) {
+				System.out.println(result.getStatusCodeValue() + " Link en linea");
+				su = createAndSaveIfValid(url, sponsor, UUID
+						.randomUUID().toString(), extractIP(request));
+			}
+		} catch (HttpClientErrorException e) {
+			System.out.println("404 Link fuera de linea");
+		}
+		
 		if (su != null) {
 			HttpHeaders h = new HttpHeaders();
 			h.setLocation(su.getUri());
