@@ -2,6 +2,7 @@ package urlshortener.team.repository;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
@@ -10,6 +11,13 @@ import java.util.Date;
 public class ClickRepositoryImpl extends urlshortener.common.repository.ClickRepositoryImpl implements ClickRepository {
 
     private static final Logger log = LoggerFactory.getLogger(ClickRepositoryImpl.class);
+
+    public ClickRepositoryImpl() {
+    }
+
+    public ClickRepositoryImpl(JdbcTemplate jdbc) {
+        this.jdbc = jdbc;
+    }
 
     @Override
     public Long uniqueVisitorsByHash(String hash) {
