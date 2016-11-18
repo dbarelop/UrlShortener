@@ -18,6 +18,7 @@ eclipse {
 
 dependencies {
     compile project(':common')
+    compile 'org.springframework.boot:spring-boot-starter-thymeleaf:1.4.0.RELEASE'
 
     // Provides the production database
     runtime 'org.hsqldb:hsqldb'
