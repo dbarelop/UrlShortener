@@ -96,8 +96,10 @@ public class UrlShortenerController {
 		if (su != null) {
 			HttpHeaders h = new HttpHeaders();
 			h.setLocation(su.getUri());
+			System.out.println("URL acortada");
 			return new ResponseEntity<>(su, h, HttpStatus.CREATED);
 		} else {
+			System.out.println("URL no acortada");
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
