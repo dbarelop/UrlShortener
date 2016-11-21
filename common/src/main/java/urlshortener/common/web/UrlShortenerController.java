@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
@@ -92,31 +90,17 @@ public class UrlShortenerController {
 		UrlValidator urlValidator = new UrlValidator(new String[] { "http",
 				"https" });
 		if (urlValidator.isValid(url)) {
-			try {
-				RestTemplate restTemplate = new RestTemplate();
-				ResponseEntity<String> result = restTemplate.exchange(url, HttpMethod.GET, 
-						null, String.class);
-				
-				if ( result.getStatusCodeValue() == 200 ){
-					String id = Hashing.murmur3_32()
-							.hashString(url, StandardCharsets.UTF_8).toString();
-					ShortURL su = new ShortURL(id, url,
-							linkTo(
-									methodOn(UrlShortenerController.class).redirectTo(
-											id, null)).toUri(), sponsor, new Date(
-									System.currentTimeMillis()), owner,
-							HttpStatus.TEMPORARY_REDIRECT.value(), true, ip, null);
-					System.out.println(result.getStatusCodeValue() + " link inline and valid");
-					return shortURLRepository.save(su);
-				}
-				
-			} catch (Exception e) {
-				System.out.println("link outline");
-			}
+			String id = Hashing.murmur3_32()
+					.hashString(url, StandardCharsets.UTF_8).toString();
+			ShortURL su = new ShortURL(id, url,
+					linkTo(
+							methodOn(UrlShortenerController.class).redirectTo(
+									id, null)).toUri(), sponsor, new Date(
+							System.currentTimeMillis()), owner,
+					HttpStatus.TEMPORARY_REDIRECT.value(), true, ip, null);
+			return shortURLRepository.save(su);
 		} else {
-			System.out.println("link invalid");
 			return null;
 		}
-		return null;
 	}
 }
