@@ -17,9 +17,19 @@
 			<h1>URL Shortener</h1>
 			<p class="lead">A front-end example page for the project</p>
 			<br />
+			<form class="col-lg-12 lead" role="form" id="shortname" action="">
+				<div class="input-group input-group-lg col-sm-offset-4 col-sm-4">
+					<input id="shortnameV" type="text" class="center-block form-control input-lg" title="Enter a Short Name" placeholder="Enter a Short Name" name="shortName" />
+					<span class="input-group-btn">
+						<button class="btn btn-lg btn-primary" type="submit"> Validate</button>
+					</span>
+				</div>
+			</form>
+			<br />
 			<form class="col-lg-12" role="form" id="shortener" action="">
 				<div class="input-group input-group-lg col-sm-offset-4 col-sm-4">
-					<input type="text" class="center-block form-control input-lg" title="Enter a URL" placeholder="Enter a URL" name="url" />
+					<input type="hidden" name="shortName" value="" id="shortnameH"/>					
+					<input type="text" class="center-block form-control input-lg" title="Enter a URL" placeholder="Enter a URL" name="url" />					
 					<span class="input-group-btn">
 						<button class="btn btn-lg btn-primary" type="submit">Shorten me!</button>
 					</span>

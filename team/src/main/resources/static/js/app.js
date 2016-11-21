@@ -4,10 +4,21 @@ $(document).ready(
             function(event) {
                 event.preventDefault();
                 $.ajax({
+                    type : "GET",
+                    url : "/idGenerate",
+                    data : $(this).serialize(),                        
+                    success : function(msg) {                        	
+                    	$("#shortnameH").val(msg);                    	
+                    },
+                    error : function() {                    	
+                    }
+                });
+                $.ajax({
                     type : "POST",
                     url : "/link",
-                    data : $(this).serialize(),
-                    success : function(msg) {
+                    data : $(this).serialize(),                    
+                    success : function(msg) {                 	
+                    	
                         $("#result").html(
                             "<div class='alert alert-success lead'>" +
                                 "<a target='_blank' href='" + msg.uri + "'>" + msg.uri + "</a>" +
@@ -26,5 +37,28 @@ $(document).ready(
                         $("#result").html("<div class='alert alert-danger lead'>ERROR</div>");
                     }
                 });
+                
             });
+        
+        $("#shortname").submit(
+                function(event) {                    
+                	event.preventDefault();
+                    $.ajax({
+                        type : "GET",
+                        url : "/idValidate",
+                        data : $(this).serialize(),                        
+                        success : function(msg) {                        	
+                        	$("#shortnameH").val(msg);                        	
+                        	$("#result").html("<div class='alert alert-success lead'><p>" + msg +" Is a ShortName Valid" + "</p></div>"
+                        			);                        	
+                        },
+                        error : function() {
+                        	var $short = $("#shortnameV").val();
+                        	$("#shortnameH").val($short);
+                        	$("#result").html("<div class='alert alert-success lead'><p>" + $short +" already exist </p></div>"
+                        			);
+                           
+                        }
+                    });
+                });
     });

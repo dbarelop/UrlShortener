@@ -1,6 +1,5 @@
 package urlshortener.common.web;
 
-import com.google.common.hash.Hashing;
 
 import org.apache.commons.validator.routines.UrlValidator;
 import org.slf4j.Logger;
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.sql.Date;
 import java.util.UUID;
 
@@ -73,10 +71,11 @@ public class UrlShortenerController {
 
 	@RequestMapping(value = "/link", method = RequestMethod.POST)
 	public ResponseEntity<ShortURL> shortener(@RequestParam("url") String url,
+											  @RequestParam("shortName") String id,
 											  @RequestParam(value = "sponsor", required = false) String sponsor,
 											  HttpServletRequest request) {
 		
-		ShortURL su = createAndSaveIfValid(url, sponsor, UUID
+		ShortURL su = createAndSaveIfValid(id,url, sponsor, UUID
 				.randomUUID().toString(), extractIP(request));
 		if (su != null) {
 			HttpHeaders h = new HttpHeaders();
@@ -87,7 +86,7 @@ public class UrlShortenerController {
 		}
 	}
 
-	private ShortURL createAndSaveIfValid(String url, String sponsor,
+	private ShortURL createAndSaveIfValid(String id, String url, String sponsor,
 										  String owner, String ip) {
 		UrlValidator urlValidator = new UrlValidator(new String[] { "http",
 				"https" });
@@ -98,13 +97,12 @@ public class UrlShortenerController {
 						null, String.class);
 				
 				if ( result.getStatusCodeValue() == 200 ){
-					String id = Hashing.murmur3_32()
-							.hashString(url, StandardCharsets.UTF_8).toString();
+				
 					ShortURL su = new ShortURL(id, url,
 							linkTo(
 									methodOn(UrlShortenerController.class).redirectTo(
 											id, null)).toUri(), sponsor, new Date(
-									System.currentTimeMillis()), owner,
+													System.currentTimeMillis()), owner,
 							HttpStatus.TEMPORARY_REDIRECT.value(), true, ip, null);
 					System.out.println(result.getStatusCodeValue() + " link inline and valid");
 					return shortURLRepository.save(su);
