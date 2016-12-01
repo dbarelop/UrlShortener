@@ -37,6 +37,8 @@
                             <li class="list-group-item"><strong>Creation date:</strong> <span th:text="${metrics.created}"></span></li>
                             <li class="list-group-item"><strong>Target URL:</strong> <a th:href="${metrics.target}" th:text="${metrics.target}"></a></li>
                             <li class="list-group-item"><strong>Unique visitors:</strong> <span class="badge" th:text="${metrics.uniqueVisitors}"></span></li>
+                            <li class="list-group-item"><strong>Different browsers:</strong> <span class="badge" th:text="${metrics.differentBrowsers}"></span></li>
+                            <li class="list-group-item"><strong>Different operating systems:</strong> <span class="badge" th:text="${metrics.differentOperatingSystems}"></span></li>
                         </ul>
                     </div>
                 </div>

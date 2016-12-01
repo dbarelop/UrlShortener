@@ -20,6 +20,36 @@ public class ClickRepositoryImpl extends urlshortener.common.repository.ClickRep
     }
 
     @Override
+    public Long clicksByHashBefore(String hash, Date endDate) {
+        try {
+            return jdbc.queryForObject("select count(*) from click where hash = ? and created <= ?", new Object[]{hash, endDate}, Long.class);
+        } catch (Exception e) {
+            log.debug("When counting unique visitors for hash" + hash, e);
+        }
+        return -1L;
+    }
+
+    @Override
+    public Long clicksByHashAfter(String hash, Date startDate) {
+        try {
+            return jdbc.queryForObject("select count(*) from click where hash = ? and created >= ?", new Object[]{hash, startDate}, Long.class);
+        } catch (Exception e) {
+            log.debug("When counting unique visitors for hash" + hash, e);
+        }
+        return -1L;
+    }
+
+    @Override
+    public Long clicksByHashBetween(String hash, Date startDate, Date endDate) {
+        try {
+            return jdbc.queryForObject("select count(*) from click where hash = ? and created >= ? and created <= ?", new Object[]{hash, startDate, endDate}, Long.class);
+        } catch (Exception e) {
+            log.debug("When counting unique visitors for hash" + hash, e);
+        }
+        return -1L;
+    }
+
+    @Override
     public Long uniqueVisitorsByHash(String hash) {
         try {
             return jdbc.queryForObject("select count(distinct ip) from click where hash = ?", new Object[]{hash}, Long.class);
@@ -60,9 +90,9 @@ public class ClickRepositoryImpl extends urlshortener.common.repository.ClickRep
     }
 
     @Override
-    public Long clicksByHashBefore(String hash, Date endDate) {
+    public Long differentBrowsersByHash(String hash) {
         try {
-            return jdbc.queryForObject("select count(*) from click where hash = ? and created <= ?", new Object[]{hash, endDate}, Long.class);
+            return jdbc.queryForObject("select count(distinct browser) from click where hash = ?", new Object[]{hash}, Long.class);
         } catch (Exception e) {
             log.debug("When counting unique visitors for hash" + hash, e);
         }
@@ -70,9 +100,9 @@ public class ClickRepositoryImpl extends urlshortener.common.repository.ClickRep
     }
 
     @Override
-    public Long clicksByHashAfter(String hash, Date startDate) {
+    public Long differentBrowsersByHashBefore(String hash, Date endDate) {
         try {
-            return jdbc.queryForObject("select count(*) from click where hash = ? and created >= ?", new Object[]{hash, startDate}, Long.class);
+            return jdbc.queryForObject("select count(distinct browser) from click where hash = ? and created <= ?", new Object[]{hash, endDate}, Long.class);
         } catch (Exception e) {
             log.debug("When counting unique visitors for hash" + hash, e);
         }
@@ -80,9 +110,59 @@ public class ClickRepositoryImpl extends urlshortener.common.repository.ClickRep
     }
 
     @Override
-    public Long clicksByHashBetween(String hash, Date startDate, Date endDate) {
+    public Long differentBrowsersByHashAfter(String hash, Date startDate) {
         try {
-            return jdbc.queryForObject("select count(*) from click where hash = ? and created >= ? and created <= ?", new Object[]{hash, startDate, endDate}, Long.class);
+            return jdbc.queryForObject("select count(distinct browser) from click where hash = ? and created >= ?", new Object[]{hash, startDate}, Long.class);
+        } catch (Exception e) {
+            log.debug("When counting unique visitors for hash" + hash, e);
+        }
+        return -1L;
+    }
+
+    @Override
+    public Long differentBrowsersByHashBetween(String hash, Date startDate, Date endDate) {
+        try {
+            return jdbc.queryForObject("select count(distinct browser) from click where hash = ? and created >= ? and created <= ?", new Object[]{hash, startDate, endDate}, Long.class);
+        } catch (Exception e) {
+            log.debug("When counting unique visitors for hash" + hash, e);
+        }
+        return -1L;
+    }
+
+    @Override
+    public Long differentOperatingSystemsByHash(String hash) {
+        try {
+            return jdbc.queryForObject("select count(distinct platform) from click where hash = ?", new Object[]{hash}, Long.class);
+        } catch (Exception e) {
+            log.debug("When counting unique visitors for hash" + hash, e);
+        }
+        return -1L;
+    }
+
+    @Override
+    public Long differentOperatingSystemsByHashBefore(String hash, Date endDate) {
+        try {
+            return jdbc.queryForObject("select count(distinct platform) from click where hash = ? and created <= ?", new Object[]{hash, endDate}, Long.class);
+        } catch (Exception e) {
+            log.debug("When counting unique visitors for hash" + hash, e);
+        }
+        return -1L;
+    }
+
+    @Override
+    public Long differentOperatingSystemsByHashAfter(String hash, Date startDate) {
+        try {
+            return jdbc.queryForObject("select count(distinct platform) from click where hash = ? and created >= ?", new Object[]{hash, startDate}, Long.class);
+        } catch (Exception e) {
+            log.debug("When counting unique visitors for hash" + hash, e);
+        }
+        return -1L;
+    }
+
+    @Override
+    public Long differentOperatingSystemsByHashBetween(String hash, Date startDate, Date endDate) {
+        try {
+            return jdbc.queryForObject("select count(distinct platform) from click where hash = ? and created >= ? and created <= ?", new Object[]{hash, startDate, endDate}, Long.class);
         } catch (Exception e) {
             log.debug("When counting unique visitors for hash" + hash, e);
         }
