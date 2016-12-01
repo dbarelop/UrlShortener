@@ -2,6 +2,7 @@ package urlshortener.common.web;
 
 import com.google.common.hash.Hashing;
 
+import eu.bitwalker.useragentutils.UserAgent;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,22 +46,27 @@ public class UrlShortenerController {
 			HttpServletRequest request) {
 		ShortURL l = shortURLRepository.findByKey(id);
 		if (l != null) {
-			createAndSaveClick(id, extractIP(request));
+			createAndSaveClick(id, extractIP(request), extractUserAgent(request));
 			return createSuccessfulRedirectToResponse(l);
 		} else {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}
 
-	private void createAndSaveClick(String hash, String ip) {
+	private void createAndSaveClick(String hash, String ip, UserAgent userAgent) {
 		Click cl = new Click(null, hash, new Date(System.currentTimeMillis()),
-				null, null, null, ip, null);
+				null, userAgent.getBrowser().toString(), userAgent.getOperatingSystem().toString(), ip, null);
 		cl=clickRepository.save(cl);
 		LOG.info(cl!=null?"["+hash+"] saved with id ["+cl.getId()+"]":"["+hash+"] was not saved");
 	}
 
 	private String extractIP(HttpServletRequest request) {
 		return request.getRemoteAddr();
+	}
+
+	private UserAgent extractUserAgent(HttpServletRequest request) {
+		String userAgentString = request.getHeader("User-Agent");
+		return UserAgent.parseUserAgentString(userAgentString);
 	}
 
 	private ResponseEntity<?> createSuccessfulRedirectToResponse(ShortURL l) {
