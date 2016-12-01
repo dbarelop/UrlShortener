@@ -19,9 +19,7 @@ import org.springframework.util.MultiValueMap;
 import java.net.URI;
 import java.nio.charset.Charset;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
@@ -38,7 +36,7 @@ public class SystemTests {
 		ResponseEntity<String> entity = new TestRestTemplate().getForEntity(
 				"http://localhost:" + this.port, String.class);
 		assertThat(entity.getStatusCode(), is(HttpStatus.OK));
-		assertThat(entity.getHeaders().getContentType(), is(new MediaType("text", "html")));
+		assertThat(entity.getHeaders().getContentType(), anyOf(is(new MediaType("text", "html")), is(new MediaType("text", "html", Charset.forName("UTF-8")))));
 		assertThat(entity.getBody(), containsString("<title>URL"));
 	}
 
