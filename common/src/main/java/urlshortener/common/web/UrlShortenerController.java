@@ -74,7 +74,7 @@ public class UrlShortenerController {
 											  @RequestParam("shortName") String id,
 											  @RequestParam(value = "sponsor", required = false) String sponsor,
 											  HttpServletRequest request) {
-		
+		System.out.println("url: " + url + " id: " + id);
 		ShortURL su = createAndSaveIfValid(id,url, sponsor, UUID
 				.randomUUID().toString(), extractIP(request));
 		if (su != null) {

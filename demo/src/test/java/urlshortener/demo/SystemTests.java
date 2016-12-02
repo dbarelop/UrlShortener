@@ -38,7 +38,7 @@ public class SystemTests {
 		ResponseEntity<String> entity = new TestRestTemplate().getForEntity(
 				"http://localhost:" + this.port, String.class);
 		assertThat(entity.getStatusCode(), is(HttpStatus.OK));
-		assertThat(entity.getHeaders().getContentType(), is(new MediaType("text", "html", Charset.forName("UTF-8"))));
+		assertThat(entity.getHeaders().getContentType(), is(new MediaType("text", "html")));
 		assertThat(entity.getBody(), containsString("<title>URL"));
 	}
 
@@ -54,30 +54,30 @@ public class SystemTests {
 
 	@Test
 	public void testCreateLink() throws Exception {
-		ResponseEntity<String> entity = postLink("http://example.com/");
+		ResponseEntity<String> entity = postLink("http://example.com/","12345");
 		assertThat(entity.getStatusCode(), is(HttpStatus.CREATED));
-		assertThat(entity.getHeaders().getLocation(), is(new URI("http://localhost:"+ this.port+"/f684a3c4")));
+		assertThat(entity.getHeaders().getLocation(), is(new URI("http://localhost:"+ this.port+"/12345")));
 		assertThat(entity.getHeaders().getContentType(), is(new MediaType("application", "json", Charset.forName("UTF-8"))));
 		ReadContext rc = JsonPath.parse(entity.getBody());
-		assertThat(rc.read("$.hash"), is("f684a3c4"));
-		assertThat(rc.read("$.uri"), is("http://localhost:"+ this.port+"/f684a3c4"));
+		assertThat(rc.read("$.hash"), is("12345"));
+		assertThat(rc.read("$.uri"), is("http://localhost:"+ this.port+"/12345"));
 		assertThat(rc.read("$.target"), is("http://example.com/"));
 		assertThat(rc.read("$.sponsor"), is(nullValue()));
 	}
 
 	@Test
 	public void testRedirection() throws Exception {
-		postLink("http://example.com/");
+		postLink("http://example.com/","12345");
 		ResponseEntity<String> entity = new TestRestTemplate().getForEntity(
 				"http://localhost:" + this.port
-						+ "/f684a3c4", String.class);
+						+ "/12345", String.class);
 		assertThat(entity.getStatusCode(), is(HttpStatus.TEMPORARY_REDIRECT));
 		assertThat(entity.getHeaders().getLocation(), is(new URI("http://example.com/")));
 	}
 
-	private ResponseEntity<String> postLink(String url) {
+	private ResponseEntity<String> postLink(String url, String id) {
 		MultiValueMap<String, Object> parts = new LinkedMultiValueMap<>();
-		parts.add("url", url);
+		parts.add("url", url); parts.add("shortName", id);
 		return new TestRestTemplate().postForEntity(
 				"http://localhost:" + this.port+"/link", parts, String.class);
 	}
