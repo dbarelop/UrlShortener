@@ -15,6 +15,8 @@ public class ShortURL {
 	private Boolean safe;
 	private String ip;
 	private String country;
+	private Integer status;
+	private String badStatusDate;
 
 	public ShortURL(String hash, String target, URI uri, String sponsor,
 			Date created, String owner, Integer mode, Boolean safe, String ip,
@@ -72,6 +74,22 @@ public class ShortURL {
 
 	public String getCountry() {
 		return country;
+	}
+	
+	public Integer getStatus() {
+		return status;
+	}
+	
+	public String getBadStateDate() {
+		return badStatusDate;
+	}
+	
+	public void setStatus(Integer status) {
+		this.status = status;
+	}
+	
+	public void setBadStatusDate(String badStatusDate) {
+		this.badStatusDate = badStatusDate;
 	}
 
 }
