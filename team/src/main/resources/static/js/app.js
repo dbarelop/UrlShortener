@@ -28,7 +28,7 @@ $(document).ready(
 
 						if ($("#shortnameV").val()) {
 							$.ajax({
-								type : "GET",
+								type : "POST",
 								url : "/brandedLink",
 								data : $(this).serialize(),
 								success : onSuccess,
