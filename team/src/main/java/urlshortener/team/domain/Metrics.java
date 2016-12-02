@@ -1,9 +1,12 @@
 package urlshortener.team.domain;
 
+import eu.bitwalker.useragentutils.Browser;
+import eu.bitwalker.useragentutils.OperatingSystem;
 import urlshortener.common.domain.ShortURL;
 
 import java.net.URI;
 import java.sql.Date;
+import java.util.Map;
 
 public class Metrics {
 
@@ -12,27 +15,27 @@ public class Metrics {
     private String target;
     private Long clicks;
     private Long uniqueVisitors;
-    private Long differentBrowsers;
-    private Long differentOperatingSystems;
+    private Map<Browser, Long> clicksByBrowser;
+    private Map<OperatingSystem, Long> clicksByOS;
 
-    public Metrics(URI uri, ShortURL shortURL, Long clicks, Long uniqueVisitors, Long differentBrowsers, Long differentOperatingSystems) {
+    public Metrics(URI uri, ShortURL shortURL, Long clicks, Long uniqueVisitors, Map<Browser, Long> clicksByBrowser, Map<OperatingSystem, Long> clicksByOS) {
         this.uri = uri;
         this.created = shortURL.getCreated();
         this.target = shortURL.getTarget();
         this.clicks = clicks;
         this.uniqueVisitors = uniqueVisitors;
-        this.differentBrowsers = differentBrowsers;
-        this.differentOperatingSystems = differentOperatingSystems;
+        this.clicksByBrowser = clicksByBrowser;
+        this.clicksByOS = clicksByOS;
     }
 
-    public Metrics(URI uri, Date created, String target, Long clicks, Long uniqueVisitors, Long differentBrowsers, Long differentOperatingSystems) {
+    public Metrics(URI uri, Date created, String target, Long clicks, Long uniqueVisitors, Map<Browser, Long> clicksByBrowser, Map<OperatingSystem, Long> clicksByOS) {
         this.uri = uri;
         this.created = created;
         this.target = target;
         this.clicks = clicks;
         this.uniqueVisitors = uniqueVisitors;
-        this.differentBrowsers = differentBrowsers;
-        this.differentOperatingSystems = differentOperatingSystems;
+        this.clicksByBrowser = clicksByBrowser;
+        this.clicksByOS = clicksByOS;
     }
 
     public URI getUri() {
@@ -75,19 +78,19 @@ public class Metrics {
         this.uniqueVisitors = uniqueVisitors;
     }
 
-    public Long getDifferentBrowsers() {
-        return differentBrowsers;
+    public Map<Browser, Long> getClicksByBrowser() {
+        return clicksByBrowser;
     }
 
-    public void setDifferentBrowsers(Long differentBrowsers) {
-        this.differentBrowsers = differentBrowsers;
+    public void setClicksByBrowser(Map<Browser, Long> clicksByBrowser) {
+        this.clicksByBrowser = clicksByBrowser;
     }
 
-    public Long getDifferentOperatingSystems() {
-        return differentOperatingSystems;
+    public Map<OperatingSystem, Long> getClicksByOS() {
+        return clicksByOS;
     }
 
-    public void setDifferentOperatingSystems(Long differentOperatingSystems) {
-        this.differentOperatingSystems = differentOperatingSystems;
+    public void setClicksByOS(Map<OperatingSystem, Long> clicksByOS) {
+        this.clicksByOS = clicksByOS;
     }
 }

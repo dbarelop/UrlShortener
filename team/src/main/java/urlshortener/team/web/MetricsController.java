@@ -1,5 +1,7 @@
 package urlshortener.team.web;
 
+import eu.bitwalker.useragentutils.Browser;
+import eu.bitwalker.useragentutils.OperatingSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,7 @@ import java.net.URI;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Map;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
@@ -66,33 +69,12 @@ public class MetricsController {
     }
 
     private Metrics getMetrics(ShortURL shortURL, Date startDate, Date endDate) {
-        Long clicks;
-        Long uniqueVisitors;
-        Long differentBrowsers;
-        Long differentOperatingSystems;
-        if (startDate == null && endDate == null) {
-            clicks = clickRepository.clicksByHash(shortURL.getHash());
-            uniqueVisitors = clickRepository.uniqueVisitorsByHash(shortURL.getHash());
-            differentBrowsers = clickRepository.differentBrowsersByHash(shortURL.getHash());
-            differentOperatingSystems = clickRepository.differentOperatingSystemsByHash(shortURL.getHash());
-        } else if (startDate == null && endDate != null) {
-            clicks = clickRepository.clicksByHashBefore(shortURL.getHash(), endDate);
-            uniqueVisitors = clickRepository.uniqueVisitorsByHashBefore(shortURL.getHash(), endDate);
-            differentBrowsers = clickRepository.differentBrowsersByHashBefore(shortURL.getHash(), endDate);
-            differentOperatingSystems = clickRepository.differentOperatingSystemsByHashBefore(shortURL.getHash(), endDate);
-        } else if (startDate != null && endDate == null) {
-            clicks = clickRepository.clicksByHashAfter(shortURL.getHash(), startDate);
-            uniqueVisitors = clickRepository.uniqueVisitorsByHashAfter(shortURL.getHash(), startDate);
-            differentBrowsers = clickRepository.differentBrowsersByHashAfter(shortURL.getHash(), startDate);
-            differentOperatingSystems = clickRepository.differentOperatingSystemsByHashAfter(shortURL.getHash(), startDate);
-        } else {
-            clicks = clickRepository.clicksByHashBetween(shortURL.getHash(), startDate, endDate);
-            uniqueVisitors = clickRepository.uniqueVisitorsByHashBetween(shortURL.getHash(), startDate, endDate);
-            differentBrowsers = clickRepository.differentBrowsersByHashBetween(shortURL.getHash(), startDate, endDate);
-            differentOperatingSystems = clickRepository.differentOperatingSystemsByHashBetween(shortURL.getHash(), startDate, endDate);
-        }
         URI uri = linkTo(methodOn(UrlShortenerController.class).redirectTo(shortURL.getHash(), null)).toUri();
-        Metrics metrics = new Metrics(uri, shortURL, clicks, uniqueVisitors, differentBrowsers, differentOperatingSystems);
+        Long clicks = clickRepository.clicksByHashBetween(shortURL.getHash(), startDate, endDate);
+        Long uniqueVisitors = clickRepository.uniqueVisitorsByHashBetween(shortURL.getHash(), startDate, endDate);
+        Map<Browser, Long> clicksByBrowser = clickRepository.clicksForBrowserByHashBetween(shortURL.getHash(), startDate, endDate);
+        Map<OperatingSystem, Long> clicksByOS = clickRepository.clicksForOSByHashBetween(shortURL.getHash(), startDate, endDate);
+        Metrics metrics = new Metrics(uri, shortURL, clicks, uniqueVisitors, clicksByBrowser, clicksByOS);
         return metrics;
     }
 
