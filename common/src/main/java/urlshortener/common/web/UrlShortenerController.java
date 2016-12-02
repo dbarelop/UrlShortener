@@ -1,6 +1,8 @@
 package urlshortener.common.web;
 
+import com.google.common.hash.Hashing;
 
+import eu.bitwalker.useragentutils.UserAgent;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,9 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-
-import com.google.common.hash.Hashing;
 
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
@@ -47,22 +46,27 @@ public class UrlShortenerController {
 			HttpServletRequest request) {
 		ShortURL l = shortURLRepository.findByKey(id);
 		if (l != null) {
-			createAndSaveClick(id, extractIP(request));
+			createAndSaveClick(id, extractIP(request), extractUserAgent(request));
 			return createSuccessfulRedirectToResponse(l);
 		} else {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}
 
-	private void createAndSaveClick(String hash, String ip) {
+	private void createAndSaveClick(String hash, String ip, UserAgent userAgent) {
 		Click cl = new Click(null, hash, new Date(System.currentTimeMillis()),
-				null, null, null, ip, null);
+				null, userAgent.getBrowser().toString(), userAgent.getOperatingSystem().toString(), ip, null);
 		cl=clickRepository.save(cl);
 		LOG.info(cl!=null?"["+hash+"] saved with id ["+cl.getId()+"]":"["+hash+"] was not saved");
 	}
 
 	private String extractIP(HttpServletRequest request) {
 		return request.getRemoteAddr();
+	}
+
+	private UserAgent extractUserAgent(HttpServletRequest request) {
+		String userAgentString = request.getHeader("User-Agent");
+		return UserAgent.parseUserAgentString(userAgentString);
 	}
 
 	private ResponseEntity<?> createSuccessfulRedirectToResponse(ShortURL l) {
@@ -75,7 +79,6 @@ public class UrlShortenerController {
 	public ResponseEntity<ShortURL> shortener(@RequestParam("url") String url,
 											  @RequestParam(value = "sponsor", required = false) String sponsor,
 											  HttpServletRequest request) {
-		
 		ShortURL su = createAndSaveIfValid(url, sponsor, UUID
 				.randomUUID().toString(), extractIP(request));
 		if (su != null) {
@@ -83,21 +86,19 @@ public class UrlShortenerController {
 			h.setLocation(su.getUri());
 			return new ResponseEntity<>(su, h, HttpStatus.CREATED);
 		} else {
-			
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
 
-		
+
 	private ShortURL createAndSaveIfValid(String url, String sponsor, String owner, String ip) {
 		UrlValidator urlValidator = new UrlValidator(new String[] { "http", "https" });
 		if (urlValidator.isValid(url)) {
-			String id = Hashing.murmur3_32().hashString(url, StandardCharsets.UTF_8).toString();
-			ShortURL su = new ShortURL(id, url,
-					linkTo(methodOn(UrlShortenerController.class).redirectTo(id, null)).toUri(), sponsor,
-					new Date(System.currentTimeMillis()), owner, 
-					HttpStatus.TEMPORARY_REDIRECT.value(), true, ip, null);
-			return shortURLRepository.save(su);
+            String id = Hashing.murmur3_32().hashString(url, StandardCharsets.UTF_8).toString();
+            ShortURL su = new ShortURL(id, url,
+                    linkTo(methodOn(UrlShortenerController.class).redirectTo(id, null)).toUri(), sponsor, new Date(System.currentTimeMillis()), owner,
+                    HttpStatus.TEMPORARY_REDIRECT.value(), true, ip, null);
+            return shortURLRepository.save(su);
 		} else {
 			return null;
 		}
