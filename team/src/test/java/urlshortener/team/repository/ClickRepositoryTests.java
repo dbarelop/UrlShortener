@@ -12,10 +12,11 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import urlshortener.common.domain.ShortURL;
 import urlshortener.common.repository.ShortURLRepository;
 import urlshortener.common.repository.ShortURLRepositoryImpl;
-import urlshortener.team.repository.fixture.ShortURLFixture;
 import urlshortener.team.repository.fixture.ClickFixture;
+import urlshortener.team.repository.fixture.ShortURLFixture;
 
 import java.sql.Date;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
@@ -40,7 +41,7 @@ public class ClickRepositoryTests {
     }
 
     @Test
-    public void thatFiltersClicksByDate() {
+    public void thatReturnsClicksCorrectly() {
         ShortURL shortURL = ShortURLFixture.url1();
         long current = System.currentTimeMillis();
         long before = current - 10000;
@@ -51,14 +52,14 @@ public class ClickRepositoryTests {
         clickRepository.save(ClickFixture.click(shortURL, new Date(before)));
         clickRepository.save(ClickFixture.click(shortURL, new Date(after)));
 
-        assertEquals(clickRepository.clicksByHash(shortURL.getHash()).longValue(), 3);
-        assertEquals(clickRepository.clicksByHashAfter(shortURL.getHash(), new Date(current)).longValue(), 2);
-        assertEquals(clickRepository.clicksByHashBefore(shortURL.getHash(), new Date(current)).longValue(), 2);
+        assertEquals(clickRepository.clicksByHashBetween(shortURL.getHash(), null, null).longValue(), 3);
+        assertEquals(clickRepository.clicksByHashBetween(shortURL.getHash(), null, new Date(current)).longValue(), 2);
+        assertEquals(clickRepository.clicksByHashBetween(shortURL.getHash(), new Date(current), null).longValue(), 2);
         assertEquals(clickRepository.clicksByHashBetween(shortURL.getHash(), new Date(before), new Date(after)).longValue(), 3);
     }
 
     @Test
-    public void thatFiltersUniqueVisitorsByDate() {
+    public void thatReturnsUniqueVisitorsCorrectly() {
         ShortURL shortURL = ShortURLFixture.url1();
         long current = System.currentTimeMillis();
         long before = current - 10000;
@@ -69,14 +70,14 @@ public class ClickRepositoryTests {
         clickRepository.save(ClickFixture.click1(shortURL, new Date(before), "10.0.0.2"));
         clickRepository.save(ClickFixture.click1(shortURL, new Date(after), "10.0.0.3"));
 
-        assertEquals(clickRepository.uniqueVisitorsByHash(shortURL.getHash()).longValue(), 3);
-        assertEquals(clickRepository.uniqueVisitorsByHashAfter(shortURL.getHash(), new Date(current)).longValue(), 2);
-        assertEquals(clickRepository.uniqueVisitorsByHashBefore(shortURL.getHash(), new Date(current)).longValue(), 2);
+        assertEquals(clickRepository.uniqueVisitorsByHashBetween(shortURL.getHash(), null, null).longValue(), 3);
+        assertEquals(clickRepository.uniqueVisitorsByHashBetween(shortURL.getHash(), null, new Date(current)).longValue(), 2);
+        assertEquals(clickRepository.uniqueVisitorsByHashBetween(shortURL.getHash(), new Date(current), null).longValue(), 2);
         assertEquals(clickRepository.uniqueVisitorsByHashBetween(shortURL.getHash(), new Date(before), new Date(after)).longValue(), 3);
     }
 
     @Test
-    public void thatFiltersDifferentBrowsersByDate() {
+    public void thatReturnsClicksByBrowserCorrectly() {
         ShortURL shortURL = ShortURLFixture.url1();
         long current = System.currentTimeMillis();
         long before = current - 10000;
@@ -84,17 +85,28 @@ public class ClickRepositoryTests {
 
         shortURLRepository.save(ShortURLFixture.url1());
         clickRepository.save(ClickFixture.click2(shortURL, new Date(current), Browser.CHROME.toString()));
+        clickRepository.save(ClickFixture.click2(shortURL, new Date(current), Browser.CHROME.toString()));
+        clickRepository.save(ClickFixture.click2(shortURL, new Date(before), Browser.FIREFOX.toString()));
         clickRepository.save(ClickFixture.click2(shortURL, new Date(before), Browser.FIREFOX.toString()));
         clickRepository.save(ClickFixture.click2(shortURL, new Date(after), Browser.OPERA.toString()));
+        clickRepository.save(ClickFixture.click2(shortURL, new Date(after), Browser.OPERA.toString()));
 
-        assertEquals(clickRepository.differentBrowsersByHash(shortURL.getHash()).longValue(), 3);
-        assertEquals(clickRepository.differentBrowsersByHashAfter(shortURL.getHash(), new Date(current)).longValue(), 2);
-        assertEquals(clickRepository.differentBrowsersByHashBefore(shortURL.getHash(), new Date(current)).longValue(), 2);
-        assertEquals(clickRepository.differentBrowsersByHashBetween(shortURL.getHash(), new Date(before), new Date(after)).longValue(), 3);
+        Map<Browser, Long> clicks = clickRepository.clicksForBrowserByHashBetween(shortURL.getHash(), null, null);
+        assertEquals(clicks.size(), 3);
+        assertEquals(clicks.values().stream().mapToLong(Long::longValue).sum(), 6);
+        clicks = clickRepository.clicksForBrowserByHashBetween(shortURL.getHash(), null, new Date(current));
+        assertEquals(clicks.size(), 2);
+        assertEquals(clicks.values().stream().mapToLong(Long::longValue).sum(), 4);
+        clicks = clickRepository.clicksForBrowserByHashBetween(shortURL.getHash(), new Date(current), null);
+        assertEquals(clicks.size(), 2);
+        assertEquals(clicks.values().stream().mapToLong(Long::longValue).sum(), 4);
+        clicks = clickRepository.clicksForBrowserByHashBetween(shortURL.getHash(), new Date(before), new Date(after));
+        assertEquals(clicks.size(), 3);
+        assertEquals(clicks.values().stream().mapToLong(Long::longValue).sum(), 6);
     }
 
     @Test
-    public void thatFiltersDifferentOperatingSystemsByDate() {
+    public void thatReturnsClicksByOSCorrectly() {
         ShortURL shortURL = ShortURLFixture.url1();
         long current = System.currentTimeMillis();
         long before = current - 10000;
@@ -102,12 +114,23 @@ public class ClickRepositoryTests {
 
         shortURLRepository.save(ShortURLFixture.url1());
         clickRepository.save(ClickFixture.click3(shortURL, new Date(current), OperatingSystem.LINUX.toString()));
+        clickRepository.save(ClickFixture.click3(shortURL, new Date(current), OperatingSystem.LINUX.toString()));
+        clickRepository.save(ClickFixture.click3(shortURL, new Date(before), OperatingSystem.MAC_OS.toString()));
         clickRepository.save(ClickFixture.click3(shortURL, new Date(before), OperatingSystem.MAC_OS.toString()));
         clickRepository.save(ClickFixture.click3(shortURL, new Date(after), OperatingSystem.WINDOWS.toString()));
+        clickRepository.save(ClickFixture.click3(shortURL, new Date(after), OperatingSystem.WINDOWS.toString()));
 
-        assertEquals(clickRepository.differentOperatingSystemsByHash(shortURL.getHash()).longValue(), 3);
-        assertEquals(clickRepository.differentOperatingSystemsByHashAfter(shortURL.getHash(), new Date(current)).longValue(), 2);
-        assertEquals(clickRepository.differentOperatingSystemsByHashBefore(shortURL.getHash(), new Date(current)).longValue(), 2);
-        assertEquals(clickRepository.differentOperatingSystemsByHashBetween(shortURL.getHash(), new Date(before), new Date(after)).longValue(), 3);
+        Map<OperatingSystem, Long> clicks = clickRepository.clicksForOSByHashBetween(shortURL.getHash(), null, null);
+        assertEquals(clicks.size(), 3);
+        assertEquals(clicks.values().stream().mapToLong(Long::longValue).sum(), 6);
+        clicks = clickRepository.clicksForOSByHashBetween(shortURL.getHash(), null, new Date(current));
+        assertEquals(clicks.size(), 2);
+        assertEquals(clicks.values().stream().mapToLong(Long::longValue).sum(), 4);
+        clicks = clickRepository.clicksForOSByHashBetween(shortURL.getHash(), new Date(current), null);
+        assertEquals(clicks.size(), 2);
+        assertEquals(clicks.values().stream().mapToLong(Long::longValue).sum(), 4);
+        clicks = clickRepository.clicksForOSByHashBetween(shortURL.getHash(), new Date(before), new Date(after));
+        assertEquals(clicks.size(), 3);
+        assertEquals(clicks.values().stream().mapToLong(Long::longValue).sum(), 6);
     }
 }
