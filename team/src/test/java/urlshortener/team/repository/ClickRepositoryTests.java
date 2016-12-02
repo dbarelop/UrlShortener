@@ -1,5 +1,7 @@
 package urlshortener.team.repository;
 
+import eu.bitwalker.useragentutils.Browser;
+import eu.bitwalker.useragentutils.OperatingSystem;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -63,13 +65,49 @@ public class ClickRepositoryTests {
         long after = current + 10000;
 
         shortURLRepository.save(ShortURLFixture.url1());
-        clickRepository.save(ClickFixture.click(shortURL, new Date(current), "10.0.0.1"));
-        clickRepository.save(ClickFixture.click(shortURL, new Date(before), "10.0.0.2"));
-        clickRepository.save(ClickFixture.click(shortURL, new Date(after), "10.0.0.3"));
+        clickRepository.save(ClickFixture.click1(shortURL, new Date(current), "10.0.0.1"));
+        clickRepository.save(ClickFixture.click1(shortURL, new Date(before), "10.0.0.2"));
+        clickRepository.save(ClickFixture.click1(shortURL, new Date(after), "10.0.0.3"));
 
         assertEquals(clickRepository.uniqueVisitorsByHash(shortURL.getHash()).longValue(), 3);
         assertEquals(clickRepository.uniqueVisitorsByHashAfter(shortURL.getHash(), new Date(current)).longValue(), 2);
         assertEquals(clickRepository.uniqueVisitorsByHashBefore(shortURL.getHash(), new Date(current)).longValue(), 2);
         assertEquals(clickRepository.uniqueVisitorsByHashBetween(shortURL.getHash(), new Date(before), new Date(after)).longValue(), 3);
+    }
+
+    @Test
+    public void thatFiltersDifferentBrowsersByDate() {
+        ShortURL shortURL = ShortURLFixture.url1();
+        long current = System.currentTimeMillis();
+        long before = current - 10000;
+        long after = current + 10000;
+
+        shortURLRepository.save(ShortURLFixture.url1());
+        clickRepository.save(ClickFixture.click2(shortURL, new Date(current), Browser.CHROME.toString()));
+        clickRepository.save(ClickFixture.click2(shortURL, new Date(before), Browser.FIREFOX.toString()));
+        clickRepository.save(ClickFixture.click2(shortURL, new Date(after), Browser.OPERA.toString()));
+
+        assertEquals(clickRepository.differentBrowsersByHash(shortURL.getHash()).longValue(), 3);
+        assertEquals(clickRepository.differentBrowsersByHashAfter(shortURL.getHash(), new Date(current)).longValue(), 2);
+        assertEquals(clickRepository.differentBrowsersByHashBefore(shortURL.getHash(), new Date(current)).longValue(), 2);
+        assertEquals(clickRepository.differentBrowsersByHashBetween(shortURL.getHash(), new Date(before), new Date(after)).longValue(), 3);
+    }
+
+    @Test
+    public void thatFiltersDifferentOperatingSystemsByDate() {
+        ShortURL shortURL = ShortURLFixture.url1();
+        long current = System.currentTimeMillis();
+        long before = current - 10000;
+        long after = current + 10000;
+
+        shortURLRepository.save(ShortURLFixture.url1());
+        clickRepository.save(ClickFixture.click3(shortURL, new Date(current), OperatingSystem.LINUX.toString()));
+        clickRepository.save(ClickFixture.click3(shortURL, new Date(before), OperatingSystem.MAC_OS.toString()));
+        clickRepository.save(ClickFixture.click3(shortURL, new Date(after), OperatingSystem.WINDOWS.toString()));
+
+        assertEquals(clickRepository.differentOperatingSystemsByHash(shortURL.getHash()).longValue(), 3);
+        assertEquals(clickRepository.differentOperatingSystemsByHashAfter(shortURL.getHash(), new Date(current)).longValue(), 2);
+        assertEquals(clickRepository.differentOperatingSystemsByHashBefore(shortURL.getHash(), new Date(current)).longValue(), 2);
+        assertEquals(clickRepository.differentOperatingSystemsByHashBetween(shortURL.getHash(), new Date(before), new Date(after)).longValue(), 3);
     }
 }

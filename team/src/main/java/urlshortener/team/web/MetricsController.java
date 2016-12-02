@@ -42,8 +42,8 @@ public class MetricsController {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return null;
         }
-        Date startDate = parseDate(startDateStr);
-        Date endDate = parseDate(endDateStr);
+        Date startDate = startDateStr != null ? parseDate(startDateStr) : null;
+        Date endDate = endDateStr != null ? parseDate(endDateStr) : null;
         Metrics metrics = getMetrics(shortURL, startDate, endDate);
         model.addAttribute("metrics", metrics);
         return "metrics";
@@ -60,29 +60,39 @@ public class MetricsController {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return null;
         }
-        Date startDate = parseDate(startDateStr);
-        Date endDate = parseDate(endDateStr);
+        Date startDate = startDateStr != null ? parseDate(startDateStr) : null;
+        Date endDate = endDateStr != null ? parseDate(endDateStr) : null;
         return getMetrics(shortURL, startDate, endDate);
     }
 
     private Metrics getMetrics(ShortURL shortURL, Date startDate, Date endDate) {
         Long clicks;
         Long uniqueVisitors;
+        Long differentBrowsers;
+        Long differentOperatingSystems;
         if (startDate == null && endDate == null) {
             clicks = clickRepository.clicksByHash(shortURL.getHash());
             uniqueVisitors = clickRepository.uniqueVisitorsByHash(shortURL.getHash());
+            differentBrowsers = clickRepository.differentBrowsersByHash(shortURL.getHash());
+            differentOperatingSystems = clickRepository.differentOperatingSystemsByHash(shortURL.getHash());
         } else if (startDate == null && endDate != null) {
             clicks = clickRepository.clicksByHashBefore(shortURL.getHash(), endDate);
             uniqueVisitors = clickRepository.uniqueVisitorsByHashBefore(shortURL.getHash(), endDate);
+            differentBrowsers = clickRepository.differentBrowsersByHashBefore(shortURL.getHash(), endDate);
+            differentOperatingSystems = clickRepository.differentOperatingSystemsByHashBefore(shortURL.getHash(), endDate);
         } else if (startDate != null && endDate == null) {
             clicks = clickRepository.clicksByHashAfter(shortURL.getHash(), startDate);
             uniqueVisitors = clickRepository.uniqueVisitorsByHashAfter(shortURL.getHash(), startDate);
+            differentBrowsers = clickRepository.differentBrowsersByHashAfter(shortURL.getHash(), startDate);
+            differentOperatingSystems = clickRepository.differentOperatingSystemsByHashAfter(shortURL.getHash(), startDate);
         } else {
             clicks = clickRepository.clicksByHashBetween(shortURL.getHash(), startDate, endDate);
             uniqueVisitors = clickRepository.uniqueVisitorsByHashBetween(shortURL.getHash(), startDate, endDate);
+            differentBrowsers = clickRepository.differentBrowsersByHashBetween(shortURL.getHash(), startDate, endDate);
+            differentOperatingSystems = clickRepository.differentOperatingSystemsByHashBetween(shortURL.getHash(), startDate, endDate);
         }
         URI uri = linkTo(methodOn(UrlShortenerController.class).redirectTo(shortURL.getHash(), null)).toUri();
-        Metrics metrics = new Metrics(uri, shortURL, clicks, uniqueVisitors);
+        Metrics metrics = new Metrics(uri, shortURL, clicks, uniqueVisitors, differentBrowsers, differentOperatingSystems);
         return metrics;
     }
 
