@@ -30,8 +30,8 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 	}
 
 	@Override
-	public ResponseEntity<ShortURL> shortener(@RequestParam("url") String url,
-			@RequestParam(value = "sponsor", required = false) String sponsor,
+	public ResponseEntity<ShortURL> shortener(@RequestParam("url") String url,								
+								@RequestParam(value = "sponsor", required = false) String sponsor,
 											  HttpServletRequest request) {
 		logger.info("Requested new short for uri " + url);
 		statusService.verifyStatus(url);
@@ -40,4 +40,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		//shortURL.getBody().setBadStatusDate(statusService.getBadStatusDate());
 		return shortURL;
 	}
+	
+	
+	
 }
