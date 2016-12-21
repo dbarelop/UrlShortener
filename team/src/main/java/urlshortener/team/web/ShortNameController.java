@@ -4,6 +4,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 import java.sql.Date;
+import java.util.List;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
@@ -57,13 +58,17 @@ public class ShortNameController {
 		if (urlValidator.isValid(url)) {
 
 			String finalId;
-			ShortURL l = shortURLRepository.findByKey(id);
+			ShortURL l = shortURLRepository.findByKey(id);			
+			List<ShortURL>  ListUrl = shortURLRepository.findByTarget(url);
 			
+			if (!(ListUrl.isEmpty())) {				
+				shortURLRepository.delete(ListUrl.get(0).getHash());
+			}
+						
 			if (l == null & !id.equals("")) {
 				
 				finalId = id;
-				//TODO implemmentar no repeticion de url con diferentes id
-
+								
 				ShortURL su = new ShortURL(finalId, url,
 						linkTo(methodOn(UrlShortenerController.class).redirectTo(finalId, null)).toUri(), sponsor,
 						new Date(System.currentTimeMillis()), owner, HttpStatus.TEMPORARY_REDIRECT.value(), true, ip,
