@@ -9,10 +9,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import urlshortener.common.domain.ShortURL;
-import urlshortener.common.repository.ShortURLRepository;
-import urlshortener.common.web.UrlShortenerController;
 import urlshortener.team.domain.Metrics;
 import urlshortener.team.repository.ClickRepository;
+import urlshortener.team.repository.ShortURLRepository;
 
 import javax.servlet.http.HttpServletResponse;
 import java.net.URI;
@@ -69,7 +68,7 @@ public class MetricsController {
     }
 
     private Metrics getMetrics(ShortURL shortURL, Date startDate, Date endDate) {
-        URI uri = linkTo(methodOn(UrlShortenerController.class).redirectTo(shortURL.getHash(), null)).toUri();
+        URI uri = linkTo(methodOn(UrlShortenerControllerWithLogs.class).redirectTo(shortURL.getHash(), null)).toUri();
         Long clicks = clickRepository.clicksByHashBetween(shortURL.getHash(), startDate, endDate);
         Long uniqueVisitors = clickRepository.uniqueVisitorsByHashBetween(shortURL.getHash(), startDate, endDate);
         Map<Browser, Long> clicksByBrowser = clickRepository.clicksForBrowserByHashBetween(shortURL.getHash(), startDate, endDate);

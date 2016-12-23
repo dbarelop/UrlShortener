@@ -9,6 +9,8 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.validator.routines.UrlValidator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -20,12 +22,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 import urlshortener.common.domain.ShortURL;
-import urlshortener.common.repository.ShortURLRepository;
-import urlshortener.common.web.UrlShortenerController;
+import urlshortener.team.repository.ShortURLRepository;
 
 @RestController
 public class ShortNameController {
 	
+	private static final Logger LOG = LoggerFactory.getLogger(ShortNameController.class);
+	
+	@Autowired
+	private StatusService statusService;
 	@Autowired
 	protected ShortURLRepository shortURLRepository;	
 		
@@ -38,7 +43,8 @@ public class ShortNameController {
 											  @RequestParam(value = "shortName", required = false) String id,
 											  @RequestParam(value = "sponsor", required = false) String sponsor,
 											  HttpServletRequest request) {
-
+		LOG.info("Requested new short for uri " + url + " and short name = " + id);
+		statusService.verifyStatus(url);
 		ShortURL su = createAndSaveIfValid(id,url, sponsor, UUID
 				.randomUUID().toString(), extractIP(request));
 		if (su != null) {
@@ -65,18 +71,20 @@ public class ShortNameController {
 				//TODO implemmentar no repeticion de url con diferentes id
 
 				ShortURL su = new ShortURL(finalId, url,
-						linkTo(methodOn(UrlShortenerController.class).redirectTo(finalId, null)).toUri(), sponsor,
+						linkTo(methodOn(UrlShortenerControllerWithLogs.class).redirectTo(finalId, null)).toUri(), sponsor,
 						new Date(System.currentTimeMillis()), owner, HttpStatus.TEMPORARY_REDIRECT.value(), true, ip,
 						null);
+				su.setStatus(statusService.getStatus());
+	            su.setBadStatusDate(statusService.getBadStatusDate());
 				return shortURLRepository.save(su);
 
 			} else {
-				System.out.println("shortName already exist " + id);
+				LOG.info("shortName already exist = " + id);
 				return null;
 			}
 
 		} else {
-			System.out.println("link invalid");
+			LOG.info("Link invalid");
 			return null;
 		}
 
