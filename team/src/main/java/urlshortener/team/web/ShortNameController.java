@@ -4,6 +4,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 import java.sql.Date;
+import java.util.List;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,14 +24,23 @@ import org.springframework.web.bind.annotation.RestController;
 import urlshortener.common.domain.ShortURL;
 import urlshortener.common.repository.ShortURLRepository;
 import urlshortener.common.web.UrlShortenerController;
+import urlshortener.team.domain.ShortName;
 
 @RestController
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class ShortNameController {
 	
 	@Autowired
-	protected ShortURLRepository shortURLRepository;	
+	protected ShortURLRepository shortURLRepository;
 		
+	private List<String> words;
+	private ShortName shortname;
+	
+	public ShortNameController(){
+		shortname  = new ShortName();
+		words = shortname.getDictionary();
+	}
+	
 	private String extractIP(HttpServletRequest request) {
 		return request.getRemoteAddr();
 	}
@@ -59,13 +69,18 @@ public class ShortNameController {
 		if (urlValidator.isValid(url)) {
 
 			String finalId;
-			ShortURL l = shortURLRepository.findByKey(id);
+			ShortURL l = shortURLRepository.findByKey(id);			
+			List<ShortURL>  ListUrl = shortURLRepository.findByTarget(url);
 			
+			if (!(ListUrl.isEmpty())) {				
+				shortURLRepository.delete(ListUrl.get(0).getHash());
+			}
+						
 			if (l == null & !id.equals("")) {
 				
 				finalId = id;
-				//TODO implemmentar no repeticion de url con diferentes id
-
+				suggest(id);
+								
 				ShortURL su = new ShortURL(finalId, url,
 						linkTo(methodOn(UrlShortenerController.class).redirectTo(finalId, null)).toUri(), sponsor,
 						new Date(System.currentTimeMillis()), owner, HttpStatus.TEMPORARY_REDIRECT.value(), true, ip,
@@ -83,6 +98,44 @@ public class ShortNameController {
 		}
 
 	}
+		
+	
+	private boolean suggest(String UserWord) {
 
+		if (UserWord.isEmpty()) {
+			return false;
+		}
+		System.out.println("User word: " + UserWord);
+		boolean suggestionAdded = false;
+
+		for (String word : words) {
+			boolean coincidences = true;
+			for (int i = 0; i < UserWord.length(); i++) {
+
+				if (UserWord.length() <= word.length()) {
+					if (!UserWord.toLowerCase().startsWith(String.valueOf(word.toLowerCase().charAt(i)), i)) {
+						coincidences = false;
+						break;
+					}
+				}
+			}
+			if (coincidences) {
+				if (UserWord.length() < word.length()) {
+					addSuggestions(word);
+					suggestionAdded = true;
+				}
+			}
+		}
+		return suggestionAdded;
+	}
+
+	private void addSuggestions(String word) {
+		System.out.println("suggest: " + word);
+		//TODO implementar la respuesta de las sugerencias en el cliente
+	}
+	
+	
+	
+	
 	
 }
