@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.validator.routines.UrlValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,12 +20,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-
 import urlshortener.common.domain.ShortURL;
 import urlshortener.common.repository.ShortURLRepository;
 import urlshortener.common.web.UrlShortenerController;
 
 @RestController
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class ShortNameController {
 	
 	@Autowired
@@ -35,9 +37,9 @@ public class ShortNameController {
 
 	@RequestMapping(value = "/brandedLink", method = RequestMethod.POST)
 	public ResponseEntity<ShortURL> shortenerid(@RequestParam("url") String url,
-											  @RequestParam(value = "shortName", required = false) String id,
-											  @RequestParam(value = "sponsor", required = false) String sponsor,
-											  HttpServletRequest request) {
+												@RequestParam(value = "shortName", required = false) String id,
+												@RequestParam(value = "sponsor", required = false) String sponsor,
+												HttpServletRequest request) {
 
 		ShortURL su = createAndSaveIfValid(id,url, sponsor, UUID
 				.randomUUID().toString(), extractIP(request));
