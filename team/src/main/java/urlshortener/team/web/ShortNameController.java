@@ -3,10 +3,7 @@ package urlshortener.team.web;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.sql.Date;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
@@ -25,14 +22,21 @@ import org.springframework.web.bind.annotation.RestController;
 import urlshortener.common.domain.ShortURL;
 import urlshortener.common.repository.ShortURLRepository;
 import urlshortener.common.web.UrlShortenerController;
+import urlshortener.team.domain.ShortName;
 
 @RestController
 public class ShortNameController {
 	
 	@Autowired
-	protected ShortURLRepository shortURLRepository;	
+	protected ShortURLRepository shortURLRepository;
 		
-	private List<String> words = new LinkedList<>();
+	private List<String> words;
+	private ShortName shortname;
+	
+	public ShortNameController(){
+		shortname  = new ShortName();
+		words = shortname.getDictionary();
+	}
 	
 	private String extractIP(HttpServletRequest request) {
 		return request.getRemoteAddr();
@@ -43,7 +47,7 @@ public class ShortNameController {
 											  @RequestParam(value = "shortName", required = false) String id,
 											  @RequestParam(value = "sponsor", required = false) String sponsor,
 											  HttpServletRequest request) {
-		fillDictionary();
+
 		ShortURL su = createAndSaveIfValid(id,url, sponsor, UUID
 				.randomUUID().toString(), extractIP(request));
 		if (su != null) {
@@ -93,64 +97,39 @@ public class ShortNameController {
 	}
 		
 	
-	private void fillDictionary(){
-		
-		String fichero = "src/main/resources/wordsEn.txt";
-    try {
-        FileReader fr = new FileReader(fichero);
-        BufferedReader br = new BufferedReader(fr);
-   
-        String linea;
-        while((linea = br.readLine()) != null)
-        	if(linea!=null && linea.length()>0)        	
-        		words.add(linea);
-   
-        fr.close();
-      }
-      catch(Exception e) {
-        System.out.println("Error leyendo fichero "+ fichero + ": " + e);
-      }
-        
-    }
-	
-	
 	private boolean suggest(String UserWord) {
 
-        if (UserWord.isEmpty()) {
-            return false;
-        }
-        System.out.println("User word: " + UserWord);
-        boolean suggestionAdded = false;
+		if (UserWord.isEmpty()) {
+			return false;
+		}
+		System.out.println("User word: " + UserWord);
+		boolean suggestionAdded = false;
 
-        for (String word : words) {
-            boolean coincidences = true;
-            for (int i = 0; i < UserWord.length(); i++) {
-            	            	
-            	if (UserWord.length() <= word.length()) {
+		for (String word : words) {
+			boolean coincidences = true;
+			for (int i = 0; i < UserWord.length(); i++) {
+
+				if (UserWord.length() <= word.length()) {
 					if (!UserWord.toLowerCase().startsWith(String.valueOf(word.toLowerCase().charAt(i)), i)) {
-                    	coincidences = false;
-                        break;
-                  }	
+						coincidences = false;
+						break;
+					}
 				}
-            	 		
-            	                
-            }
-            if (coincidences) {
-            	if (UserWord.length() < word.length()) {
-            		addSuggestions(word);
-            		suggestionAdded = true;
-            	}
-            }
-        }
-        return suggestionAdded;
-    }
+			}
+			if (coincidences) {
+				if (UserWord.length() < word.length()) {
+					addSuggestions(word);
+					suggestionAdded = true;
+				}
+			}
+		}
+		return suggestionAdded;
+	}
 
 	private void addSuggestions(String word) {
 		System.out.println("suggest: " + word);
 		//TODO implementar la respuesta de las sugerencias en el cliente
 	}
-	
-	
 	
 	
 	
