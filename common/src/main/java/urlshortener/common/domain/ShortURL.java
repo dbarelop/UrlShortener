@@ -83,6 +83,14 @@ public class ShortURL {
 	public String getBadStateDate() {
 		return badStatusDate;
 	}
+
+	public URI getQRLink() {
+		return qrLink;
+	}
+
+	public void setQRLink(URI qrLink) {
+		this.qrLink = qrLink;
+	}
 	
 	public void setStatus(Integer status) {
 		this.status = status;
