@@ -16,14 +16,19 @@ import urlshortener.common.web.UrlShortenerController;
 @RestController
 public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 
+	private static final Logger logger = LoggerFactory.getLogger(UrlShortenerControllerWithLogs.class);
+
 	@Autowired
 	private StatusService statusService;
-	private static final Logger logger = LoggerFactory.getLogger(UrlShortenerControllerWithLogs.class);
+	@Autowired
+	private MetricsController metricsController;
 
 	@Override
 	public ResponseEntity<?> redirectTo(@PathVariable String id, HttpServletRequest request) {
 		logger.info("Requested redirection with hash " + id);
-		return super.redirectTo(id, request);
+		ResponseEntity<?> re = super.redirectTo(id, request);
+		metricsController.notifyNewMetrics(id);
+		return re;
 	}
 
 	@Override

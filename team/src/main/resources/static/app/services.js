@@ -4,17 +4,17 @@ angular.module("UrlShortenerApp.services").service("MetricsService", function($q
         stomp: null
     };
 
+    var hash = $location.absUrl().split(/[\s/]+/).pop();
+
     service.RECONNECT_TIMEOUT = 30000;
     service.SOCKET_URL = "/metrics";
-    service.CHAT_TOPIC = "/topic/metrics";
-    service.CHAT_BROKER = "/app/metrics";
+    service.CHAT_TOPIC = "/topic/metrics/" + hash;
+    service.CHAT_BROKER = "/app/metrics/" + hash;
     service.connected = false;
 
     service.receive = function() {
         return listener.promise;
     };
-
-    var hash = $location.absUrl().split(/[\s/]+/).pop();
 
     service.send = function() {
         if (service.connected) {
