@@ -38,8 +38,8 @@ import javax.servlet.http.HttpServletResponse;
 public class QRCodeController {
 
 	/**
-	 * @param width - anchura del código QR (200 es adecuado)
-	 * @param height - altura del código QR (200 es adecuado)
+	 * @param width - anchura del codigo QR (200 es adecuado)
+	 * @param height - altura del codigo QR (200 es adecuado)
 	 * @throws WriterException
 	 * @throws IOException
 	 */
