@@ -10,10 +10,10 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import urlshortener.common.domain.ShortURL;
-import urlshortener.common.repository.ShortURLRepository;
-import urlshortener.common.repository.ShortURLRepositoryImpl;
 import urlshortener.team.repository.fixture.ClickFixture;
 import urlshortener.team.repository.fixture.ShortURLFixture;
+import urlshortener.team.repository.ShortURLRepository;
+import urlshortener.team.repository.ShortURLRepositoryImpl;
 
 import java.sql.Date;
 import java.util.Map;
