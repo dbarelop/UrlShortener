@@ -15,3 +15,6 @@ gradle-app.setting
 .idea/
 /.project
 /.DS_Store
+
+gradlew*
+gradle/

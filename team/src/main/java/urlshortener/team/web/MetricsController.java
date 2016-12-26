@@ -5,6 +5,12 @@ import eu.bitwalker.useragentutils.OperatingSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +21,7 @@ import urlshortener.team.repository.ShortURLRepository;
 
 import javax.servlet.http.HttpServletResponse;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -24,6 +31,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @Controller
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class MetricsController {
 
     private static final Logger logger = LoggerFactory.getLogger(MetricsController.class);
@@ -33,11 +41,11 @@ public class MetricsController {
     @Autowired
     private ClickRepository clickRepository;
 
-    @RequestMapping(value = "/metrics/{hash}", method = RequestMethod.GET)
-    public String getMetrics(@PathVariable String hash,
-                             @RequestParam(value = "start_date", required = false) String startDateStr,
-                             @RequestParam(value = "end_date", required = false) String endDateStr,
-                             Model model, HttpServletResponse response) {
+    @RequestMapping(value = "/metrics/{hash}", method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)
+    public String getMetricsHtml(@PathVariable String hash,
+                                 @RequestParam(value = "start_date", required = false) String startDateStr,
+                                 @RequestParam(value = "end_date", required = false) String endDateStr,
+                                 Model model, HttpServletResponse response) {
         logger.info("Requested metrics for link with hash " + hash);
         ShortURL shortURL = shortURLRepository.findByKey(hash);
         if (shortURL == null) {
@@ -51,7 +59,14 @@ public class MetricsController {
         return "metrics";
     }
 
-    @RequestMapping(value = "/metrics/{hash}", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "/api/metrics/{hash}", method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)
+    public ResponseEntity<Void> redirect(@PathVariable String hash) throws URISyntaxException {
+        HttpHeaders h = new HttpHeaders();
+        h.setLocation(new URI("/metrics/" + hash));
+        return new ResponseEntity<>(h, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/api/metrics/{hash}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody Metrics getMetricsJson(@PathVariable String hash,
                                                 @RequestParam(value = "start_date", required = false) String startDateStr,
                                                 @RequestParam(value = "end_date", required = false) String endDateStr,

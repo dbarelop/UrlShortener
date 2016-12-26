@@ -7,11 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.google.common.hash.Hashing;
 
@@ -36,7 +32,7 @@ import urlshortener.team.repository.ShortURLRepository;
 public class UrlShortenerControllerWithLogs {
 
 	private static final Logger LOG = LoggerFactory.getLogger(UrlShortenerControllerWithLogs.class);
-	
+
 	@Autowired
 	private StatusService statusService;
 	@Autowired
@@ -87,23 +83,23 @@ public class UrlShortenerControllerWithLogs {
 			return null;
 		}
 	}
-	
+
 	private void createAndSaveClick(String hash, String ip, UserAgent userAgent) {
 		Click cl = new Click(null, hash, new Date(System.currentTimeMillis()),
 				null, userAgent.getBrowser().toString(), userAgent.getOperatingSystem().toString(), ip, null);
 		cl=clickRepository.save(cl);
 		LOG.info(cl!=null?"["+hash+"] saved with id ["+cl.getId()+"]":"["+hash+"] was not saved");
 	}
-	
+
 	private String extractIP(HttpServletRequest request) {
 		return request.getRemoteAddr();
 	}
-	
+
 	private UserAgent extractUserAgent(HttpServletRequest request) {
 		String userAgentString = request.getHeader("User-Agent");
 		return UserAgent.parseUserAgentString(userAgentString);
 	}
-	
+
 	private ResponseEntity<?> createSuccessfulRedirectToResponse(ShortURL l) {
 		HttpHeaders h = new HttpHeaders();
 		h.setLocation(URI.create(l.getTarget()));

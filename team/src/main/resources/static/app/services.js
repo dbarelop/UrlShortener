@@ -2,7 +2,8 @@ angular.module("UrlShortenerApp.services").service("MetricsService", function($q
     var service = {}, listener = $q.defer();
 
     service.getMetrics = function(hash) {
-        $http.get('http://localhost:8080/metrics/' + hash).then(function(res) {
+        var config = { headers: { "Accept": "application/json" }};
+        $http.get('http://localhost:8080/api/metrics/' + hash, config).then(function(res) {
             listener.notify(res.data);
         }, function(err) {
             console.log(err);
