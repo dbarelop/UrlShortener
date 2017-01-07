@@ -1,15 +1,9 @@
 package urlshortener.team.web;
 
-import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.*;
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Hashtable;
-//import java.util.concurrent.atomic.AtomicLong;
 
 import com.google.zxing.BarcodeFormat;
-import com.google.zxing.EncodeHintType;
 import com.google.zxing.Writer;
 import com.google.zxing.WriterException;
 
@@ -17,9 +11,6 @@ import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 
-import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
-import com.sun.jndi.toolkit.url.Uri;
-import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,10 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import urlshortener.common.domain.ShortURL;
-import urlshortener.common.repository.ShortURLRepository;
-import urlshortener.team.domain.QRCode;
+import urlshortener.team.repository.ShortURLRepository;
 
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletResponse;
 
 
