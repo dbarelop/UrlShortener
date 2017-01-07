@@ -10,6 +10,8 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.validator.routines.UrlValidator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -22,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import urlshortener.common.domain.ShortURL;
-import urlshortener.common.repository.ShortURLRepository;
+import urlshortener.team.repository.ShortURLRepository;
 import urlshortener.common.web.UrlShortenerController;
 import urlshortener.team.domain.ShortName;
 
@@ -30,17 +32,21 @@ import urlshortener.team.domain.ShortName;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class ShortNameController {
 	
+	private static final Logger LOG = LoggerFactory.getLogger(ShortNameController.class);
+
+	@Autowired
+	private StatusService statusService;
 	@Autowired
 	protected ShortURLRepository shortURLRepository;
 		
 	private List<String> words;
 	private ShortName shortname;
-	
+
 	public ShortNameController(){
 		shortname  = new ShortName();
 		words = shortname.getDictionary();
 	}
-	
+
 	private String extractIP(HttpServletRequest request) {
 		return request.getRemoteAddr();
 	}
@@ -50,7 +56,8 @@ public class ShortNameController {
 												@RequestParam(value = "shortName", required = false) String id,
 												@RequestParam(value = "sponsor", required = false) String sponsor,
 												HttpServletRequest request) {
-
+		LOG.info("Requested new short for uri " + url + " and short name = " + id);
+		statusService.verifyStatus(url);
 		ShortURL su = createAndSaveIfValid(id,url, sponsor, UUID
 				.randomUUID().toString(), extractIP(request));
 		if (su != null) {
@@ -64,41 +71,42 @@ public class ShortNameController {
 	}
 	
 	private ShortURL createAndSaveIfValid(String id, String url, String sponsor, String owner, String ip) {
-		UrlValidator urlValidator = new UrlValidator(new String[] { "http", "https" });
+        UrlValidator urlValidator = new UrlValidator(new String[]{"http", "https"});
 
-		if (urlValidator.isValid(url)) {
+        if (urlValidator.isValid(url)) {
 
-			String finalId;
-			ShortURL l = shortURLRepository.findByKey(id);			
-			List<ShortURL>  ListUrl = shortURLRepository.findByTarget(url);
-			
-			if (!(ListUrl.isEmpty())) {				
-				shortURLRepository.delete(ListUrl.get(0).getHash());
-			}
-						
-			if (l == null & !id.equals("")) {
-				
-				finalId = id;
-				suggest(id);
-								
-				ShortURL su = new ShortURL(finalId, url,
-						linkTo(methodOn(UrlShortenerController.class).redirectTo(finalId, null)).toUri(), sponsor,
-						new Date(System.currentTimeMillis()), owner, HttpStatus.TEMPORARY_REDIRECT.value(), true, ip,
-						null);
-				return shortURLRepository.save(su);
+            String finalId;
+            ShortURL l = shortURLRepository.findByKey(id);
+            List<ShortURL> ListUrl = shortURLRepository.findByTarget(url);
 
-			} else {
-				System.out.println("shortName already exist " + id);
-				return null;
-			}
+            if (!(ListUrl.isEmpty())) {
+                shortURLRepository.delete(ListUrl.get(0).getHash());
+            }
 
-		} else {
-			System.out.println("link invalid");
-			return null;
-		}
+            if (l == null & !id.equals("")) {
 
-	}
-		
+                finalId = id;
+                suggest(id);
+
+                ShortURL su = new ShortURL(finalId, url,
+                        linkTo(methodOn(UrlShortenerControllerWithLogs.class).redirectTo(finalId, null)).toUri(), sponsor,
+                        new Date(System.currentTimeMillis()), owner, HttpStatus.TEMPORARY_REDIRECT.value(), true, ip,
+                        null);
+                su.setStatus(statusService.getStatus());
+                su.setBadStatusDate(statusService.getBadStatusDate());
+                return shortURLRepository.save(su);
+
+            } else {
+                LOG.info("shortName already exist = " + id);
+                return null;
+            }
+
+        } else {
+            LOG.info("Link invalid");
+            return null;
+        }
+
+    }
 	
 	private boolean suggest(String UserWord) {
 
@@ -133,9 +141,4 @@ public class ShortNameController {
 		System.out.println("suggest: " + word);
 		//TODO implementar la respuesta de las sugerencias en el cliente
 	}
-	
-	
-	
-	
-	
 }
