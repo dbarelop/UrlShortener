@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.sql.Date;
 import java.util.UUID;
@@ -98,6 +99,14 @@ public class UrlShortenerController {
             ShortURL su = new ShortURL(id, url,
                     linkTo(methodOn(UrlShortenerController.class).redirectTo(id, null)).toUri(), sponsor, new Date(System.currentTimeMillis()), owner,
                     HttpStatus.TEMPORARY_REDIRECT.value(), true, ip, null);
+			try {
+				String myUrl = su.getUri().toString() + "/qrcode";
+				URI myURI = null;
+				myURI = new URI(myUrl);
+				su.setQRLink(myURI);
+			} catch (URISyntaxException e) {
+				e.printStackTrace();
+			}
             return shortURLRepository.save(su);
 		} else {
 			return null;

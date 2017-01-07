@@ -17,6 +17,7 @@ public class ShortURL {
 	private String country;
 	private Integer status;
 	private String badStatusDate;
+	private URI qrLink;
 
 	public ShortURL(String hash, String target, URI uri, String sponsor,
 			Date created, String owner, Integer mode, Boolean safe, String ip,
@@ -82,6 +83,14 @@ public class ShortURL {
 	
 	public String getBadStateDate() {
 		return badStatusDate;
+	}
+
+	public URI getQRLink() {
+		return qrLink;
+	}
+
+	public void setQRLink(URI qrLink) {
+		this.qrLink = qrLink;
 	}
 	
 	public void setStatus(Integer status) {
