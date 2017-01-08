@@ -90,6 +90,7 @@ public class ShortURL {
 	}
 
 	public void setQRLink(URI qrLink) {
+		System.out.println("setQRLink " + qrLink);
 		this.qrLink = qrLink;
 	}
 	
