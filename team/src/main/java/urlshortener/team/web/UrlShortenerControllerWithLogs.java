@@ -41,13 +41,24 @@ public class UrlShortenerControllerWithLogs {
 	@Autowired
 	private ClickRepository clickRepository;
 
-	@RequestMapping(value = "/{id:(?!link|index|metrics).*}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{id:(?!link|index|metrics|404).*}", method = RequestMethod.GET)
 	public ResponseEntity<?> redirectTo(@PathVariable String id, HttpServletRequest request) {
 		LOG.info("Requested redirection with hash " + id);
 		ShortURL l = shortURLRepository.findByKey(id);
 		if (l != null) {
+			ResponseEntity<?> response = null;
+			if (l.getStatus() == 200) {
+				response = createSuccessfulRedirectToResponse(l);
+			} else {
+				try {
+					response = badStatus(l);
+				} catch (URISyntaxException e) {
+					LOG.info("Error to redirect 404 page");
+					e.printStackTrace();
+				}
+			}
 			createAndSaveClick(id, extractIP(request), extractUserAgent(request));
-			return createSuccessfulRedirectToResponse(l);
+			return response;
 		} else {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
@@ -113,5 +124,11 @@ public class UrlShortenerControllerWithLogs {
 		HttpHeaders h = new HttpHeaders();
 		h.setLocation(URI.create(l.getTarget()));
 		return new ResponseEntity<>(h, HttpStatus.valueOf(l.getMode()));
+	}
+	
+	private ResponseEntity<?> badStatus(ShortURL shortURL) throws URISyntaxException {
+		HttpHeaders h = new HttpHeaders();
+		h.setLocation(new URI("http://localhost:8080/404/" + shortURL.getHash()));
+		return new ResponseEntity<>(h, HttpStatus.valueOf(shortURL.getMode()));
 	}
 }
