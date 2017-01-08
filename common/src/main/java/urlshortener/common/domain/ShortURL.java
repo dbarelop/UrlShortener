@@ -17,7 +17,7 @@ public class ShortURL {
 	private String country;
 	private Integer status;
 	private String badStatusDate;
-	public URI qrLink;
+	private URI qrLink;
 
 	public ShortURL(String hash, String target, URI uri, String sponsor,
 			Date created, String owner, Integer mode, Boolean safe, String ip,
