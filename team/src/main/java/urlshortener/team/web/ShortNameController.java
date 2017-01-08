@@ -3,6 +3,8 @@ package urlshortener.team.web;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.sql.Date;
 import java.util.List;
 import java.util.UUID;
@@ -94,6 +96,14 @@ public class ShortNameController {
                         null);
                 su.setStatus(statusService.getStatus());
                 su.setBadStatusDate(statusService.getBadStatusDate());
+				try {
+					String myUrl = su.getUri().toString() + "/qrcode";
+					URI myURI = null;
+					myURI = new URI(myUrl);
+					su.setQRLink(myURI);
+				} catch (URISyntaxException e) {
+					e.printStackTrace();
+				}
                 return shortURLRepository.save(su);
 
             } else {

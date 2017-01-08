@@ -20,7 +20,7 @@ $(document).ready(
 							$('#buttonQR').click(
 									function() {
 										$("#QRImage").html(
-												"<div><img src='" + msg.qrlink + "'></div>");
+												"<div><img src='" + msg.qrLink + "'></div>");
 									});
 						};
 

@@ -17,7 +17,7 @@ public class ShortURL {
 	private String country;
 	private Integer status;
 	private String badStatusDate;
-	private URI qrLink;
+	public URI qrLink;
 
 	public ShortURL(String hash, String target, URI uri, String sponsor,
 			Date created, String owner, Integer mode, Boolean safe, String ip,
@@ -90,6 +90,7 @@ public class ShortURL {
 	}
 
 	public void setQRLink(URI qrLink) {
+		System.out.println("setQRLink " + qrLink);
 		this.qrLink = qrLink;
 	}
 	
