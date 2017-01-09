@@ -55,7 +55,7 @@ public class UrlShortenerControllerWithLogs {
 				try {
 					response = badStatus(l);
 				} catch (URISyntaxException e) {
-					LOG.info("Error to redirect 404 page");
+					logger.info("Error to redirect 404 page");
 					e.printStackTrace();
 				}
 			}
@@ -68,10 +68,10 @@ public class UrlShortenerControllerWithLogs {
 	}
 
 	@RequestMapping(value = "/link", method = RequestMethod.POST)
-	public ResponseEntity<ShortURL> shortener(@RequestParam("url") String url,
+	public ResponseEntity<ShortURL> shortener(@RequestParam("url") String url,								
 								@RequestParam(value = "sponsor", required = false) String sponsor,
 											  HttpServletRequest request) {
-		LOG.info("Requested new short for uri " + url);
+		logger.info("Requested new short for uri " + url);
 		statusService.verifyStatus(url);
 		ShortURL su = createAndSaveIfValid(url, sponsor, UUID
 				.randomUUID().toString(), request.getRemoteAddr());
@@ -111,7 +111,7 @@ public class UrlShortenerControllerWithLogs {
 		Click cl = new Click(null, hash, new Date(System.currentTimeMillis()),
 				null, userAgent.getBrowser().toString(), userAgent.getOperatingSystem().toString(), ip, null);
 		cl=clickRepository.save(cl);
-		LOG.info(cl!=null?"["+hash+"] saved with id ["+cl.getId()+"]":"["+hash+"] was not saved");
+		logger.info(cl!=null?"["+hash+"] saved with id ["+cl.getId()+"]":"["+hash+"] was not saved");
 	}
 
 	private String extractIP(HttpServletRequest request) {
