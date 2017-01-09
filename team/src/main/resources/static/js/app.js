@@ -20,9 +20,7 @@ $(document).ready(
 							$('#buttonQR').click(
 									function() {
 										$("#QRImage").html(
-												"<img src='https://chart.googleapis.com/chart?cht=qr&chl="
-												+ msg.uri
-												+ "&choe=UTF-8&chs=177x177'></img>");
+												"<div><img src='" + msg.qrLink + "'></div>");
 									});
 						};
 
