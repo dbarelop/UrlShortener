@@ -19,14 +19,11 @@ public class MetricsServiceImpl implements MetricsService {
     private ClickRepository clickRepository;
 
     public Metrics getMetrics(ShortURL shortURL, Date startDate, Date endDate) {
-        // TODO: workaround
-        URI uri = URI.create("http://localhost:8080/" + shortURL.getHash());
-        //URI uri = linkTo(methodOn(UrlShortenerController.class).redirectTo(shortURL.getHash(), null)).toUri();
         Long clicks = clickRepository.clicksByHashBetween(shortURL.getHash(), startDate, endDate);
         Long uniqueVisitors = clickRepository.uniqueVisitorsByHashBetween(shortURL.getHash(), startDate, endDate);
         Map<Browser, Long> clicksByBrowser = clickRepository.clicksForBrowserByHashBetween(shortURL.getHash(), startDate, endDate);
         Map<OperatingSystem, Long> clicksByOS = clickRepository.clicksForOSByHashBetween(shortURL.getHash(), startDate, endDate);
-        Metrics metrics = new Metrics(uri, shortURL, clicks, uniqueVisitors, clicksByBrowser, clicksByOS);
+        Metrics metrics = new Metrics(shortURL.getHash(), shortURL, clicks, uniqueVisitors, clicksByBrowser, clicksByOS);
         return metrics;
     }
 }

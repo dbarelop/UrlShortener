@@ -1,4 +1,4 @@
-angular.module("UrlShortenerApp.controllers", ["chart.js"]).controller("MetricsCtrl", function($scope, MetricsService) {
+angular.module("UrlShortenerApp.controllers", ["chart.js"]).controller("MetricsCtrl", function($scope, $location, MetricsService) {
     $scope.browsersChart = {
         labels: [],
         data: []
@@ -13,6 +13,7 @@ angular.module("UrlShortenerApp.controllers", ["chart.js"]).controller("MetricsC
             $scope.error = data.error;
         } else {
             $scope.metrics = data;
+            $scope.uri = $location.protocol() + "://" + $location.host() + ($location.port() != 80 ? ":" + $location.port() : "") + "/" + data.hash;
             $scope.numBrowsers = Object.keys(data.clicksByBrowser).length;
             $scope.numOSs = Object.keys(data.clicksByOS).length;
             $scope.browsersChart.labels = Object.keys(data.clicksByBrowser);
