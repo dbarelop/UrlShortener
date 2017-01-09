@@ -32,18 +32,20 @@ import urlshortener.team.repository.ShortURLRepository;
 @RestController
 public class UrlShortenerControllerWithLogs {
 
-	private static final Logger LOG = LoggerFactory.getLogger(UrlShortenerControllerWithLogs.class);
+	private static final Logger logger = LoggerFactory.getLogger(UrlShortenerControllerWithLogs.class);
 
 	@Autowired
 	private StatusService statusService;
 	@Autowired
-	private ShortURLRepository shortURLRepository;
-	@Autowired
-	private ClickRepository clickRepository;
+	private MetricsController metricsController;
+    @Autowired
+    private ShortURLRepository shortURLRepository;
+    @Autowired
+    private ClickRepository clickRepository;
 
 	@RequestMapping(value = "/{id:(?!link|index|metrics|404).*}", method = RequestMethod.GET)
 	public ResponseEntity<?> redirectTo(@PathVariable String id, HttpServletRequest request) {
-		LOG.info("Requested redirection with hash " + id);
+		logger.info("Requested redirection with hash " + id);
 		ShortURL l = shortURLRepository.findByKey(id);
 		if (l != null) {
 			ResponseEntity<?> response = null;
@@ -53,11 +55,12 @@ public class UrlShortenerControllerWithLogs {
 				try {
 					response = badStatus(l);
 				} catch (URISyntaxException e) {
-					LOG.info("Error to redirect 404 page");
+					logger.info("Error to redirect 404 page");
 					e.printStackTrace();
 				}
 			}
 			createAndSaveClick(id, extractIP(request), extractUserAgent(request));
+            metricsController.notifyNewMetrics(id);
 			return response;
 		} else {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -68,7 +71,7 @@ public class UrlShortenerControllerWithLogs {
 	public ResponseEntity<ShortURL> shortener(@RequestParam("url") String url,								
 								@RequestParam(value = "sponsor", required = false) String sponsor,
 											  HttpServletRequest request) {
-		LOG.info("Requested new short for uri " + url);
+		logger.info("Requested new short for uri " + url);
 		statusService.verifyStatus(url);
 		ShortURL su = createAndSaveIfValid(url, sponsor, UUID
 				.randomUUID().toString(), request.getRemoteAddr());
@@ -108,7 +111,7 @@ public class UrlShortenerControllerWithLogs {
 		Click cl = new Click(null, hash, new Date(System.currentTimeMillis()),
 				null, userAgent.getBrowser().toString(), userAgent.getOperatingSystem().toString(), ip, null);
 		cl=clickRepository.save(cl);
-		LOG.info(cl!=null?"["+hash+"] saved with id ["+cl.getId()+"]":"["+hash+"] was not saved");
+		logger.info(cl!=null?"["+hash+"] saved with id ["+cl.getId()+"]":"["+hash+"] was not saved");
 	}
 
 	private String extractIP(HttpServletRequest request) {

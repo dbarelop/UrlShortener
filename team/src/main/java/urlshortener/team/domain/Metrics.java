@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class Metrics {
 
-    private URI uri;
+    private String hash;
     private Date created;
     private String target;
     private Long clicks;
@@ -18,8 +18,8 @@ public class Metrics {
     private Map<Browser, Long> clicksByBrowser;
     private Map<OperatingSystem, Long> clicksByOS;
 
-    public Metrics(URI uri, ShortURL shortURL, Long clicks, Long uniqueVisitors, Map<Browser, Long> clicksByBrowser, Map<OperatingSystem, Long> clicksByOS) {
-        this.uri = uri;
+    public Metrics(String hash, ShortURL shortURL, Long clicks, Long uniqueVisitors, Map<Browser, Long> clicksByBrowser, Map<OperatingSystem, Long> clicksByOS) {
+        this.hash = hash;
         this.created = shortURL.getCreated();
         this.target = shortURL.getTarget();
         this.clicks = clicks;
@@ -28,8 +28,8 @@ public class Metrics {
         this.clicksByOS = clicksByOS;
     }
 
-    public Metrics(URI uri, Date created, String target, Long clicks, Long uniqueVisitors, Map<Browser, Long> clicksByBrowser, Map<OperatingSystem, Long> clicksByOS) {
-        this.uri = uri;
+    public Metrics(String hash, Date created, String target, Long clicks, Long uniqueVisitors, Map<Browser, Long> clicksByBrowser, Map<OperatingSystem, Long> clicksByOS) {
+        this.hash = hash;
         this.created = created;
         this.target = target;
         this.clicks = clicks;
@@ -38,12 +38,12 @@ public class Metrics {
         this.clicksByOS = clicksByOS;
     }
 
-    public URI getUri() {
-        return uri;
+    public String getHash() {
+        return hash;
     }
 
-    public void setUri(URI uri) {
-        this.uri = uri;
+    public void setHash(String hash) {
+        this.hash = hash;
     }
 
     public Date getCreated() {
