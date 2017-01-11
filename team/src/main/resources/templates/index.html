@@ -16,7 +16,8 @@
 	<script type="text/javascript" th:src="@{/app/controllers.js}"></script>
 	<script type="text/javascript" th:src="@{/app/services.js}"></script>
 </head>
-<body ng-app="UrlShortenerApp">
+<body ng-app="UrlShortenerApp" style="padding-top: 70px;">
+<div th:replace="fragments/header :: header"></div>
 <div ng-controller="URLShortenerCtrl" class="container-full">
 	<div class="row">
 		<div class="col-lg-12 text-center">
