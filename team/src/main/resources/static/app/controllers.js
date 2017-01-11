@@ -31,14 +31,21 @@ angular.module("UrlShortenerApp.controllers", ["chart.js"])
     .controller("URLShortenerCtrl", function($scope, $location, URLShortenerService) {
         $scope.url = "";
         $scope.brandedLink = "";
+        $scope.vcardname = "";
+        $scope.vcardsurname = "";
+        $scope.vcardorganization = "";
+        $scope.vcardtelephone= "";
+        $scope.vcardEmail = "";
         $scope.shorten = function() {
             $scope.shortURL = "";
             $scope.error = "";
-            URLShortenerService.shortenUrl($scope.url, $scope.brandedLink).then(function(data) {
+            URLShortenerService.shortenUrl($scope.url, $scope.brandedLink, $scope.vcardname, $scope.vcardsurname,
+            $scope.vcardorganization, $scope.vcardtelephone, $scope.vcardemail).then(function(data) {
                 $scope.shortURL = data;
             }, function(err) {
                 $scope.error = "Unexpected error: " + err.data;
             });
         };
+        $scope.showVcard = false;
         $scope.showQr = false;
     });

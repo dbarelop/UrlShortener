@@ -35,6 +35,32 @@
 				<div class="col-sm-offset-4 col-sm-4">
 					<input type="text" class="center-block form-control input-lg" title="Enter a Short Name" placeholder="Enter a Short Name" ng-model="brandedLink" />
 				</div>
+				<div class="col-sm-offset-4 col-sm-4">
+					<br />
+					<button class="btn btn-lg btn-primary" type="button" ng-click="showVcard = !showVCard">vCard</button>
+				</div>
+				<div class="col-lg-12 text-center" ng-show="showVcard">
+					<div class="col-sm-offset-4 col-sm-4">
+						<br />
+						<input type="text" class="center-block form-control input-lg" title="Name " placeholder="Insert your name" ng-model="vcardname" />
+					</div>
+					<div class="col-sm-offset-4 col-sm-4">
+						<br />
+						<input type="text" class="center-block form-control input-lg" title="Surname " placeholder="Insert your surname" ng-model="vcardsurname" />
+					</div>
+					<div class="col-sm-offset-4 col-sm-4">
+						<br />
+						<input type="text" class="center-block form-control input-lg" title="Surname " placeholder="Insert your company" ng-model="vcardorganization" />
+					</div>
+					<div class="col-sm-offset-4 col-sm-4">
+						<br />
+						<input type="text" class="center-block form-control input-lg" title="Surname " placeholder="Insert your work telephone" ng-model="vcardtelephone" />
+					</div>
+					<div class="col-sm-offset-4 col-sm-4">
+						<br />
+						<input type="text" class="center-block form-control input-lg" title="Surname " placeholder="Insert your email" ng-model="vcardemail" />
+					</div>
+				</div>
 			</form>
 		</div>
 	</div>
@@ -65,6 +91,8 @@
 				<img ng-src="{{shortURL.qrlink}}" />
 			</div>
 		</div>
+
+
 	</div>
 </div>
 </body>
