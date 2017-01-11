@@ -57,11 +57,17 @@ public class ShortNameController {
 	public ResponseEntity<ShortURL> shortenerid(@RequestParam("url") String url,
 												@RequestParam(value = "shortName", required = false) String id,
 												@RequestParam(value = "sponsor", required = false) String sponsor,
+												@RequestParam(value="vcardname", required = false) String vcardName,
+												@RequestParam(value="vcardsurname", required = false) String vcardSurname,
+												@RequestParam(value="vcardorganization", required = false) String vcardOrganization,
+												@RequestParam(value="vcardtelephone", required = false) String vcardTelephone,
+												@RequestParam(value="vcardemail", required = false) String vcardEmail,
 												HttpServletRequest request) {
 		LOG.info("Requested new short for uri " + url + " and short name = " + id);
 		statusService.verifyStatus(url);
-		ShortURL su = createAndSaveIfValid(id,url, sponsor, UUID
-				.randomUUID().toString(), extractIP(request));
+		ShortURL su = createAndSaveIfValid(id,url, sponsor, vcardName, vcardSurname,
+				vcardOrganization, vcardTelephone, vcardEmail, UUID.randomUUID().toString(),
+				extractIP(request));
 		if (su != null) {
 			HttpHeaders h = new HttpHeaders();
 			h.setLocation(su.getUri());
@@ -72,7 +78,9 @@ public class ShortNameController {
 		}
 	}
 	
-	private ShortURL createAndSaveIfValid(String id, String url, String sponsor, String owner, String ip) {
+	private ShortURL createAndSaveIfValid(String id, String url, String sponsor, String vcardName,
+										  String vcardSurname, String vcardOrganization, String vcardTelephone,
+										  String vcardEmail,String owner, String ip) {
         UrlValidator urlValidator = new UrlValidator(new String[]{"http", "https"});
 
         if (urlValidator.isValid(url)) {
@@ -96,9 +104,26 @@ public class ShortNameController {
                         null);
                 su.setStatus(statusService.getStatus());
                 su.setBadStatusDate(statusService.getBadStatusDate());
+
 				try {
 					String myUrl = su.getUri().toString() + "/qrcode";
+					if (vcardName!=null) {
+						myUrl +="?vcardname=" + vcardName;
+						if (vcardSurname != null) {
+							myUrl +="&vcardsurname=" + vcardSurname;
+						}
+						if (vcardOrganization != null) {
+							myUrl +="&vcardorganization=" + vcardOrganization;
+						}
+						if (vcardTelephone != null) {
+							myUrl +="&vcardtelephone=" + vcardTelephone;
+						}
+						if (vcardEmail != null) {
+							myUrl +="&vcardemail=" + vcardEmail;
+						}
+					}
 					URI myURI = null;
+
 					myURI = new URI(myUrl);
 					su.setQRLink(myURI);
 				} catch (URISyntaxException e) {
