@@ -20,6 +20,8 @@ import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -60,14 +62,12 @@ public class ShortNameController {
 												HttpServletRequest request) {
 		LOG.info("Requested new short for uri " + url + " and short name = " + id);
 		statusService.verifyStatus(url);
-		ShortURL su = createAndSaveIfValid(id,url, sponsor, UUID
-				.randomUUID().toString(), extractIP(request));
+		ShortURL su = createAndSaveIfValid(id,url, sponsor, UUID.randomUUID().toString(), extractIP(request));
 		if (su != null) {
 			HttpHeaders h = new HttpHeaders();
 			h.setLocation(su.getUri());
 			return new ResponseEntity<>(su, h, HttpStatus.CREATED);
 		} else {
-			
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
@@ -85,20 +85,21 @@ public class ShortNameController {
                 shortURLRepository.delete(ListUrl.get(0).getHash());
             }
 
-            if (l == null & !id.equals("")) {
+            if (l == null && !id.equals("")) {
 
                 finalId = id;
                 suggest(id);
 
-                ShortURL su = new ShortURL(finalId, url,
+				Object user = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+				ShortURL su = new ShortURL(finalId, url,
                         linkTo(methodOn(UrlShortenerControllerWithLogs.class).redirectTo(finalId, null)).toUri(), sponsor,
                         new Date(System.currentTimeMillis()), owner, HttpStatus.TEMPORARY_REDIRECT.value(), true, ip,
-                        null);
+                        null, user instanceof User ? ((User) user).getUsername() : null);
                 su.setStatus(statusService.getStatus());
                 su.setBadStatusDate(statusService.getBadStatusDate());
 				try {
 					String myUrl = su.getUri().toString() + "/qrcode";
-					URI myURI = null;
+					URI myURI;
 					myURI = new URI(myUrl);
 					su.setQRLink(myURI);
 				} catch (URISyntaxException e) {
@@ -123,7 +124,7 @@ public class ShortNameController {
 		if (UserWord.isEmpty()) {
 			return false;
 		}
-		System.out.println("User word: " + UserWord);
+		//System.out.println("User word: " + UserWord);
 		boolean suggestionAdded = false;
 
 		for (String word : words) {
@@ -148,7 +149,7 @@ public class ShortNameController {
 	}
 
 	private void addSuggestions(String word) {
-		System.out.println("suggest: " + word);
+		//System.out.println("suggest: " + word);
 		//TODO implementar la respuesta de las sugerencias en el cliente
 	}
 }

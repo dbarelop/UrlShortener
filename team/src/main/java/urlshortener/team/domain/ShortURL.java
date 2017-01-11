@@ -20,11 +20,11 @@ public class ShortURL {
 	private Integer status;
 	private String badStatusDate;
 	private URI qrLink;
-	private User user;
+	private String user;
 
 	public ShortURL(String hash, String target, URI uri, String sponsor,
-                    Date created, String owner, Integer mode, Boolean safe, String ip,
-                    String country) {
+					Date created, String owner, Integer mode, Boolean safe, String ip,
+					String country, String user) {
 		this.hash = hash;
 		this.target = target;
 		this.uri = uri;
@@ -35,12 +35,6 @@ public class ShortURL {
 		this.safe = safe;
 		this.ip = ip;
 		this.country = country;
-	}
-
-	public ShortURL(String hash, String target, URI uri, String sponsor,
-					Date created, String owner, Integer mode, Boolean safe, String ip,
-					String country, User user) {
-		this(hash, target, uri, sponsor, created, owner, mode, safe, ip, country);
 		this.user = user;
 	}
 
@@ -111,11 +105,11 @@ public class ShortURL {
 		this.badStatusDate = badStatusDate;
 	}
 
-	public User getUser() {
+	public String getUser() {
 		return user;
 	}
 
-	public void setUser(User user) {
+	public void setUser(String user) {
 		this.user = user;
 	}
 }

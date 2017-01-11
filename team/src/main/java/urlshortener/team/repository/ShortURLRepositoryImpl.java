@@ -23,19 +23,16 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 	private static final Logger log = LoggerFactory
 			.getLogger(ShortURLRepositoryImpl.class);
 
-	private static final RowMapper<ShortURL> rowMapper = new RowMapper<ShortURL>() {
-		@Override
-		public ShortURL mapRow(ResultSet rs, int rowNum) throws SQLException {
-			ShortURL rowMapper = new ShortURL(rs.getString("hash"), rs.getString("target"),
-					null, rs.getString("sponsor"), rs.getDate("created"),
-					rs.getString("owner"), rs.getInt("mode"),
-					rs.getBoolean("safe"), rs.getString("ip"),
-					rs.getString("country"));
-			rowMapper.setStatus(rs.getInt("status"));
-			rowMapper.setBadStatusDate(rs.getString("badstatus"));
-			return rowMapper;
-		}
-	};
+	private static final RowMapper<ShortURL> rowMapper = (rs, rowNum) -> {
+        ShortURL rowMapper = new ShortURL(rs.getString("hash"), rs.getString("target"),
+                null, rs.getString("sponsor"), rs.getDate("created"),
+                rs.getString("owner"), rs.getInt("mode"),
+                rs.getBoolean("safe"), rs.getString("ip"),
+                rs.getString("country"), rs.getString("user"));
+        rowMapper.setStatus(rs.getInt("status"));
+        rowMapper.setBadStatusDate(rs.getString("badstatus"));
+        return rowMapper;
+    };
 
 	@Autowired
 	protected JdbcTemplate jdbc;
@@ -50,8 +47,7 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 	@Override
 	public ShortURL findByKey(String id) {
 		try {
-			return jdbc.queryForObject("SELECT * FROM shorturl WHERE hash=?",
-					rowMapper, id);
+			return jdbc.queryForObject("SELECT * FROM shorturl WHERE hash = ?", rowMapper, id);
 		} catch (Exception e) {
 			log.debug("When select for key " + id, e);
 			return null;
@@ -61,10 +57,11 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 	@Override
 	public ShortURL save(ShortURL su) {
 		try {
-			jdbc.update("INSERT INTO shorturl VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+			jdbc.update("INSERT INTO shorturl VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
 					su.getHash(), su.getTarget(), su.getSponsor(),
 					su.getCreated(), su.getOwner(), su.getMode(), su.getSafe(),
-					su.getIP(), su.getCountry(), su.getStatus(), su.getBadStateDate());
+					su.getIP(), su.getCountry(), su.getStatus(), su.getBadStateDate(),
+					su.getUser());
 		} catch (DuplicateKeyException e) {
 			log.debug("When insert for key " + su.getHash(), e);
 			return su;
