@@ -1,19 +1,47 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Spring Security Example </title>
+    <title>URLShortener - User area</title>
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/3.3.5/css/bootstrap.min.css}" />
+
+    <script type="text/javascript" th:src="@{/webjars/jquery/2.1.4/jquery.min.js}"></script>
+    <script type="text/javascript" th:src="@{/webjars/bootstrap/3.3.5/js/bootstrap.min.js}"></script>
 </head>
 <body>
-<div th:if="${param.error}">
-    Invalid username and password.
+<div class="container">
+    <div style="margin-top: 50px;" class="mainbox col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="panel-title">Log in to access the user area</div>
+            </div>
+            <div style="padding-top: 30px;" class="panel-body">
+                <div class="alert alert-danger alert-dismissable fade in" th:if="${param.error}">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Cerrar"><span aria-hidden="true">&times;</span></button>
+                    Username or password incorrect
+                </div>
+                <div class="alert alert-info alert-dismissable fade in" th:if="${param.logout}">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Cerrar"><span aria-hidden="true">&times;</span></button>
+                    Logged out
+                </div>
+                <form class="form-horizontal" role="form" th:action="@{/login}" method="post">
+                    <div style="margin-bottom: 25px;" class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                        <input id="username" type="text" class="form-control" name="username" value="" placeholder="Your username" th:autofocus="true" />
+                    </div>
+                    <div style="margin-bottom: 25px;" class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+                        <input id="password" type="password" class="form-control" name="password" placeholder="Your password" />
+                    </div>
+                    <div stlye="margin-top: 10px;" class="form-group">
+                        <div class="col-sm-12 controls">
+                            <button type="submit" class="btn btn-primary">Log in</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
-<div th:if="${param.logout}">
-    You have been logged out.
-</div>
-<form th:action="@{/login}" method="post">
-    <div><label> User Name : <input type="text" name="username"/> </label></div>
-    <div><label> Password: <input type="password" name="password"/> </label></div>
-    <div><input type="submit" value="Sign In"/></div>
-</form>
 </body>
 </html>
