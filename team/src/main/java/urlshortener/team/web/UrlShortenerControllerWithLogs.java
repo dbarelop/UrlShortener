@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
 import com.google.common.hash.Hashing;
@@ -25,7 +27,7 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
 import urlshortener.common.domain.Click;
-import urlshortener.common.domain.ShortURL;
+import urlshortener.team.domain.ShortURL;
 import urlshortener.common.repository.ClickRepository;
 import urlshortener.team.repository.ShortURLRepository;
 
@@ -38,10 +40,10 @@ public class UrlShortenerControllerWithLogs {
 	private StatusService statusService;
 	@Autowired
 	private MetricsController metricsController;
-    @Autowired
-    private ShortURLRepository shortURLRepository;
-    @Autowired
-    private ClickRepository clickRepository;
+	@Autowired
+	private ShortURLRepository shortURLRepository;
+	@Autowired
+	private ClickRepository clickRepository;
 
 	@RequestMapping(value = "/{id:(?!link|index|metrics|404).*}", method = RequestMethod.GET)
 	public ResponseEntity<?> redirectTo(@PathVariable String id, HttpServletRequest request) {
@@ -60,7 +62,7 @@ public class UrlShortenerControllerWithLogs {
 				}
 			}
 			createAndSaveClick(id, extractIP(request), extractUserAgent(request));
-            metricsController.notifyNewMetrics(id);
+			metricsController.notifyNewMetrics(id);
 			return response;
 		} else {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -95,12 +97,13 @@ public class UrlShortenerControllerWithLogs {
 										  String owner, String ip) {
 		UrlValidator urlValidator = new UrlValidator(new String[] { "http", "https" });
 		if (urlValidator.isValid(url)) {
-            String id = Hashing.murmur3_32().hashString(url, StandardCharsets.UTF_8).toString();
-            ShortURL su = new ShortURL(id, url,
-                    linkTo(methodOn(UrlShortenerControllerWithLogs.class).redirectTo(id, null)).toUri(), sponsor, new Date(System.currentTimeMillis()), owner,
-                    HttpStatus.TEMPORARY_REDIRECT.value(), true, ip, null);
-            su.setStatus(statusService.getStatus());
-            su.setBadStatusDate(statusService.getBadStatusDate());
+			String id = Hashing.murmur3_32().hashString(url, StandardCharsets.UTF_8).toString();
+			Object user = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			ShortURL su = new ShortURL(id, url,
+					linkTo(methodOn(UrlShortenerControllerWithLogs.class).redirectTo(id, null)).toUri(), sponsor, new Date(System.currentTimeMillis()), owner,
+					HttpStatus.TEMPORARY_REDIRECT.value(), true, ip, null, user instanceof User ? ((User) user).getUsername() : null);
+			su.setStatus(statusService.getStatus());
+			su.setBadStatusDate(statusService.getBadStatusDate());
 			try {
 				String myUrl = su.getUri().toString() + "/qrcode";
 				if (vcardName != null){
@@ -125,7 +128,7 @@ public class UrlShortenerControllerWithLogs {
 			} catch (URISyntaxException e) {
 				e.printStackTrace();
 			}
-            return shortURLRepository.save(su);
+			return shortURLRepository.save(su);
 		} else {
 			return null;
 		}
@@ -152,10 +155,11 @@ public class UrlShortenerControllerWithLogs {
 		h.setLocation(URI.create(l.getTarget()));
 		return new ResponseEntity<>(h, HttpStatus.valueOf(l.getMode()));
 	}
-	
+
 	private ResponseEntity<?> badStatus(ShortURL shortURL) throws URISyntaxException {
 		HttpHeaders h = new HttpHeaders();
-		h.setLocation(new URI("http://localhost:8080/404/" + shortURL.getHash()));
+		URI location = linkTo(methodOn(UrlShortenerControllerWithLogs.class).redirectTo("/404/" + shortURL.getHash(), null)).toUri();
+		h.setLocation(location);
 		return new ResponseEntity<>(h, HttpStatus.valueOf(shortURL.getMode()));
 	}
 }

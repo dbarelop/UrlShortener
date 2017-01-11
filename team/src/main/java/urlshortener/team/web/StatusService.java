@@ -14,7 +14,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import urlshortener.common.domain.ShortURL;
+import urlshortener.team.domain.ShortURL;
 import urlshortener.team.repository.ShortURLRepository;
 
 @Service
@@ -54,22 +54,17 @@ public class StatusService {
 			LOG.info("Short URL repository is empty.");
 		}
 		else {
-			for (ShortURL shortURL : listVerifyURL) {
-				String url = shortURL.getTarget();
-				String date = shortURL.getBadStateDate();
+			for (ShortURL su : listVerifyURL) {
+				String url = su.getTarget();
+				String date = su.getBadStateDate();
 				verifyStatus(url);
-				ShortURL su = new ShortURL(shortURL.getHash(), shortURL.getTarget(), 
-						shortURL.getUri(), shortURL.getSponsor(), shortURL.getCreated(), 
-						shortURL.getOwner(), shortURL.getMode(), shortURL.getSafe(), 
-						shortURL.getIP(), shortURL.getCountry());
 				if (status == 400) {
 					badStatusDate = date;
 				}
 				su.setStatus(status);
 				su.setBadStatusDate(badStatusDate);
 				shortURLRepository.update(su);
-				LOG.info("Uri = " + su.getTarget() + " - Status = " +
-						su.getStatus() + " since = " + su.getBadStateDate());
+				LOG.info("Uri = " + su.getTarget() + " - Status = " + su.getStatus() + " since = " + su.getBadStateDate());
 			}
 		}
 	}

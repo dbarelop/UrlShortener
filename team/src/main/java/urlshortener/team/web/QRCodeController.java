@@ -19,8 +19,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import urlshortener.team.domain.ShortURL;
 import urlshortener.team.repository.ShortURLRepository;
-import urlshortener.common.domain.ShortURL;
 
 import javax.servlet.http.HttpServletResponse;
 

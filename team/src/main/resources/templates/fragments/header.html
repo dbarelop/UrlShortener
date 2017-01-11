@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/3.3.5/css/bootstrap.min.css}" />
+
+    <script type="text/javascript" th:src="@{/webjars/jquery/2.1.4/jquery.min.js}"></script>
+</head>
+<body>
+<nav class="navbar navbar-inverse navbar-fixed-top" th:fragment="header">
+    <div class="container">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="/">URL shortener</a>
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="/">Main</a></li>
+                <li><a href="/metrics">Metrics</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right" sec:authorize="isAuthenticated()">
+                <li><a href="/profile">Profile</a></li>
+                <li>
+                    <form th:action="@{/logout}" method="post" class="form-horizontal">
+                        <div class="btn-nav">
+                            <button formaction="/logout" formmethod="post" class="btn btn-primary btn-small navbar-btn">Log out</button>
+                        </div>
+                    </form>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right" sec:authorize="!isAuthenticated()">
+                <li>
+                    <div class="btn-nav">
+                        <a href="/login" class="btn btn-primary btn-small navbar-btn">Login</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+</body>
+</html>
