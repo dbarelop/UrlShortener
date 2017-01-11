@@ -24,6 +24,7 @@
                     <ul class='list-group'>
                         <li class="list-group-item"><strong>Offline since:</strong> <span th:text="${date}"></span></li>
                         <li class="list-group-item"><strong>Target URL:</strong> <a th:href="${target}" th:text="${target}"></a></li>
+                        <li class="list-group-item"><strong>Cache:</strong> <a th:href="http://localhost:8080/cache/${hash}" th:text="${target}"></a></li>
                     </ul>
                 </div>
             </div>

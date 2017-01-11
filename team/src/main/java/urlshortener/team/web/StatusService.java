@@ -1,5 +1,8 @@
 package urlshortener.team.web;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -23,6 +26,7 @@ public class StatusService {
 	@Autowired
 	private ShortURLRepository shortURLRepository;
 	
+	private static String PATH_UPLOAD = "src/main/resources/cache/";
 	private static final Logger LOG = LoggerFactory.getLogger(StatusService.class);
 	//private static final long PERIOD = 3600000; // 1 hour
 	private static final long PERIOD = 60000; // 1 minutes
@@ -30,12 +34,13 @@ public class StatusService {
 	private String badStatusDate;
 
 	@Async
-	public void verifyStatus(String url) {
+	public ResponseEntity<String> verifyStatus(String url) {
 		RestTemplate restTemplate = new RestTemplate();
+		ResponseEntity<String> result = null;
 		status = 200;
 		badStatusDate = "";
 		try {
-			ResponseEntity<String> result = restTemplate.exchange(url, HttpMethod.GET, 
+			result = restTemplate.exchange(url, HttpMethod.GET, 
 					null, String.class);
 			status = result.getStatusCodeValue();
 			LOG.info("Status: " + status + " from uri = " + url);
@@ -44,6 +49,7 @@ public class StatusService {
 			badStatusDate();
 			LOG.info("Status: " + status + " from uri = " + url);
 		}
+		return result;
 	}
 	
 	@Scheduled(fixedRate = PERIOD)
@@ -57,13 +63,15 @@ public class StatusService {
 			for (ShortURL shortURL : listVerifyURL) {
 				String url = shortURL.getTarget();
 				String date = shortURL.getBadStateDate();
-				verifyStatus(url);
+				ResponseEntity<String> result = verifyStatus(url);
 				ShortURL su = new ShortURL(shortURL.getHash(), shortURL.getTarget(), 
 						shortURL.getUri(), shortURL.getSponsor(), shortURL.getCreated(), 
 						shortURL.getOwner(), shortURL.getMode(), shortURL.getSafe(), 
 						shortURL.getIP(), shortURL.getCountry());
 				if (status == 400) {
 					badStatusDate = date;
+				} else {
+					cacheStaticPage(result, shortURL);
 				}
 				su.setStatus(status);
 				su.setBadStatusDate(badStatusDate);
@@ -87,4 +95,23 @@ public class StatusService {
         Date badStatus = new Date();
         badStatusDate = SDF.format(badStatus);
     }
+	
+	private void cacheStaticPage(ResponseEntity<String> result, ShortURL shortURL) {
+		String body = result.getBody();
+		String fileName = PATH_UPLOAD + shortURL.getHash() + ".txt";
+		File folder = new File(PATH_UPLOAD);
+		if (!folder.exists()) {
+			folder.mkdirs();
+		}
+		File bodyFile = new File(fileName);
+		try {
+			FileWriter fl = new FileWriter(bodyFile,true);
+			fl.write(body);
+			fl.close();
+			LOG.info("Cache realizado para la uri: " + shortURL.getTarget());
+		} catch (IOException e) {
+			LOG.info("Error al escribir el fichero para la uri: " + shortURL.getTarget());
+			e.printStackTrace();
+		}
+	}
 }
