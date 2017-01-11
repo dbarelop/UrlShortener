@@ -1,6 +1,9 @@
 package urlshortener.team.web;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -90,12 +93,29 @@ public class StatusService {
 		return badStatusDate;
 	}
 	
+	@Async
+	public String getCacheStaticPage(ShortURL shortURL) throws IOException {
+		String bodyHTML = "";
+		String bodyFile = PATH_UPLOAD + shortURL.getHash() + ".txt";
+		try {
+			FileReader fr = new FileReader(bodyFile);
+			BufferedReader br = new BufferedReader(fr);
+			while((bodyHTML = br.readLine())!=null) {
+			}
+			br.close();
+		} catch (FileNotFoundException e) {
+			LOG.info("Error al leer el fichero");
+		}
+		return bodyHTML;
+	}
+	
 	private void badStatusDate() {
         final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date badStatus = new Date();
         badStatusDate = SDF.format(badStatus);
     }
 	
+	@Async
 	private void cacheStaticPage(ResponseEntity<String> result, ShortURL shortURL) {
 		String body = result.getBody();
 		String fileName = PATH_UPLOAD + shortURL.getHash() + ".txt";
