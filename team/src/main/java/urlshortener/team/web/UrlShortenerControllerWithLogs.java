@@ -25,7 +25,7 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
 import urlshortener.common.domain.Click;
-import urlshortener.common.domain.ShortURL;
+import urlshortener.team.domain.ShortURL;
 import urlshortener.common.repository.ClickRepository;
 import urlshortener.team.repository.ShortURLRepository;
 
@@ -73,8 +73,7 @@ public class UrlShortenerControllerWithLogs {
 											  HttpServletRequest request) {
 		logger.info("Requested new short for uri " + url);
 		statusService.verifyStatus(url);
-		ShortURL su = createAndSaveIfValid(url, sponsor, UUID
-				.randomUUID().toString(), request.getRemoteAddr());
+		ShortURL su = createAndSaveIfValid(url, sponsor, UUID.randomUUID().toString(), request.getRemoteAddr());
 		if (su != null) {
 			HttpHeaders h = new HttpHeaders();
 			h.setLocation(su.getUri());

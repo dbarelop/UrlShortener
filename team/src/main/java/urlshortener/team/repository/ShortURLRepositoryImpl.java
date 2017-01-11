@@ -15,7 +15,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
-import urlshortener.common.domain.ShortURL;
+import urlshortener.team.domain.ShortURL;
 
 @Repository
 public class ShortURLRepositoryImpl implements ShortURLRepository {

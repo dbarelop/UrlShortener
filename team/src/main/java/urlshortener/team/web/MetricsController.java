@@ -16,7 +16,7 @@ import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import urlshortener.common.domain.ShortURL;
+import urlshortener.team.domain.ShortURL;
 import urlshortener.team.repository.ShortURLRepository;
 import urlshortener.team.domain.Metrics;
 import urlshortener.team.message.ErrorMessage;
