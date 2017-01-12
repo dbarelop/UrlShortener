@@ -68,4 +68,14 @@ public class VCard {
     public void setUrl(String url) {
         this.url = url;
     }
+
+    public String getUrlEncodedParameters() {
+        String res = "";
+        res += "vcardname=" + getName();
+        res += (getSurname() != null ? "&vcardsurname=" + getSurname() : "");
+        res += (getOrganization() != null ? "&vcardorganization=" + getOrganization() : "");
+        res += (getTelephone() != null ? "&vcardtelephone=" + getTelephone() : "");
+        res += (getEmail() != null ? "&vcardemail=" + getEmail() : "");
+        return res;
+    }
 }
