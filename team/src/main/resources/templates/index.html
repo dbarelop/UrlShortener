@@ -5,14 +5,10 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 	<link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/3.3.5/css/bootstrap.min.css}" />
-	<link rel="stylesheet" type="text/css" th:href="@{/webjars/jquery-typeahead/2.2.1/dist/jquery.typeahead.min.css}" />
-	
+
 	<script type="text/javascript" th:src="@{/webjars/jquery/2.1.4/jquery.min.js}"></script>
 	<script type="text/javascript" th:src="@{/webjars/bootstrap/3.3.5/js/bootstrap.min.js}"></script>
 	<script type="text/javascript" th:src="@{/js/app.js}"></script>
-	<script type="text/javascript" th:src="@{/js/suggest.js}"></script>
-	<script type="text/javascript" th:src="@{/webjars/jquery-typeahead/2.2.1/dist/jquery.typeahead.min.js}"></script>
-	
 </head>
 <body>
 <div class="container-full">
@@ -30,11 +26,10 @@
 					</span>
 				</div>
 				<br />
-				<div id = "complete" class="col-sm-offset-4 col-sm-4">
-					<input id="shortnameV" type="text" class="typeahead center-block form-control input-lg" 
+				<div class="col-sm-offset-4 col-sm-4">
+					<input id="shortnameV" type="text" class="center-block form-control input-lg" 
 							title="Enter a Short Name" placeholder="Enter a Short Name" name="shortName" />
 				</div>
-				
 			</form>
 		</div>
 	</div>
