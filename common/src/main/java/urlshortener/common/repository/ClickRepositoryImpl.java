@@ -42,8 +42,7 @@ public class ClickRepositoryImpl implements ClickRepository {
 	@Override
 	public List<Click> findByHash(String hash) {
 		try {
-			return jdbc.query("SELECT * FROM click WHERE hash=?",
-					new Object[] { hash }, rowMapper);
+			return jdbc.query("SELECT * FROM click WHERE hash=?", new Object[] { hash }, rowMapper);
 		} catch (Exception e) {
 			log.debug("When select for hash " + hash, e);
 			return null;
@@ -85,7 +84,6 @@ public class ClickRepositoryImpl implements ClickRepository {
 					cl.getHash(), cl.getCreated(), cl.getReferrer(),
 					cl.getBrowser(), cl.getPlatform(), cl.getIp(),
 					cl.getCountry(), cl.getId());
-			
 		} catch (Exception e) {
 			log.info("When update for id " + cl.getId(), e);
 		}
@@ -124,8 +122,7 @@ public class ClickRepositoryImpl implements ClickRepository {
 		try {
 			return jdbc.query("SELECT * FROM click LIMIT ? OFFSET ?", new Object[] { limit, offset }, rowMapper);
 		} catch (Exception e) {
-			log.debug("When select for limit " + limit + " and offset "
-					+ offset, e);
+			log.debug("When select for limit " + limit + " and offset " + offset, e);
 			return null;
 		}
 	}

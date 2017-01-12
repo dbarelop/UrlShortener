@@ -8,17 +8,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import urlshortener.team.domain.CachedPage;
 import urlshortener.team.exception.NotFoundException;
-import urlshortener.team.service.StatusService;
+import urlshortener.team.service.CacheService;
 
 @Controller
 public class CacheController {
 
     @Autowired
-    private StatusService statusService;
+    private CacheService cacheService;
 
     @RequestMapping(value = "/cache/{hash}", method = RequestMethod.GET, produces = "text/http")
     public String getCachedPage(@PathVariable String hash, Model model) {
-        CachedPage cachedPage = statusService.getCachedPage(hash);
+        CachedPage cachedPage = cacheService.getCachedPage(hash);
         if (cachedPage != null) {
             model.addAttribute("cachedPage", cachedPage);
             return "cache";

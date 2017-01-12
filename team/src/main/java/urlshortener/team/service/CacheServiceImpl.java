@@ -20,9 +20,9 @@ import urlshortener.team.repository.CachedPageRepository;
 import urlshortener.team.repository.ShortURLRepository;
 
 @Service
-public class StatusServiceImpl implements StatusService {
+public class CacheServiceImpl implements CacheService {
 
-	private static final Logger logger = LoggerFactory.getLogger(StatusServiceImpl.class);
+	private static final Logger logger = LoggerFactory.getLogger(CacheServiceImpl.class);
 	private static final long CHECK_PERIOD = 60 * 1000;		// 1 minute
 
 	@Autowired

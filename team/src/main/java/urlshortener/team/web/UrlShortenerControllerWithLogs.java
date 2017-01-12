@@ -31,7 +31,7 @@ import urlshortener.team.domain.ShortURL;
 import urlshortener.common.repository.ClickRepository;
 import urlshortener.team.domain.VCard;
 import urlshortener.team.repository.ShortURLRepository;
-import urlshortener.team.service.StatusService;
+import urlshortener.team.service.CacheService;
 
 @RestController
 public class UrlShortenerControllerWithLogs {
@@ -39,7 +39,7 @@ public class UrlShortenerControllerWithLogs {
 	private static final Logger logger = LoggerFactory.getLogger(UrlShortenerControllerWithLogs.class);
 
 	@Autowired
-	private StatusService statusService;
+	private CacheService cacheService;
 	@Autowired
 	private MetricsController metricsController;
 	@Autowired
@@ -80,7 +80,7 @@ public class UrlShortenerControllerWithLogs {
 		VCard vcard = new VCard(vcardName, vcardSurname, vcardOrganization, vcardTelephone, vcardEmail, url);
 		ShortURL su = createAndSaveIfValid(url, sponsor, error, vcard, UUID.randomUUID().toString(), request.getRemoteAddr());
 		if (su != null) {
-			statusService.verifyStatus(su);
+			cacheService.verifyStatus(su);
 			HttpHeaders h = new HttpHeaders();
 			h.setLocation(su.getUri());
 			return new ResponseEntity<>(su, h, HttpStatus.CREATED);

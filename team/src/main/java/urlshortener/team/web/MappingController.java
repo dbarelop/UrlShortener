@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import urlshortener.team.domain.ShortURL;
 import urlshortener.team.repository.ShortURLRepository;
-import urlshortener.team.service.StatusServiceImpl;
 
 @Controller
 @Order(Ordered.HIGHEST_PRECEDENCE)

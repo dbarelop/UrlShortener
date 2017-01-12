@@ -31,7 +31,7 @@ import urlshortener.team.domain.ShortURL;
 import urlshortener.team.domain.VCard;
 import urlshortener.team.repository.ShortURLRepository;
 import urlshortener.team.domain.ShortName;
-import urlshortener.team.service.StatusService;
+import urlshortener.team.service.CacheService;
 
 @RestController
 @Order(Ordered.HIGHEST_PRECEDENCE)
@@ -40,7 +40,7 @@ public class ShortNameController {
 	private static final Logger logger = LoggerFactory.getLogger(ShortNameController.class);
 
 	@Autowired
-	private StatusService statusService;
+	private CacheService cacheService;
 	@Autowired
 	protected ShortURLRepository shortURLRepository;
 
@@ -71,7 +71,7 @@ public class ShortNameController {
 		VCard vcard = new VCard(vcardName, vcardSurname, vcardOrganization, vcardTelephone, vcardEmail, url);
 		ShortURL su = createAndSaveIfValid(id,url, sponsor, error, vcard, UUID.randomUUID().toString(), extractIP(request));
 		if (su != null) {
-			statusService.verifyStatus(su);
+			cacheService.verifyStatus(su);
 			HttpHeaders h = new HttpHeaders();
 			h.setLocation(su.getUri());
 			return new ResponseEntity<>(su, h, HttpStatus.CREATED);
