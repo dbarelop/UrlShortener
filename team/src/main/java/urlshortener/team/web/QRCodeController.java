@@ -10,6 +10,8 @@ import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,6 +28,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @RestController
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class QRCodeController {
 	private static final Logger logger = LoggerFactory.getLogger(QRCodeController.class);
 
@@ -48,7 +51,7 @@ public class QRCodeController {
 
 		ShortURL shortURL = shortURLRepository.findByKey(hash);
 		if (shortURL != null) {
-			URI uri = linkTo(methodOn(UrlShortenerControllerWithLogs.class).redirectTo(hash, null)).toUri();
+			URI uri = linkTo(methodOn(RedirectionController.class).redirectTo(hash, null)).toUri();
 			OutputStream stream = response.getOutputStream();
 			try {
 				ErrorCorrectionLevel errorCorrectionLevel = null;

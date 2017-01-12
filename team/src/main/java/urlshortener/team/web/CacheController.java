@@ -3,6 +3,8 @@ package urlshortener.team.web;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.PrintWriter;
 
 @Controller
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class CacheController {
 
     private static final Logger logger = LoggerFactory.getLogger(CacheController.class);
