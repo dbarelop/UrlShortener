@@ -1,11 +1,6 @@
 package urlshortener.common.repository;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Types;
+import java.sql.*;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -75,7 +70,7 @@ public class ClickRepositoryImpl implements ClickRepository {
 									Statement.RETURN_GENERATED_KEYS);
 					ps.setNull(1, Types.BIGINT);
 					ps.setString(2, cl.getHash());
-					ps.setDate(3, cl.getCreated());
+					ps.setDate(3, cl.getCreated() != null ? new Date(cl.getCreated().getTime()) : null);
 					ps.setString(4, cl.getReferrer());
 					ps.setString(5, cl.getBrowser());
 					ps.setString(6, cl.getPlatform());

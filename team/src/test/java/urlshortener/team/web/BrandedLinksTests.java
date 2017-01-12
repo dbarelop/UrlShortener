@@ -24,7 +24,7 @@ import static org.junit.Assert.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment= RANDOM_PORT)
+@SpringBootTest(webEnvironment = RANDOM_PORT)
 @DirtiesContext
 public class BrandedLinksTests {
 
@@ -48,17 +48,17 @@ public class BrandedLinksTests {
 	@Test
 	public void b_testUniqueId() throws Exception {
 		postBrandedLink("http://example.com/","id1");
-		ResponseEntity<String> entity = postBrandedLink("http://example.com/","id1");
-		assertThat(entity.getStatusCode(), is(HttpStatus.BAD_REQUEST));
+		ResponseEntity<String> response = postBrandedLink("http://example.com/","id1");
+		assertThat(response.getStatusCode(), is(HttpStatus.BAD_REQUEST));
 	}
 
 	
 	@Test
 	public void c_testRedirection() throws Exception {
 		postBrandedLink("http://example.com/","id2");
-		ResponseEntity<String> entity = new TestRestTemplate().getForEntity("http://localhost:" + this.port + "/id2", String.class);
-		assertThat(entity.getStatusCode(), is(HttpStatus.TEMPORARY_REDIRECT));
-		assertThat(entity.getHeaders().getLocation(), is(new URI("http://example.com/")));
+		ResponseEntity<String> response = new TestRestTemplate().getForEntity("http://localhost:" + this.port + "/id2", String.class);
+		assertThat(response.getStatusCode(), is(HttpStatus.TEMPORARY_REDIRECT));
+		assertThat(response.getHeaders().getLocation(), is(new URI("http://example.com/")));
 	}
 	
 	
@@ -67,6 +67,4 @@ public class BrandedLinksTests {
 		parts.add("url", url); parts.add("shortName", id);
 		return new TestRestTemplate().postForEntity("http://localhost:" + this.port + "/brandedLink", parts, String.class);
 	}
-
-
 }

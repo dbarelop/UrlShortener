@@ -5,7 +5,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.sql.Date;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -32,7 +32,6 @@ import urlshortener.team.domain.VCard;
 import urlshortener.team.repository.ShortURLRepository;
 import urlshortener.team.domain.ShortName;
 import urlshortener.team.service.StatusService;
-import urlshortener.team.service.StatusServiceImpl;
 
 @RestController
 @Order(Ordered.HIGHEST_PRECEDENCE)
@@ -71,8 +70,8 @@ public class ShortNameController {
 		logger.info("Requested new short for uri " + url + " and short name = " + id);
 		VCard vcard = new VCard(vcardName, vcardSurname, vcardOrganization, vcardTelephone, vcardEmail, url);
 		ShortURL su = createAndSaveIfValid(id,url, sponsor, error, vcard, UUID.randomUUID().toString(), extractIP(request));
-        statusService.verifyStatus(su);
 		if (su != null) {
+			statusService.verifyStatus(su);
 			HttpHeaders h = new HttpHeaders();
 			h.setLocation(su.getUri());
 			return new ResponseEntity<>(su, h, HttpStatus.CREATED);
@@ -85,25 +84,14 @@ public class ShortNameController {
 		UrlValidator urlValidator = new UrlValidator(new String[]{"http", "https"});
 
 		if (urlValidator.isValid(url)) {
-
-			String finalId;
 			ShortURL l = shortURLRepository.findByKey(id);
-			List<ShortURL> ListUrl = shortURLRepository.findByTarget(url);
-
-			if (!(ListUrl.isEmpty())) {
-				shortURLRepository.delete(ListUrl.get(0).getHash());
-			}
-
-			if (l == null && !id.equals("")) {
-
-				finalId = id;
+			if (l == null && !id.isEmpty()) {
 				suggest(id);
 
 				Object user = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-				ShortURL su = new ShortURL(finalId, url,
-						linkTo(methodOn(UrlShortenerControllerWithLogs.class).redirectTo(finalId, null)).toUri(), sponsor,
-						new Date(System.currentTimeMillis()), owner, HttpStatus.TEMPORARY_REDIRECT.value(), true, ip,
-						null, user instanceof User ? ((User) user).getUsername() : null);
+				ShortURL su = new ShortURL(id, url, linkTo(methodOn(UrlShortenerControllerWithLogs.class).redirectTo(id, null)).toUri(),
+						sponsor, new Date(), owner, HttpStatus.TEMPORARY_REDIRECT.value(), true, ip, null,
+						user instanceof User ? ((User) user).getUsername() : null);
 				try {
 					String qrUri = su.getUri().toString() + "/qrcode?error=" + error;
 					qrUri += (vcard.getName() != null ? "?" + vcard.getUrlEncodedParameters() : "");
@@ -113,7 +101,7 @@ public class ShortNameController {
 				}
 				return shortURLRepository.save(su);
 			} else {
-				logger.info("shortName already exist = " + id);
+				logger.info("shortName already exists = " + id);
 				return null;
 			}
 		} else {

@@ -9,6 +9,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.DirectFieldAccessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -47,6 +48,8 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 	public ShortURL findByKey(String id) {
 		try {
 			return jdbc.queryForObject("SELECT * FROM shorturl WHERE hash = ?", rowMapper, id);
+		} catch (EmptyResultDataAccessException e) {
+			return null;
 		} catch (Exception e) {
 			log.error("When select for key " + id, e);
 			return null;
@@ -126,6 +129,8 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 		try {
 			return jdbc.query("SELECT * FROM shorturl LIMIT ? OFFSET ?",
 					new Object[] { limit, offset }, rowMapper);
+		} catch (EmptyResultDataAccessException e) {
+			return null;
 		} catch (Exception e) {
 			log.error("When select for limit " + limit + " and offset " + offset, e);
 			return null;
@@ -136,6 +141,8 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 	public List<ShortURL> findAll() {
 		try {
 			return jdbc.query("SELECT * FROM shorturl", rowMapper);
+		} catch (EmptyResultDataAccessException e) {
+			return null;
 		} catch (Exception e) {
 			log.error("When select all from shorturl", e);
 			return null;
@@ -145,8 +152,9 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 	@Override
 	public List<ShortURL> findByTarget(String target) {
 		try {
-			return jdbc.query("SELECT * FROM shorturl WHERE target = ?",
-					new Object[] { target }, rowMapper);
+			return jdbc.query("SELECT * FROM shorturl WHERE target = ?", new Object[] { target }, rowMapper);
+		} catch (EmptyResultDataAccessException e) {
+			return null;
 		} catch (Exception e) {
 			log.error("When select for target " + target , e);
 			return Collections.emptyList();
