@@ -24,7 +24,7 @@ import static org.junit.Assert.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment= RANDOM_PORT)
+@SpringBootTest(webEnvironment = RANDOM_PORT)
 @DirtiesContext
 public class BrandedLinksTests {
 
@@ -47,28 +47,24 @@ public class BrandedLinksTests {
 
 	@Test
 	public void b_testUniqueId() throws Exception {
-		ResponseEntity<String> entity = postBrandedLink("http://example.com/","id");
-		assertThat(entity.getStatusCode(), is(HttpStatus.BAD_REQUEST));
+		postBrandedLink("http://example.com/","id1");
+		ResponseEntity<String> response = postBrandedLink("http://example.com/","id1");
+		assertThat(response.getStatusCode(), is(HttpStatus.BAD_REQUEST));
 	}
 
 	
 	@Test
 	public void c_testRedirection() throws Exception {
-		postBrandedLink("http://example.com/","id1");
-		ResponseEntity<String> entity = new TestRestTemplate().getForEntity(
-				"http://localhost:" + this.port
-						+ "/id1", String.class);
-		assertThat(entity.getStatusCode(), is(HttpStatus.TEMPORARY_REDIRECT));
-		assertThat(entity.getHeaders().getLocation(), is(new URI("http://example.com/")));
+		postBrandedLink("http://example.com/","id2");
+		ResponseEntity<String> response = new TestRestTemplate().getForEntity("http://localhost:" + this.port + "/id2", String.class);
+		assertThat(response.getStatusCode(), is(HttpStatus.TEMPORARY_REDIRECT));
+		assertThat(response.getHeaders().getLocation(), is(new URI("http://example.com/")));
 	}
 	
 	
 	private ResponseEntity<String> postBrandedLink(String url, String id) {
 		MultiValueMap<String, Object> parts = new LinkedMultiValueMap<>();
-		parts.add("url", url);parts.add("shortName", id);
-		return new TestRestTemplate().postForEntity(
-				"http://localhost:" + this.port+"/brandedLink", parts, String.class);
+		parts.add("url", url); parts.add("shortName", id);
+		return new TestRestTemplate().postForEntity("http://localhost:" + this.port + "/brandedLink", parts, String.class);
 	}
-
-
 }

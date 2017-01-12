@@ -14,19 +14,26 @@
 	<div class="row">
 		<div class="col-lg-12 text-center">
 			<h1>URL 404</h1>
-			<p class="lead">A front-end example page to display date since URL is outline</p>
+			<p class="lead">A front-end example page to display date since URL is offline</p>
 			<br />
-			<div class="panel panel-default" th:if="${metrics}">
-                    <div class="panel-heading"><h3><a th:href="${metrics.uri}" th:text="${metrics.uri}"></a></h3></div>
-                    <div class="panel-body">
-                        <ul class='list-group'>
-                            <li class="list-group-item"><strong>Outline since:</strong> <span th:text="${metrics.created}"></span></li>
-                            <li class="list-group-item"><strong>Target URL:</strong> <a th:href="${metrics.target}" th:text="${metrics.target}"></a></li>
-                        </ul>
-                    </div>
+			<div class="panel panel-default">
+                <div class="panel-heading">
+					<!--/*@thymesVar id="uri" type="java.net.URI"*/-->
+                	<h3><a th:href="${uri}" th:text="${uri}"></a></h3>
+               	</div>
+                <div class="panel-body">
+                    <ul class='list-group'>
+						<!--/*@thymesVar id="date" type="java.util.Date"*/-->
+						<!--/*@thymesVar id="target" type="java.lang.String"*/-->
+						<!--/*@thymesVar id="hash" type="java.lang.String"*/-->
+                        <li class="list-group-item"><strong>Offline since:</strong> <span th:text="${date}"></span></li>
+                        <li class="list-group-item"><strong>Target URL:</strong> <a th:href="${target}" th:text="${target}"></a></li>
+                        <li class="list-group-item"><strong>Cache:</strong> <a th:href="${hash}" th:text="${hash}"></a></li>
+                    </ul>
                 </div>
+            </div>
 			<br />
-			<form class="col-lg-12" role="form" id="shortener" action="index.html">
+			<form class="col-lg-12" role="form" id="shortener" action="/">
 				<div class="input-group input-group-lg col-sm-offset-4 col-sm-4">			
 					<span class="input-group-btn">
 						<button class="btn btn-lg btn-primary" type="submit">Go to index</button>

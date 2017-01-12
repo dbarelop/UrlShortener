@@ -1,4 +1,4 @@
-package urlshortener.common.domain;
+package urlshortener.team.domain;
 
 import org.springframework.http.HttpStatus;
 
@@ -13,27 +13,28 @@ public class ShortURL {
 	private String sponsor;
 	private Date created;
 	private String owner;
-	private Integer mode;
 	private Boolean safe;
 	private String ip;
 	private String country;
 	private HttpStatus lastStatus;
 	private Date lastCheck;
 	private URI qrLink;
+	private String user;
 
 	public ShortURL(String hash, String target, URI uri, String sponsor,
-			Date created, String owner, Integer mode, Boolean safe, String ip,
-			String country) {
+					Date created, String owner, Boolean safe, String ip,
+					String country, String user) {
 		this.hash = hash;
 		this.target = target;
 		this.uri = uri;
 		this.sponsor = sponsor;
 		this.created = created;
 		this.owner = owner;
-		this.mode = mode;
 		this.safe = safe;
 		this.ip = ip;
 		this.country = country;
+		this.user = user;
+		this.lastStatus = HttpStatus.OK;
 	}
 
 	public ShortURL() {
@@ -59,10 +60,6 @@ public class ShortURL {
 		return owner;
 	}
 
-	public Integer getMode() {
-		return mode;
-	}
-
 	public String getSponsor() {
 		return sponsor;
 	}
@@ -82,7 +79,7 @@ public class ShortURL {
 	public HttpStatus getLastStatus() {
 		return lastStatus;
 	}
-
+	
 	public Date getLastCheck() {
 		return lastCheck;
 	}
@@ -92,7 +89,6 @@ public class ShortURL {
 	}
 
 	public void setQRLink(URI qrLink) {
-		System.out.println("setQRLink " + qrLink);
 		this.qrLink = qrLink;
 	}
 	
@@ -104,4 +100,11 @@ public class ShortURL {
 		this.lastCheck = lastCheck;
 	}
 
+	public String getUser() {
+		return user;
+	}
+
+	public void setUser(String user) {
+		this.user = user;
+	}
 }

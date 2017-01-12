@@ -8,10 +8,17 @@
 
 	<script type="text/javascript" th:src="@{/webjars/jquery/2.1.4/jquery.min.js}"></script>
 	<script type="text/javascript" th:src="@{/webjars/bootstrap/3.3.5/js/bootstrap.min.js}"></script>
-	<script type="text/javascript" th:src="@{/js/app.js}"></script>
+	<script type="text/javascript" th:src="@{/webjars/angularjs/1.5.8/angular.min.js}"></script>
+	<!-- TODO: chart.js not needed -->
+	<script type="text/javascript" th:src="@{/webjars/chartjs/2.1.3/Chart.js}"></script>
+	<script type="text/javascript" th:src="@{/webjars/angular-chart.js/1.0.3/angular-chart.min.js}"></script>
+	<script type="text/javascript" th:src="@{/app/app.js}"></script>
+	<script type="text/javascript" th:src="@{/app/controllers.js}"></script>
+	<script type="text/javascript" th:src="@{/app/services.js}"></script>
 </head>
-<body>
-<div class="container-full">
+<body ng-app="UrlShortenerApp" style="padding-top: 70px;">
+<div th:replace="fragments/header :: header"></div>
+<div ng-controller="URLShortenerCtrl" class="container-full">
 	<div class="row">
 		<div class="col-lg-12 text-center">
 			<h1>URL Shortener</h1>
@@ -19,37 +26,79 @@
 			<br />
 			<form class="col-lg-12" role="form" id="shortener" action="">
 				<div class="input-group input-group-lg col-sm-offset-4 col-sm-4">
-					<input type="text" class="center-block form-control input-lg" title="Enter a URL" 
-							placeholder="Enter a URL" name="url" />					
+					<input type="text" class="center-block form-control input-lg" title="Enter a URL" placeholder="Enter a URL" ng-model="url" />
 					<span class="input-group-btn">
-						<button class="btn btn-lg btn-primary" type="submit">Shorten me!</button>
+						<button class="btn btn-lg btn-primary" type="button" ng-click="shorten()">Shorten me!</button>
 					</span>
 				</div>
 				<br />
 				<div class="col-sm-offset-4 col-sm-4">
-					<input id="shortnameV" type="text" class="center-block form-control input-lg" 
-							title="Enter a Short Name" placeholder="Enter a Short Name" name="shortName" />
+					<input type="text" class="center-block form-control input-lg" title="Enter a Short Name" placeholder="Enter a Short Name" ng-model="brandedLink" />
+				</div>
+				<div class="col-sm-offset-4 col-sm-4">
+					<br />
+					<select class="form-control" ng-model="qrErrorLevel">
+						<option value="" disabled="1" selected="1">QR error correction level</option>
+						<option value="L">L (~7% of codewords can be restored)</option>
+						<option value="M">M (~15% of codewords can be restored)</option>
+						<option value="Q">Q (~25% of codewords can be restored)</option>
+						<option value="H">H (~30% of codewords can be restored)</option>
+					</select>
+				</div>
+				<div class="col-sm-offset-4 col-sm-4">
+					<br />
+					<button class="btn btn-lg btn-primary" type="button" ng-click="showVcard = !showVCard">vCard</button>
+				</div>
+				<div class="col-lg-12 text-center" ng-show="showVcard">
+					<div class="col-sm-offset-4 col-sm-4">
+						<br />
+						<input type="text" class="center-block form-control input-lg" title="Name " placeholder="Insert your name" ng-model="vcard.vcardName" />
+					</div>
+					<div class="col-sm-offset-4 col-sm-4">
+						<br />
+						<input type="text" class="center-block form-control input-lg" title="Surname " placeholder="Insert your surname" ng-model="vcard.vcardSurname" />
+					</div>
+					<div class="col-sm-offset-4 col-sm-4">
+						<br />
+						<input type="text" class="center-block form-control input-lg" title="Surname " placeholder="Insert your company" ng-model="vcard.vcardOrganization" />
+					</div>
+					<div class="col-sm-offset-4 col-sm-4">
+						<br />
+						<input type="text" class="center-block form-control input-lg" title="Surname " placeholder="Insert your work telephone" ng-model="vcard.vcardTelephone" />
+					</div>
+					<div class="col-sm-offset-4 col-sm-4">
+						<br />
+						<input type="text" class="center-block form-control input-lg" title="Surname " placeholder="Insert your email" ng-model="vcard.vcardEmail" />
+					</div>
 				</div>
 			</form>
 		</div>
 	</div>
-	<div class="row">
+	<div class="row" ng-if="error">
 		<div class="col-lg-12 text-center">
 			<div class="col-sm-offset-4 col-sm-4 text-center">
 				<br />
-				<div id="result" />
+				<div class='alert alert-danger lead'>{{error}}</div>
+			</div>
+		</div>
+	</div>
+	<div class="row" ng-if="shortURL">
+		<div class="col-lg-12 text-center">
+			<div class="col-sm-offset-4 col-sm-4 text-center">
+				<br />
+				<div class="alert alert-success lead"><a target="_blank" ng-href="{{shortURL.uri}}">{{shortURL.uri}}</a></div>
 			</div>
 		</div>
 		<div class="col-lg-12 text-center">
 			<div class="col-sm-offset-4 col-sm-4 text-center">
 				<br />
-				<div id="resultQR" />
+				<button class="btn btn-lg btn-primary" type="button" ng-click="showQr = !showQr">Show QR Code</button>
 			</div>
 		</div>
-		<div class="col-lg-12 text-center">
+		<div class="col-lg-12 text-center" ng-show="showQr">
 			<div class="col-sm-offset-4 col-sm-4 text-center">
 				<br />
-				<div id="QRImage" />
+				<img ng-src="{{shortURL.qrlink}}" />
 			</div>
 		</div>
 	</div>
