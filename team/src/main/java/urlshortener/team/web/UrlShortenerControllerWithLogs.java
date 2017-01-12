@@ -73,6 +73,7 @@ public class UrlShortenerControllerWithLogs {
 	@RequestMapping(value = "/link", method = RequestMethod.POST)
 	public ResponseEntity<ShortURL> shortener(@RequestParam("url") String url,
 											  @RequestParam(value = "sponsor", required = false) String sponsor,
+											  @RequestParam(value="error", defaultValue = "L") String error,
 											  @RequestParam(value = "vcardname", required = false) String vcardName,
 											  @RequestParam(value = "vcardsurname", required = false) String vcardSurname,
 											  @RequestParam(value = "vcardorganization", required = false) String vcardOrganization,
@@ -82,7 +83,7 @@ public class UrlShortenerControllerWithLogs {
 		logger.info("Requested new short for uri " + url);
 		statusService.verifyStatus(url);
 		VCard vcard = new VCard(vcardName, vcardSurname, vcardOrganization, vcardTelephone, vcardEmail, url);
-		ShortURL su = createAndSaveIfValid(url, sponsor, vcard, UUID.randomUUID().toString(), request.getRemoteAddr());
+		ShortURL su = createAndSaveIfValid(url, sponsor, error, vcard, UUID.randomUUID().toString(), request.getRemoteAddr());
 		if (su != null) {
 			HttpHeaders h = new HttpHeaders();
 			h.setLocation(su.getUri());
@@ -92,7 +93,7 @@ public class UrlShortenerControllerWithLogs {
 		}
 	}
 	
-	private ShortURL createAndSaveIfValid(String url, String sponsor, VCard vcard, String owner, String ip) {
+	private ShortURL createAndSaveIfValid(String url, String sponsor, String error, VCard vcard, String owner, String ip) {
 		UrlValidator urlValidator = new UrlValidator(new String[] { "http", "https" });
 		if (urlValidator.isValid(url)) {
 			String id = Hashing.murmur3_32().hashString(url, StandardCharsets.UTF_8).toString();
@@ -103,8 +104,8 @@ public class UrlShortenerControllerWithLogs {
 			su.setStatus(statusService.getStatus());
 			su.setBadStatusDate(statusService.getBadStatusDate());
 			try {
-				String qrUri = su.getUri().toString() + "/qrcode";
-				qrUri += (vcard.getName() != null ? "?" + vcard.getUrlEncodedParameters() : "");
+				String qrUri = su.getUri().toString() + "/qrcode?error=" + error;
+				qrUri += (vcard.getName() != null ? vcard.getUrlEncodedParameters() : "");
 				su.setQRLink(new URI(qrUri));
 			} catch (URISyntaxException e) {
 				logger.error(e.getMessage(), e);

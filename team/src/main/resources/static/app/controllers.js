@@ -31,16 +31,18 @@ angular.module("UrlShortenerApp.controllers", ["chart.js"])
     .controller("URLShortenerCtrl", function($scope, $location, URLShortenerService) {
         $scope.url = "";
         $scope.brandedLink = "";
-        $scope.vcardname = "";
-        $scope.vcardsurname = "";
-        $scope.vcardorganization = "";
-        $scope.vcardtelephone= "";
-        $scope.vcardEmail = "";
+        $scope.vcard = {
+            vcardName: "",
+            vcardSurname: "",
+            vcardOrganization: "",
+            vcardTelephone: "",
+            vcardEmail: ""
+        };
+        $scope.qrErrorLevel = "";
         $scope.shorten = function() {
             $scope.shortURL = "";
             $scope.error = "";
-            URLShortenerService.shortenUrl($scope.url, $scope.brandedLink, $scope.vcardname, $scope.vcardsurname,
-            $scope.vcardorganization, $scope.vcardtelephone, $scope.vcardemail).then(function(data) {
+            URLShortenerService.shortenUrl($scope.url, $scope.brandedLink, $scope.vcard, $scope.qrErrorLevel).then(function(data) {
                 $scope.shortURL = data;
             }, function(err) {
                 $scope.error = "Unexpected error: " + err.data;

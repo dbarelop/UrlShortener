@@ -54,20 +54,19 @@ angular.module("UrlShortenerApp.services")
     .service("URLShortenerService", function($q, $http) {
         var service = {};
 
-        service.shortenUrl = function(url, brandedLink, vcardname, vcardsurname, vcardorganization,
-        vcardtelephone, vcardemail) {
+        service.shortenUrl = function(url, brandedLink, vcard, qrErrorLevel) {
             var deferred = $q.defer();
-            var path = "/link", params = { params: { url: url }};
+            var path = "/link", params = { params: { url: url, error: qrErrorLevel }};
             if (brandedLink) {
                 path = "/brandedLink";
                 params.params.shortName = brandedLink;
             }
-            if (vcardname)  {
-                params.params.vcardname = vcardname;
-                params.params.vcardsurname = vcardsurname;
-                params.params.vcardorganization = vcardorganization;
-                params.params.vcardtelephone = vcardtelephone;
-                params.params.vcardemail = vcardemail;
+            if (vcard.vcardName)  {
+                params.params.vcardname = vcard.vcardName;
+                params.params.vcardsurname = vcard.vcardSurname;
+                params.params.vcardorganization = vcard.vcardOrganization;
+                params.params.vcardtelephone = vcard.vcardTelephone;
+                params.params.vcardemail = vcard.vcardEmail;
             }
             $http.post(path, null, params).then(function(data) {
                 deferred.resolve(data.data);
