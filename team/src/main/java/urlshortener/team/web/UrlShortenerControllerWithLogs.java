@@ -137,6 +137,7 @@ public class UrlShortenerControllerWithLogs {
 		HttpHeaders h = new HttpHeaders();
 		URI location = linkTo(methodOn(UrlShortenerControllerWithLogs.class).redirectTo("/404/" + shortURL.getHash(), null)).toUri();
 		h.setLocation(location);
+		// TODO: check shortURL.getMode()
 		return new ResponseEntity<>(h, HttpStatus.valueOf(shortURL.getMode()));
 	}
 }

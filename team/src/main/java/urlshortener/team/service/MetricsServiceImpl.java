@@ -8,7 +8,6 @@ import urlshortener.team.domain.ShortURL;
 import urlshortener.team.domain.Metrics;
 import urlshortener.team.repository.ClickRepository;
 
-import java.net.URI;
 import java.util.Date;
 import java.util.Map;
 

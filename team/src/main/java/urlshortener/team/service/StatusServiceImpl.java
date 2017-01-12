@@ -34,9 +34,11 @@ public class StatusServiceImpl implements StatusService {
 	@Scheduled(fixedRate = CHECK_PERIOD)
 	public void periodicallyVerifyStatus() {
 		logger.debug("Periodical URL status verification starting...");
-		List<ShortURL> listVerifyURL = shortURLRepository.listVerify();
-		for (ShortURL su : listVerifyURL) {
-			verifyStatus(su);
+		List<ShortURL> shortURLs = shortURLRepository.findAll();
+		if (shortURLs != null) {
+			for (ShortURL su : shortURLs) {
+				verifyStatus(su);
+			}
 		}
 	}
 
