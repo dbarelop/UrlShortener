@@ -31,6 +31,7 @@ import urlshortener.team.domain.ShortURL;
 import urlshortener.team.domain.VCard;
 import urlshortener.team.repository.ShortURLRepository;
 import urlshortener.team.domain.ShortName;
+import urlshortener.team.service.StatusService;
 import urlshortener.team.service.StatusServiceImpl;
 
 @RestController
@@ -68,7 +69,6 @@ public class ShortNameController {
 												@RequestParam(value = "vcardemail", required = false) String vcardEmail,
 												HttpServletRequest request) {
 		logger.info("Requested new short for uri " + url + " and short name = " + id);
-		statusService.verifyStatus(url);
 		VCard vcard = new VCard(vcardName, vcardSurname, vcardOrganization, vcardTelephone, vcardEmail, url);
 		ShortURL su = createAndSaveIfValid(id,url, sponsor, error, vcard, UUID.randomUUID().toString(), extractIP(request));
         statusService.verifyStatus(su);

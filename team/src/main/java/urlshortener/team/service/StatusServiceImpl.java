@@ -14,7 +14,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import urlshortener.common.domain.ShortURL;
+import urlshortener.team.domain.ShortURL;
 import urlshortener.team.domain.CachedPage;
 import urlshortener.team.repository.CachedPageRepository;
 import urlshortener.team.repository.ShortURLRepository;

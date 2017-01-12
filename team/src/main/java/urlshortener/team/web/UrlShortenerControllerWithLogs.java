@@ -31,6 +31,7 @@ import urlshortener.team.domain.ShortURL;
 import urlshortener.common.repository.ClickRepository;
 import urlshortener.team.domain.VCard;
 import urlshortener.team.repository.ShortURLRepository;
+import urlshortener.team.service.StatusService;
 import urlshortener.team.service.StatusServiceImpl;
 
 @RestController
@@ -77,7 +78,6 @@ public class UrlShortenerControllerWithLogs {
 											  @RequestParam(value = "vcardemail", required = false) String vcardEmail,
 											  HttpServletRequest request) {
 		logger.info("Requested new short for uri " + url);
-		statusService.verifyStatus(url);
 		VCard vcard = new VCard(vcardName, vcardSurname, vcardOrganization, vcardTelephone, vcardEmail, url);
 		ShortURL su = createAndSaveIfValid(url, sponsor, error, vcard, UUID.randomUUID().toString(), request.getRemoteAddr());
         statusService.verifyStatus(su);
@@ -133,7 +133,7 @@ public class UrlShortenerControllerWithLogs {
 		return new ResponseEntity<>(h, HttpStatus.valueOf(l.getMode()));
 	}
 
-	private ResponseEntity<?> badStatus(ShortURL shortURL) throws URISyntaxException {
+	private ResponseEntity<?> badStatus(ShortURL shortURL) {
 		HttpHeaders h = new HttpHeaders();
 		URI location = linkTo(methodOn(UrlShortenerControllerWithLogs.class).redirectTo("/404/" + shortURL.getHash(), null)).toUri();
 		h.setLocation(location);
