@@ -8,6 +8,8 @@ angular.module("UrlShortenerApp.controllers", ["chart.js"])
             labels: [],
             data: []
         };
+        $scope.from = "";
+        $scope.to = "";
 
         var hash = $location.absUrl().split(/[\s/]+/).pop();
         if (hash != "metrics") {

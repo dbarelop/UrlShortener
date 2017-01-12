@@ -34,6 +34,7 @@ dependencies {
     compile 'org.webjars:angular-chart.js:1.0.3'
     compile 'org.webjars:stomp-websocket:2.3.3'
     compile 'org.webjars:sockjs-client:1.1.1'
+    compile 'org.webjars:bootstrap-datepicker:1.6.4'
 
 	// https://mvnrepository.com/artifact/com.google.zxing/core
     compile group: 'com.google.zxing', name: 'core', version: '3.3.0'
