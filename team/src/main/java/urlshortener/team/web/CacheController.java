@@ -24,7 +24,7 @@ public class CacheController {
     public String getCachedPage(@PathVariable String hash, Model model) {
         CachedPage cachedPage = cacheService.getCachedPage(hash);
         if (cachedPage != null) {
-            logger.info("** Serving cache for " + hash + " from " + cachedPage.getDate());
+            logger.info("** Serving cached version of " + hash + " from " + cachedPage.getDate());
             model.addAttribute("cachedPage", cachedPage);
             return "cache";
         } else {

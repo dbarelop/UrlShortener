@@ -34,6 +34,7 @@ public class ShortURL {
 		this.ip = ip;
 		this.country = country;
 		this.user = user;
+		this.lastStatus = HttpStatus.OK;
 	}
 
 	public ShortURL() {

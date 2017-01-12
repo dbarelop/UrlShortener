@@ -53,11 +53,11 @@ public class UrlShortenerControllerWithLogs {
 		ShortURL l = shortURLRepository.findByKey(id);
 		if (l != null) {
 			ResponseEntity<?> response;
-			if (l.getLastStatus() == null || l.getLastStatus() == HttpStatus.OK) {
-				response = createSuccessfulRedirectToResponse(l);
-			} else {
+			if (l.getLastStatus() == null || l.getLastStatus() != HttpStatus.OK) {
 				logger.info("** " + l.getTarget() + " was down during last test");
 				response = badStatus(l);
+			} else {
+				response = createSuccessfulRedirectToResponse(l);
 			}
 			createAndSaveClick(id, extractIP(request), extractUserAgent(request));
 			metricsController.notifyNewMetrics(id);

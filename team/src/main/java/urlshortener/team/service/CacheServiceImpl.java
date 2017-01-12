@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import urlshortener.team.domain.ShortURL;
@@ -51,12 +52,16 @@ public class CacheServiceImpl implements CacheService {
 	@Async
 	public void verifyStatus(ShortURL shortURL) {
 		RestTemplate restTemplate = new RestTemplate();
-		ResponseEntity<String> result = restTemplate.exchange(shortURL.getTarget(), HttpMethod.GET, null, String.class);
-		shortURL.setLastStatus(result.getStatusCode());
-		shortURL.setLastCheck(new Date());
-		if (result.getStatusCode() == HttpStatus.OK) {
-			cacheStaticPage(result, shortURL);
+		try {
+			ResponseEntity<String> result = restTemplate.exchange(shortURL.getTarget(), HttpMethod.GET, null, String.class);
+			shortURL.setLastStatus(result.getStatusCode());
+			if (result.getStatusCode() == HttpStatus.OK) {
+				cacheStaticPage(result, shortURL);
+			}
+		} catch (RestClientException e) {
+			shortURL.setLastStatus(null);
 		}
+		shortURL.setLastCheck(new Date());
 	}
 	
 	private void cacheStaticPage(ResponseEntity<String> result, ShortURL shortURL) {
