@@ -36,8 +36,10 @@ public class MappingController {
     public String badStatus(@PathVariable String hash, Model model) {
     	ShortURL shortURL = shortURLRepository.findByKey(hash);
     	model.addAttribute("uri", linkTo(methodOn(UrlShortenerControllerWithLogs.class).redirectTo(shortURL.getHash(), null)).toUri());
-        model.addAttribute("date", shortURL.getBadStateDate());
+        model.addAttribute("date", shortURL.getLastCheck());
         model.addAttribute("target", shortURL.getTarget());
+        // TODO: remove hardcoded port and host
+        model.addAttribute("hash", "http://localhost:8080/cache/" + shortURL.getHash());
     	return "404";
     }
 

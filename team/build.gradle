@@ -20,6 +20,7 @@ dependencies {
     compile project(':common')
     compile 'org.springframework.boot:spring-boot-starter-thymeleaf:1.4.0.RELEASE'
     compile 'org.springframework.boot:spring-boot-starter-websocket:1.4.0.RELEASE'
+    compile 'org.springframework.boot:spring-boot-starter-data-mongodb:1.4.0.RELEASE'
     compile 'org.springframework.boot:spring-boot-starter-security:1.4.0.RELEASE'
     compile 'org.thymeleaf.extras:thymeleaf-extras-springsecurity4'
 

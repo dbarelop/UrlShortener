@@ -1,9 +1,9 @@
 package urlshortener.team.domain;
 
-import org.springframework.security.core.userdetails.User;
+import org.springframework.http.HttpStatus;
 
 import java.net.URI;
-import java.sql.Date;
+import java.util.Date;
 
 public class ShortURL {
 
@@ -13,17 +13,16 @@ public class ShortURL {
 	private String sponsor;
 	private Date created;
 	private String owner;
-	private Integer mode;
 	private Boolean safe;
 	private String ip;
 	private String country;
-	private Integer status;
-	private String badStatusDate;
+	private HttpStatus lastStatus;
+	private Date lastCheck;
 	private URI qrLink;
 	private String user;
 
 	public ShortURL(String hash, String target, URI uri, String sponsor,
-					Date created, String owner, Integer mode, Boolean safe, String ip,
+					Date created, String owner, Boolean safe, String ip,
 					String country, String user) {
 		this.hash = hash;
 		this.target = target;
@@ -31,11 +30,11 @@ public class ShortURL {
 		this.sponsor = sponsor;
 		this.created = created;
 		this.owner = owner;
-		this.mode = mode;
 		this.safe = safe;
 		this.ip = ip;
 		this.country = country;
 		this.user = user;
+		this.lastStatus = HttpStatus.OK;
 	}
 
 	public ShortURL() {
@@ -61,10 +60,6 @@ public class ShortURL {
 		return owner;
 	}
 
-	public Integer getMode() {
-		return mode;
-	}
-
 	public String getSponsor() {
 		return sponsor;
 	}
@@ -81,12 +76,12 @@ public class ShortURL {
 		return country;
 	}
 	
-	public Integer getStatus() {
-		return status;
+	public HttpStatus getLastStatus() {
+		return lastStatus;
 	}
 	
-	public String getBadStateDate() {
-		return badStatusDate;
+	public Date getLastCheck() {
+		return lastCheck;
 	}
 
 	public URI getQRLink() {
@@ -97,12 +92,12 @@ public class ShortURL {
 		this.qrLink = qrLink;
 	}
 	
-	public void setStatus(Integer status) {
-		this.status = status;
+	public void setLastStatus(HttpStatus lastStatus) {
+		this.lastStatus = lastStatus;
 	}
 	
-	public void setBadStatusDate(String badStatusDate) {
-		this.badStatusDate = badStatusDate;
+	public void setLastCheck(Date lastCheck) {
+		this.lastCheck = lastCheck;
 	}
 
 	public String getUser() {

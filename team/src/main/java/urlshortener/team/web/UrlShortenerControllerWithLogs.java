@@ -21,7 +21,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.sql.Date;
+import java.util.Date;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
@@ -31,6 +31,7 @@ import urlshortener.team.domain.ShortURL;
 import urlshortener.common.repository.ClickRepository;
 import urlshortener.team.domain.VCard;
 import urlshortener.team.repository.ShortURLRepository;
+import urlshortener.team.service.CacheService;
 
 @RestController
 public class UrlShortenerControllerWithLogs {
@@ -38,7 +39,7 @@ public class UrlShortenerControllerWithLogs {
 	private static final Logger logger = LoggerFactory.getLogger(UrlShortenerControllerWithLogs.class);
 
 	@Autowired
-	private StatusService statusService;
+	private CacheService cacheService;
 	@Autowired
 	private MetricsController metricsController;
 	@Autowired
@@ -51,16 +52,12 @@ public class UrlShortenerControllerWithLogs {
 		logger.info("Requested redirection with hash " + id);
 		ShortURL l = shortURLRepository.findByKey(id);
 		if (l != null) {
-			ResponseEntity<?> response = null;
-			if (l.getStatus() == 200) {
-				response = createSuccessfulRedirectToResponse(l);
+			ResponseEntity<?> response;
+			if (l.getLastStatus() == null || l.getLastStatus() != HttpStatus.OK) {
+				logger.info("** " + l.getTarget() + " was down during last test");
+				response = badStatus(l);
 			} else {
-				try {
-					response = badStatus(l);
-				} catch (URISyntaxException e) {
-					logger.info("Error to redirect 404 page");
-					e.printStackTrace();
-				}
+				response = createSuccessfulRedirectToResponse(l);
 			}
 			createAndSaveClick(id, extractIP(request), extractUserAgent(request));
 			metricsController.notifyNewMetrics(id);
@@ -81,10 +78,10 @@ public class UrlShortenerControllerWithLogs {
 											  @RequestParam(value = "vcardemail", required = false) String vcardEmail,
 											  HttpServletRequest request) {
 		logger.info("Requested new short for uri " + url);
-		statusService.verifyStatus(url);
 		VCard vcard = new VCard(vcardName, vcardSurname, vcardOrganization, vcardTelephone, vcardEmail, url);
 		ShortURL su = createAndSaveIfValid(url, sponsor, error, vcard, UUID.randomUUID().toString(), request.getRemoteAddr());
 		if (su != null) {
+			cacheService.verifyStatus(su);
 			HttpHeaders h = new HttpHeaders();
 			h.setLocation(su.getUri());
 			return new ResponseEntity<>(su, h, HttpStatus.CREATED);
@@ -98,11 +95,8 @@ public class UrlShortenerControllerWithLogs {
 		if (urlValidator.isValid(url)) {
 			String id = Hashing.murmur3_32().hashString(url, StandardCharsets.UTF_8).toString();
 			Object user = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			ShortURL su = new ShortURL(id, url,
-					linkTo(methodOn(UrlShortenerControllerWithLogs.class).redirectTo(id, null)).toUri(), sponsor, new Date(System.currentTimeMillis()), owner,
-					HttpStatus.TEMPORARY_REDIRECT.value(), true, ip, null, user instanceof User ? ((User) user).getUsername() : null);
-			su.setStatus(statusService.getStatus());
-			su.setBadStatusDate(statusService.getBadStatusDate());
+			ShortURL su = new ShortURL(id, url, linkTo(methodOn(UrlShortenerControllerWithLogs.class).redirectTo(id, null)).toUri(),
+					sponsor, new Date(), owner, true, ip, null, user instanceof User ? ((User) user).getUsername() : null);
 			try {
 				String qrUri = su.getUri().toString() + "/qrcode?error=" + error;
 				qrUri += (vcard.getName() != null ? vcard.getUrlEncodedParameters() : "");
@@ -117,8 +111,7 @@ public class UrlShortenerControllerWithLogs {
 	}
 
 	private void createAndSaveClick(String hash, String ip, UserAgent userAgent) {
-		Click cl = new Click(null, hash, new Date(System.currentTimeMillis()),
-				null, userAgent.getBrowser().toString(), userAgent.getOperatingSystem().toString(), ip, null);
+		Click cl = new Click(null, hash, new Date(), null, userAgent.getBrowser().toString(), userAgent.getOperatingSystem().toString(), ip, null);
 		cl=clickRepository.save(cl);
 		logger.info(cl!=null?"["+hash+"] saved with id ["+cl.getId()+"]":"["+hash+"] was not saved");
 	}
@@ -135,13 +128,13 @@ public class UrlShortenerControllerWithLogs {
 	private ResponseEntity<?> createSuccessfulRedirectToResponse(ShortURL l) {
 		HttpHeaders h = new HttpHeaders();
 		h.setLocation(URI.create(l.getTarget()));
-		return new ResponseEntity<>(h, HttpStatus.valueOf(l.getMode()));
+		return new ResponseEntity<>(h, HttpStatus.TEMPORARY_REDIRECT);
 	}
 
-	private ResponseEntity<?> badStatus(ShortURL shortURL) throws URISyntaxException {
+	private ResponseEntity<?> badStatus(ShortURL shortURL) {
 		HttpHeaders h = new HttpHeaders();
-		URI location = linkTo(methodOn(UrlShortenerControllerWithLogs.class).redirectTo("/404/" + shortURL.getHash(), null)).toUri();
+		URI location = linkTo(methodOn(UrlShortenerControllerWithLogs.class).redirectTo("404/" + shortURL.getHash(), null)).toUri();
 		h.setLocation(location);
-		return new ResponseEntity<>(h, HttpStatus.valueOf(shortURL.getMode()));
+		return new ResponseEntity<>(h, HttpStatus.TEMPORARY_REDIRECT);
 	}
 }

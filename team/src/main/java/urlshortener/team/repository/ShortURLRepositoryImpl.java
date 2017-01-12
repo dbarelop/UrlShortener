@@ -1,7 +1,5 @@
 package urlshortener.team.repository;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
 
@@ -11,6 +9,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.DirectFieldAccessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -26,11 +26,10 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 	private static final RowMapper<ShortURL> rowMapper = (rs, rowNum) -> {
         ShortURL rowMapper = new ShortURL(rs.getString("hash"), rs.getString("target"),
                 null, rs.getString("sponsor"), rs.getDate("created"),
-                rs.getString("owner"), rs.getInt("mode"),
-                rs.getBoolean("safe"), rs.getString("ip"),
+                rs.getString("owner"), rs.getBoolean("safe"), rs.getString("ip"),
                 rs.getString("country"), rs.getString("user"));
-        rowMapper.setStatus(rs.getInt("status"));
-        rowMapper.setBadStatusDate(rs.getString("badstatus"));
+        rowMapper.setLastStatus(rs.getInt("laststatus") == 0 ? null : HttpStatus.valueOf(rs.getInt("laststatus")));
+        rowMapper.setLastCheck(rs.getDate("lastcheck"));
         return rowMapper;
     };
 
@@ -48,8 +47,10 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 	public ShortURL findByKey(String id) {
 		try {
 			return jdbc.queryForObject("SELECT * FROM shorturl WHERE hash = ?", rowMapper, id);
+		} catch (EmptyResultDataAccessException e) {
+			return null;
 		} catch (Exception e) {
-			log.debug("When select for key " + id, e);
+			log.error("When select for key " + id, e);
 			return null;
 		}
 	}
@@ -57,16 +58,16 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 	@Override
 	public ShortURL save(ShortURL su) {
 		try {
-			jdbc.update("INSERT INTO shorturl VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
+			jdbc.update("INSERT INTO shorturl VALUES (?,?,?,?,?,?,?,?,?,?,?)",
 					su.getHash(), su.getTarget(), su.getSponsor(),
-					su.getCreated(), su.getOwner(), su.getMode(), su.getSafe(),
-					su.getIP(), su.getCountry(), su.getStatus(), su.getBadStateDate(),
+					su.getCreated(), su.getOwner(), su.getSafe(),
+					su.getIP(), su.getCountry(), su.getLastStatus() != null ? su.getLastStatus().value() : null, su.getLastCheck(),
 					su.getUser());
 		} catch (DuplicateKeyException e) {
-			log.debug("When insert for key " + su.getHash(), e);
+			log.error("When insert for key " + su.getHash(), e);
 			return su;
 		} catch (Exception e) {
-			log.debug("When insert", e);
+			log.error("When insert", e);
 			return null;
 		}
 		return su;
@@ -75,14 +76,13 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 	@Override
 	public ShortURL mark(ShortURL su, boolean safeness) {
 		try {
-			jdbc.update("UPDATE shorturl SET safe=? WHERE hash=?", safeness,
-					su.getHash());
+			jdbc.update("UPDATE shorturl SET safe=? WHERE hash=?", safeness, su.getHash());
 			ShortURL res = new ShortURL();
 			BeanUtils.copyProperties(su, res);
 			new DirectFieldAccessor(res).setPropertyValue("safe", safeness);
 			return res;
 		} catch (Exception e) {
-			log.debug("When update", e);
+			log.error("When update", e);
 			return null;
 		}
 	}
@@ -92,13 +92,13 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 		try {
 			jdbc.update(
 					"update shorturl set target=?, sponsor=?, created=?, "
-					+ "owner=?, mode=?, safe=?, ip=?, country=?, status=?,"
-					+ "badstatus=? where hash=?",
+					+ "owner=?, safe=?, ip=?, country=?, laststatus=?,"
+					+ "lastcheck=? where hash=?",
 					su.getTarget(), su.getSponsor(), su.getCreated(),
-					su.getOwner(), su.getMode(), su.getSafe(), su.getIP(),
-					su.getCountry(), su.getStatus(), su.getBadStateDate(), su.getHash());
+					su.getOwner(), su.getSafe(), su.getIP(),
+					su.getCountry(), su.getLastStatus() != null ? su.getLastStatus().value() : null, su.getLastCheck(), su.getHash());
 		} catch (Exception e) {
-			log.debug("When update for hash " + su.getHash(), e);
+			log.error("When update for hash " + su.getHash(), e);
 		}
 	}
 
@@ -107,7 +107,7 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 		try {
 			jdbc.update("delete from shorturl where hash=?", hash);
 		} catch (Exception e) {
-			log.debug("When delete for hash " + hash, e);
+			log.error("When delete for hash " + hash, e);
 		}
 	}
 
@@ -117,7 +117,7 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 			return jdbc.queryForObject("select count(*) from shorturl",
 					Long.class);
 		} catch (Exception e) {
-			log.debug("When counting", e);
+			log.error("When counting", e);
 		}
 		return -1L;
 	}
@@ -127,19 +127,22 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 		try {
 			return jdbc.query("SELECT * FROM shorturl LIMIT ? OFFSET ?",
 					new Object[] { limit, offset }, rowMapper);
+		} catch (EmptyResultDataAccessException e) {
+			return null;
 		} catch (Exception e) {
-			log.debug("When select for limit " + limit + " and offset "
-					+ offset, e);
+			log.error("When select for limit " + limit + " and offset " + offset, e);
 			return null;
 		}
 	}
-	
+
 	@Override
-	public List<ShortURL> listVerify() {
+	public List<ShortURL> findAll() {
 		try {
 			return jdbc.query("SELECT * FROM shorturl", rowMapper);
+		} catch (EmptyResultDataAccessException e) {
+			return null;
 		} catch (Exception e) {
-			log.debug("When select verify", e);
+			log.error("When select all from shorturl", e);
 			return null;
 		}
 	}
@@ -147,10 +150,11 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 	@Override
 	public List<ShortURL> findByTarget(String target) {
 		try {
-			return jdbc.query("SELECT * FROM shorturl WHERE target = ?",
-					new Object[] { target }, rowMapper);
+			return jdbc.query("SELECT * FROM shorturl WHERE target = ?", new Object[] { target }, rowMapper);
+		} catch (EmptyResultDataAccessException e) {
+			return null;
 		} catch (Exception e) {
-			log.debug("When select for target " + target , e);
+			log.error("When select for target " + target , e);
 			return Collections.emptyList();
 		}
 	}

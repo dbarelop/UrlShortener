@@ -11,13 +11,12 @@ CREATE TABLE SHORTURL(
 	SPONSOR		VARCHAR(1024),						-- Sponsor URL
 	CREATED 	TIMESTAMP,								-- Creation date
 	OWNER		  VARCHAR(255),							-- User id
-	MODE		  INTEGER,									-- Redirect mode
 	SAFE		  BOOLEAN,									-- Safe target
 	IP			  VARCHAR(20),							-- IP
 	COUNTRY		VARCHAR(50),							-- Country
-	STATUS		INTEGER,									-- Status value
-	BADSTATUS	VARCHAR(20),							-- Date bad status value
-	USER  		VARCHAR(20)								-- User who created the short url
+  LASTSTATUS INTEGER,                 -- Last check status
+  LASTCHECK	TIMESTAMP,                -- Last check date
+  USER  		VARCHAR(20)								-- User who created the short url
 );
 
 -- Click

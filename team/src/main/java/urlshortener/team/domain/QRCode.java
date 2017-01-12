@@ -1,8 +1,5 @@
 package urlshortener.team.domain;
 
-/**
- * Created by catal on 20/12/2016.
- */
 public class QRCode {
 
     private String url;
