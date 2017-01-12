@@ -73,7 +73,7 @@ public class UrlShortenerControllerWithLogs {
 	@RequestMapping(value = "/link", method = RequestMethod.POST)
 	public ResponseEntity<ShortURL> shortener(@RequestParam("url") String url,
 											  @RequestParam(value = "sponsor", required = false) String sponsor,
-											  @RequestParam(value="error", defaultValue = "L") String error,
+											  @RequestParam(value = "error", defaultValue = "L") String error,
 											  @RequestParam(value = "vcardname", required = false) String vcardName,
 											  @RequestParam(value = "vcardsurname", required = false) String vcardSurname,
 											  @RequestParam(value = "vcardorganization", required = false) String vcardOrganization,

@@ -34,12 +34,6 @@ public class QRCodeController {
 	@Autowired
 	protected ShortURLRepository shortURLRepository;
 
-	/**
-	 * @param width - anchura del codigo QR (200 es adecuado)
-	 * @param height - altura del codigo QR (200 es adecuado)
-	 * @throws WriterException
-	 * @throws IOException
-	 */
 	@RequestMapping("/{hash}/qrcode")
 	public void qrCode (@PathVariable String hash,
 						@RequestParam(value="width", defaultValue="200") int width,

@@ -105,7 +105,7 @@ public class ShortNameController {
 				su.setStatus(statusService.getStatus());
 				su.setBadStatusDate(statusService.getBadStatusDate());
 				try {
-					String qrUri = su.getUri().toString() + "/qrcode?error=";
+					String qrUri = su.getUri().toString() + "/qrcode?error=" + error;
 					qrUri += (vcard.getName() != null ? "?" + vcard.getUrlEncodedParameters() : "");
 					su.setQRLink(new URI(qrUri));
 				} catch (URISyntaxException e) {
