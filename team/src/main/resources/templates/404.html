@@ -18,10 +18,14 @@
 			<br />
 			<div class="panel panel-default">
                 <div class="panel-heading">
+					<!--/*@thymesVar id="uri" type="java.net.URI"*/-->
                 	<h3><a th:href="${uri}" th:text="${uri}"></a></h3>
                	</div>
                 <div class="panel-body">
                     <ul class='list-group'>
+						<!--/*@thymesVar id="date" type="java.util.Date"*/-->
+						<!--/*@thymesVar id="target" type="java.lang.String"*/-->
+						<!--/*@thymesVar id="hash" type="java.lang.String"*/-->
                         <li class="list-group-item"><strong>Offline since:</strong> <span th:text="${date}"></span></li>
                         <li class="list-group-item"><strong>Target URL:</strong> <a th:href="${target}" th:text="${target}"></a></li>
                         <li class="list-group-item"><strong>Cache:</strong> <a th:href="${hash}" th:text="${hash}"></a></li>

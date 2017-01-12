@@ -11,6 +11,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.DirectFieldAccessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -31,8 +32,8 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 					rs.getString("owner"), rs.getInt("mode"),
 					rs.getBoolean("safe"), rs.getString("ip"),
 					rs.getString("country"));
-			rowMapper.setStatus(rs.getInt("status"));
-			rowMapper.setBadStatusDate(rs.getString("badstatus"));
+			rowMapper.setLastStatus(HttpStatus.valueOf(rs.getInt("status")));
+			rowMapper.setLastCheck(rs.getDate("lastcheck"));
 			return rowMapper;
 		}
 	};
@@ -64,7 +65,7 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 			jdbc.update("INSERT INTO shorturl VALUES (?,?,?,?,?,?,?,?,?,?,?)",
 					su.getHash(), su.getTarget(), su.getSponsor(),
 					su.getCreated(), su.getOwner(), su.getMode(), su.getSafe(),
-					su.getIP(), su.getCountry(), su.getStatus(), su.getBadStateDate());
+					su.getIP(), su.getCountry(), su.getLastStatus(), su.getLastCheck());
 		} catch (DuplicateKeyException e) {
 			log.debug("When insert for key " + su.getHash(), e);
 			return su;
@@ -95,11 +96,11 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 		try {
 			jdbc.update(
 					"update shorturl set target=?, sponsor=?, created=?, "
-					+ "owner=?, mode=?, safe=?, ip=?, country=?, status=?,"
-					+ "badstatus=? where hash=?",
+					+ "owner=?, mode=?, safe=?, ip=?, country=?, laststatus=?,"
+					+ "lastcheck=? where hash=?",
 					su.getTarget(), su.getSponsor(), su.getCreated(),
 					su.getOwner(), su.getMode(), su.getSafe(), su.getIP(),
-					su.getCountry(), su.getStatus(), su.getBadStateDate(), su.getHash());
+					su.getCountry(), su.getLastStatus(), su.getLastCheck(), su.getHash());
 		} catch (Exception e) {
 			log.debug("When update for hash " + su.getHash(), e);
 		}

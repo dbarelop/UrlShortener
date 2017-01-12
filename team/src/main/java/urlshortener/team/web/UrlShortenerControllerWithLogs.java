@@ -28,6 +28,7 @@ import urlshortener.common.domain.Click;
 import urlshortener.common.domain.ShortURL;
 import urlshortener.common.repository.ClickRepository;
 import urlshortener.team.repository.ShortURLRepository;
+import urlshortener.team.service.StatusServiceImpl;
 
 @RestController
 public class UrlShortenerControllerWithLogs {
@@ -35,7 +36,7 @@ public class UrlShortenerControllerWithLogs {
 	private static final Logger logger = LoggerFactory.getLogger(UrlShortenerControllerWithLogs.class);
 
 	@Autowired
-	private StatusService statusService;
+	private StatusServiceImpl statusService;
 	@Autowired
 	private MetricsController metricsController;
     @Autowired
@@ -48,16 +49,11 @@ public class UrlShortenerControllerWithLogs {
 		logger.info("Requested redirection with hash " + id);
 		ShortURL l = shortURLRepository.findByKey(id);
 		if (l != null) {
-			ResponseEntity<?> response = null;
-			if (l.getStatus() == 200) {
+			ResponseEntity<?> response;
+			if (l.getLastStatus() == HttpStatus.OK) {
 				response = createSuccessfulRedirectToResponse(l);
 			} else {
-				try {
-					response = badStatus(l);
-				} catch (URISyntaxException e) {
-					logger.info("Error to redirect 404 page");
-					e.printStackTrace();
-				}
+				response = badStatus(l);
 			}
 			createAndSaveClick(id, extractIP(request), extractUserAgent(request));
             metricsController.notifyNewMetrics(id);
@@ -72,9 +68,8 @@ public class UrlShortenerControllerWithLogs {
 								@RequestParam(value = "sponsor", required = false) String sponsor,
 											  HttpServletRequest request) {
 		logger.info("Requested new short for uri " + url);
-		statusService.verifyStatus(url);
-		ShortURL su = createAndSaveIfValid(url, sponsor, UUID
-				.randomUUID().toString(), request.getRemoteAddr());
+		ShortURL su = createAndSaveIfValid(url, sponsor, UUID.randomUUID().toString(), request.getRemoteAddr());
+		statusService.verifyStatus(su);
 		if (su != null) {
 			HttpHeaders h = new HttpHeaders();
 			h.setLocation(su.getUri());
@@ -91,8 +86,6 @@ public class UrlShortenerControllerWithLogs {
             ShortURL su = new ShortURL(id, url,
                     linkTo(methodOn(UrlShortenerControllerWithLogs.class).redirectTo(id, null)).toUri(), sponsor, new Date(System.currentTimeMillis()), owner,
                     HttpStatus.TEMPORARY_REDIRECT.value(), true, ip, null);
-            su.setStatus(statusService.getStatus());
-            su.setBadStatusDate(statusService.getBadStatusDate());
 			try {
 				String myUrl = su.getUri().toString() + "/qrcode";
 				URI myURI = null;
@@ -129,9 +122,14 @@ public class UrlShortenerControllerWithLogs {
 		return new ResponseEntity<>(h, HttpStatus.valueOf(l.getMode()));
 	}
 	
-	private ResponseEntity<?> badStatus(ShortURL shortURL) throws URISyntaxException {
+	private ResponseEntity<?> badStatus(ShortURL shortURL) {
 		HttpHeaders h = new HttpHeaders();
-		h.setLocation(new URI("http://localhost:8080/404/" + shortURL.getHash()));
+		try {
+			// TODO: remove hardcoded port and host
+			h.setLocation(new URI("http://localhost:8080/404/" + shortURL.getHash()));
+		} catch (URISyntaxException e) {
+			logger.error(e.getMessage(), e);
+		}
 		return new ResponseEntity<>(h, HttpStatus.valueOf(shortURL.getMode()));
 	}
 }

@@ -27,8 +27,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import urlshortener.common.domain.ShortURL;
 import urlshortener.team.repository.ShortURLRepository;
-import urlshortener.common.web.UrlShortenerController;
 import urlshortener.team.domain.ShortName;
+import urlshortener.team.service.StatusServiceImpl;
 
 @RestController
 @Order(Ordered.HIGHEST_PRECEDENCE)
@@ -37,7 +37,7 @@ public class ShortNameController {
 	private static final Logger LOG = LoggerFactory.getLogger(ShortNameController.class);
 
 	@Autowired
-	private StatusService statusService;
+	private StatusServiceImpl statusService;
 	@Autowired
 	protected ShortURLRepository shortURLRepository;
 		
@@ -59,9 +59,8 @@ public class ShortNameController {
 												@RequestParam(value = "sponsor", required = false) String sponsor,
 												HttpServletRequest request) {
 		LOG.info("Requested new short for uri " + url + " and short name = " + id);
-		statusService.verifyStatus(url);
-		ShortURL su = createAndSaveIfValid(id,url, sponsor, UUID
-				.randomUUID().toString(), extractIP(request));
+		ShortURL su = createAndSaveIfValid(id, url, sponsor, UUID.randomUUID().toString(), extractIP(request));
+		statusService.verifyStatus(su);
 		if (su != null) {
 			HttpHeaders h = new HttpHeaders();
 			h.setLocation(su.getUri());
@@ -94,8 +93,6 @@ public class ShortNameController {
                         linkTo(methodOn(UrlShortenerControllerWithLogs.class).redirectTo(finalId, null)).toUri(), sponsor,
                         new Date(System.currentTimeMillis()), owner, HttpStatus.TEMPORARY_REDIRECT.value(), true, ip,
                         null);
-                su.setStatus(statusService.getStatus());
-                su.setBadStatusDate(statusService.getBadStatusDate());
 				try {
 					String myUrl = su.getUri().toString() + "/qrcode";
 					URI myURI = null;
