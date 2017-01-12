@@ -2,7 +2,6 @@ package urlshortener.team.domain;
 
 import eu.bitwalker.useragentutils.Browser;
 import eu.bitwalker.useragentutils.OperatingSystem;
-import urlshortener.common.domain.ShortURL;
 
 import java.util.Date;
 import java.util.Map;

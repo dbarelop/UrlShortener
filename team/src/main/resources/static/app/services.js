@@ -1,16 +1,14 @@
 angular.module("UrlShortenerApp.services")
-    .service("MetricsService", function($q, $http, $timeout, $location) {
+    .service("MetricsService", function($q, $http, $timeout) {
         var service = {}, listener = $q.defer(), socket = {
             client: null,
             stomp: null
         };
 
-        var hash = $location.absUrl().split(/[\s/]+/).pop();
+        var hash;
 
         service.RECONNECT_TIMEOUT = 30000;
         service.SOCKET_URL = "/metrics";
-        service.CHAT_TOPIC = "/topic/metrics/" + hash;
-        service.CHAT_BROKER = "/app/metrics/" + hash;
         service.connected = false;
 
         service.receive = function() {
@@ -42,26 +40,33 @@ angular.module("UrlShortenerApp.services")
             service.send();
         };
 
-        var initialize = function() {
+        service.initialize = function(hash) {
+            service.CHAT_TOPIC = "/topic/metrics/" + hash;
+            service.CHAT_BROKER = "/app/metrics/" + hash;
             socket.client = new SockJS(service.SOCKET_URL);
             socket.stomp = Stomp.over(socket.client);
             socket.stomp.connect({}, startListener);
             socket.stomp.onclose = reconnect;
         };
 
-        initialize();
-
         return service;
     })
     .service("URLShortenerService", function($q, $http) {
         var service = {};
 
-        service.shortenUrl = function(url, brandedLink) {
+        service.shortenUrl = function(url, brandedLink, vcard, qrErrorLevel) {
             var deferred = $q.defer();
-            var path = "/link", params = { params: { url: url }};
+            var path = "/link", params = { params: { url: url, error: qrErrorLevel }};
             if (brandedLink) {
                 path = "/brandedLink";
                 params.params.shortName = brandedLink;
+            }
+            if (vcard.vcardName)  {
+                params.params.vcardname = vcard.vcardName;
+                params.params.vcardsurname = vcard.vcardSurname;
+                params.params.vcardorganization = vcard.vcardOrganization;
+                params.params.vcardtelephone = vcard.vcardTelephone;
+                params.params.vcardemail = vcard.vcardEmail;
             }
             $http.post(path, null, params).then(function(data) {
                 deferred.resolve(data.data);

@@ -9,7 +9,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
-import urlshortener.common.domain.ShortURL;
+import urlshortener.team.domain.ShortURL;
 import urlshortener.team.repository.fixture.ClickFixture;
 import urlshortener.team.repository.fixture.ShortURLFixture;
 import urlshortener.team.repository.ShortURLRepository;

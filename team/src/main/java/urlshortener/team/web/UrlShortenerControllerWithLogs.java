@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
 import com.google.common.hash.Hashing;
@@ -25,8 +27,9 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
 import urlshortener.common.domain.Click;
-import urlshortener.common.domain.ShortURL;
+import urlshortener.team.domain.ShortURL;
 import urlshortener.common.repository.ClickRepository;
+import urlshortener.team.domain.VCard;
 import urlshortener.team.repository.ShortURLRepository;
 import urlshortener.team.service.StatusServiceImpl;
 
@@ -36,13 +39,13 @@ public class UrlShortenerControllerWithLogs {
 	private static final Logger logger = LoggerFactory.getLogger(UrlShortenerControllerWithLogs.class);
 
 	@Autowired
-	private StatusServiceImpl statusService;
+	private StatusService statusService;
 	@Autowired
 	private MetricsController metricsController;
-    @Autowired
-    private ShortURLRepository shortURLRepository;
-    @Autowired
-    private ClickRepository clickRepository;
+	@Autowired
+	private ShortURLRepository shortURLRepository;
+	@Autowired
+	private ClickRepository clickRepository;
 
 	@RequestMapping(value = "/{id:(?!link|index|metrics|404).*}", method = RequestMethod.GET)
 	public ResponseEntity<?> redirectTo(@PathVariable String id, HttpServletRequest request) {
@@ -56,7 +59,7 @@ public class UrlShortenerControllerWithLogs {
 				response = badStatus(l);
 			}
 			createAndSaveClick(id, extractIP(request), extractUserAgent(request));
-            metricsController.notifyNewMetrics(id);
+			metricsController.notifyNewMetrics(id);
 			return response;
 		} else {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -64,12 +67,20 @@ public class UrlShortenerControllerWithLogs {
 	}
 
 	@RequestMapping(value = "/link", method = RequestMethod.POST)
-	public ResponseEntity<ShortURL> shortener(@RequestParam("url") String url,								
-								@RequestParam(value = "sponsor", required = false) String sponsor,
+	public ResponseEntity<ShortURL> shortener(@RequestParam("url") String url,
+											  @RequestParam(value = "sponsor", required = false) String sponsor,
+											  @RequestParam(value = "error", defaultValue = "L") String error,
+											  @RequestParam(value = "vcardname", required = false) String vcardName,
+											  @RequestParam(value = "vcardsurname", required = false) String vcardSurname,
+											  @RequestParam(value = "vcardorganization", required = false) String vcardOrganization,
+											  @RequestParam(value = "vcardtelephone", required = false) String vcardTelephone,
+											  @RequestParam(value = "vcardemail", required = false) String vcardEmail,
 											  HttpServletRequest request) {
 		logger.info("Requested new short for uri " + url);
-		ShortURL su = createAndSaveIfValid(url, sponsor, UUID.randomUUID().toString(), request.getRemoteAddr());
-		statusService.verifyStatus(su);
+		statusService.verifyStatus(url);
+		VCard vcard = new VCard(vcardName, vcardSurname, vcardOrganization, vcardTelephone, vcardEmail, url);
+		ShortURL su = createAndSaveIfValid(url, sponsor, error, vcard, UUID.randomUUID().toString(), request.getRemoteAddr());
+        statusService.verifyStatus(su);
 		if (su != null) {
 			HttpHeaders h = new HttpHeaders();
 			h.setLocation(su.getUri());
@@ -79,22 +90,22 @@ public class UrlShortenerControllerWithLogs {
 		}
 	}
 	
-	private ShortURL createAndSaveIfValid(String url, String sponsor, String owner, String ip) {
+	private ShortURL createAndSaveIfValid(String url, String sponsor, String error, VCard vcard, String owner, String ip) {
 		UrlValidator urlValidator = new UrlValidator(new String[] { "http", "https" });
 		if (urlValidator.isValid(url)) {
-            String id = Hashing.murmur3_32().hashString(url, StandardCharsets.UTF_8).toString();
-            ShortURL su = new ShortURL(id, url,
-                    linkTo(methodOn(UrlShortenerControllerWithLogs.class).redirectTo(id, null)).toUri(), sponsor, new Date(System.currentTimeMillis()), owner,
-                    HttpStatus.TEMPORARY_REDIRECT.value(), true, ip, null);
+			String id = Hashing.murmur3_32().hashString(url, StandardCharsets.UTF_8).toString();
+			Object user = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			ShortURL su = new ShortURL(id, url,
+					linkTo(methodOn(UrlShortenerControllerWithLogs.class).redirectTo(id, null)).toUri(), sponsor, new Date(System.currentTimeMillis()), owner,
+					HttpStatus.TEMPORARY_REDIRECT.value(), true, ip, null, user instanceof User ? ((User) user).getUsername() : null);
 			try {
-				String myUrl = su.getUri().toString() + "/qrcode";
-				URI myURI = null;
-				myURI = new URI(myUrl);
-				su.setQRLink(myURI);
+				String qrUri = su.getUri().toString() + "/qrcode?error=" + error;
+				qrUri += (vcard.getName() != null ? vcard.getUrlEncodedParameters() : "");
+				su.setQRLink(new URI(qrUri));
 			} catch (URISyntaxException e) {
-				e.printStackTrace();
+				logger.error(e.getMessage(), e);
 			}
-            return shortURLRepository.save(su);
+			return shortURLRepository.save(su);
 		} else {
 			return null;
 		}
@@ -121,15 +132,11 @@ public class UrlShortenerControllerWithLogs {
 		h.setLocation(URI.create(l.getTarget()));
 		return new ResponseEntity<>(h, HttpStatus.valueOf(l.getMode()));
 	}
-	
-	private ResponseEntity<?> badStatus(ShortURL shortURL) {
+
+	private ResponseEntity<?> badStatus(ShortURL shortURL) throws URISyntaxException {
 		HttpHeaders h = new HttpHeaders();
-		try {
-			// TODO: remove hardcoded port and host
-			h.setLocation(new URI("http://localhost:8080/404/" + shortURL.getHash()));
-		} catch (URISyntaxException e) {
-			logger.error(e.getMessage(), e);
-		}
+		URI location = linkTo(methodOn(UrlShortenerControllerWithLogs.class).redirectTo("/404/" + shortURL.getHash(), null)).toUri();
+		h.setLocation(location);
 		return new ResponseEntity<>(h, HttpStatus.valueOf(shortURL.getMode()));
 	}
 }

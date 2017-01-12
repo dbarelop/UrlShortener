@@ -2,7 +2,7 @@ package urlshortener.team.repository;
 
 import java.util.List;
 
-import urlshortener.common.domain.ShortURL;
+import urlshortener.team.domain.ShortURL;
 
 public interface ShortURLRepository {
 
