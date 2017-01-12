@@ -61,7 +61,7 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 			jdbc.update("INSERT INTO shorturl VALUES (?,?,?,?,?,?,?,?,?,?,?)",
 					su.getHash(), su.getTarget(), su.getSponsor(),
 					su.getCreated(), su.getOwner(), su.getSafe(),
-					su.getIP(), su.getCountry(), su.getLastStatus().value(), su.getLastCheck(),
+					su.getIP(), su.getCountry(), su.getLastStatus() != null ? su.getLastStatus().value() : null, su.getLastCheck(),
 					su.getUser());
 		} catch (DuplicateKeyException e) {
 			log.error("When insert for key " + su.getHash(), e);
@@ -96,7 +96,7 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 					+ "lastcheck=? where hash=?",
 					su.getTarget(), su.getSponsor(), su.getCreated(),
 					su.getOwner(), su.getSafe(), su.getIP(),
-					su.getCountry(), su.getLastStatus().value(), su.getLastCheck(), su.getHash());
+					su.getCountry(), su.getLastStatus() != null ? su.getLastStatus().value() : null, su.getLastCheck(), su.getHash());
 		} catch (Exception e) {
 			log.error("When update for hash " + su.getHash(), e);
 		}
