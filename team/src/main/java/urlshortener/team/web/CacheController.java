@@ -1,5 +1,7 @@
 package urlshortener.team.web;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,6 +15,8 @@ import urlshortener.team.service.CacheService;
 @Controller
 public class CacheController {
 
+    private static final Logger logger = LoggerFactory.getLogger(CacheController.class);
+
     @Autowired
     private CacheService cacheService;
 
@@ -20,6 +24,7 @@ public class CacheController {
     public String getCachedPage(@PathVariable String hash, Model model) {
         CachedPage cachedPage = cacheService.getCachedPage(hash);
         if (cachedPage != null) {
+            logger.info("** Serving cache for " + hash + " from " + cachedPage.getDate());
             model.addAttribute("cachedPage", cachedPage);
             return "cache";
         } else {

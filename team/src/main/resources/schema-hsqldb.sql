@@ -11,7 +11,6 @@ CREATE TABLE SHORTURL(
 	SPONSOR		VARCHAR(1024),						-- Sponsor URL
 	CREATED 	TIMESTAMP,								-- Creation date
 	OWNER		  VARCHAR(255),							-- User id
-	MODE		  INTEGER,									-- Redirect mode
 	SAFE		  BOOLEAN,									-- Safe target
 	IP			  VARCHAR(20),							-- IP
 	COUNTRY		VARCHAR(50),							-- Country

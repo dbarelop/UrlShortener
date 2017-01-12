@@ -56,6 +56,7 @@ public class UrlShortenerControllerWithLogs {
 			if (l.getLastStatus() == null || l.getLastStatus() == HttpStatus.OK) {
 				response = createSuccessfulRedirectToResponse(l);
 			} else {
+				logger.info("** " + l.getTarget() + " was down during last test");
 				response = badStatus(l);
 			}
 			createAndSaveClick(id, extractIP(request), extractUserAgent(request));
@@ -95,8 +96,7 @@ public class UrlShortenerControllerWithLogs {
 			String id = Hashing.murmur3_32().hashString(url, StandardCharsets.UTF_8).toString();
 			Object user = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			ShortURL su = new ShortURL(id, url, linkTo(methodOn(UrlShortenerControllerWithLogs.class).redirectTo(id, null)).toUri(),
-					sponsor, new Date(), owner, HttpStatus.TEMPORARY_REDIRECT.value(), true, ip, null,
-					user instanceof User ? ((User) user).getUsername() : null);
+					sponsor, new Date(), owner, true, ip, null, user instanceof User ? ((User) user).getUsername() : null);
 			try {
 				String qrUri = su.getUri().toString() + "/qrcode?error=" + error;
 				qrUri += (vcard.getName() != null ? vcard.getUrlEncodedParameters() : "");
@@ -128,14 +128,13 @@ public class UrlShortenerControllerWithLogs {
 	private ResponseEntity<?> createSuccessfulRedirectToResponse(ShortURL l) {
 		HttpHeaders h = new HttpHeaders();
 		h.setLocation(URI.create(l.getTarget()));
-		return new ResponseEntity<>(h, HttpStatus.valueOf(l.getMode()));
+		return new ResponseEntity<>(h, HttpStatus.TEMPORARY_REDIRECT);
 	}
 
 	private ResponseEntity<?> badStatus(ShortURL shortURL) {
 		HttpHeaders h = new HttpHeaders();
 		URI location = linkTo(methodOn(UrlShortenerControllerWithLogs.class).redirectTo("404/" + shortURL.getHash(), null)).toUri();
 		h.setLocation(location);
-		// TODO: check shortURL.getMode()
-		return new ResponseEntity<>(h, HttpStatus.valueOf(shortURL.getMode()));
+		return new ResponseEntity<>(h, HttpStatus.TEMPORARY_REDIRECT);
 	}
 }

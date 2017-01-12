@@ -90,8 +90,7 @@ public class ShortNameController {
 
 				Object user = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 				ShortURL su = new ShortURL(id, url, linkTo(methodOn(UrlShortenerControllerWithLogs.class).redirectTo(id, null)).toUri(),
-						sponsor, new Date(), owner, HttpStatus.TEMPORARY_REDIRECT.value(), true, ip, null,
-						user instanceof User ? ((User) user).getUsername() : null);
+						sponsor, new Date(), owner, true, ip, null, user instanceof User ? ((User) user).getUsername() : null);
 				try {
 					String qrUri = su.getUri().toString() + "/qrcode?error=" + error;
 					qrUri += (vcard.getName() != null ? "?" + vcard.getUrlEncodedParameters() : "");

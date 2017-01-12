@@ -60,6 +60,7 @@ public class CacheServiceImpl implements CacheService {
 	}
 	
 	private void cacheStaticPage(ResponseEntity<String> result, ShortURL shortURL) {
+		logger.info("** Storing cache version of " + shortURL.getTarget());
 		CachedPage cachedPage = new CachedPage(shortURL.getHash(), shortURL.getLastCheck(), shortURL.getTarget(), result.getBody());
 		cachedPageRepository.save(cachedPage);
 	}

@@ -26,8 +26,7 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 	private static final RowMapper<ShortURL> rowMapper = (rs, rowNum) -> {
         ShortURL rowMapper = new ShortURL(rs.getString("hash"), rs.getString("target"),
                 null, rs.getString("sponsor"), rs.getDate("created"),
-                rs.getString("owner"), rs.getInt("mode"),
-                rs.getBoolean("safe"), rs.getString("ip"),
+                rs.getString("owner"), rs.getBoolean("safe"), rs.getString("ip"),
                 rs.getString("country"), rs.getString("user"));
         rowMapper.setLastStatus(rs.getInt("laststatus") == 0 ? null : HttpStatus.valueOf(rs.getInt("laststatus")));
         rowMapper.setLastCheck(rs.getDate("lastcheck"));
@@ -59,9 +58,9 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 	@Override
 	public ShortURL save(ShortURL su) {
 		try {
-			jdbc.update("INSERT INTO shorturl VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
+			jdbc.update("INSERT INTO shorturl VALUES (?,?,?,?,?,?,?,?,?,?,?)",
 					su.getHash(), su.getTarget(), su.getSponsor(),
-					su.getCreated(), su.getOwner(), su.getMode(), su.getSafe(),
+					su.getCreated(), su.getOwner(), su.getSafe(),
 					su.getIP(), su.getCountry(), su.getLastStatus(), su.getLastCheck(),
 					su.getUser());
 		} catch (DuplicateKeyException e) {
@@ -77,8 +76,7 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 	@Override
 	public ShortURL mark(ShortURL su, boolean safeness) {
 		try {
-			jdbc.update("UPDATE shorturl SET safe=? WHERE hash=?", safeness,
-					su.getHash());
+			jdbc.update("UPDATE shorturl SET safe=? WHERE hash=?", safeness, su.getHash());
 			ShortURL res = new ShortURL();
 			BeanUtils.copyProperties(su, res);
 			new DirectFieldAccessor(res).setPropertyValue("safe", safeness);
@@ -94,10 +92,10 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 		try {
 			jdbc.update(
 					"update shorturl set target=?, sponsor=?, created=?, "
-					+ "owner=?, mode=?, safe=?, ip=?, country=?, laststatus=?,"
+					+ "owner=?, safe=?, ip=?, country=?, laststatus=?,"
 					+ "lastcheck=? where hash=?",
 					su.getTarget(), su.getSponsor(), su.getCreated(),
-					su.getOwner(), su.getMode(), su.getSafe(), su.getIP(),
+					su.getOwner(), su.getSafe(), su.getIP(),
 					su.getCountry(), su.getLastStatus(), su.getLastCheck(), su.getHash());
 		} catch (Exception e) {
 			log.error("When update for hash " + su.getHash(), e);
