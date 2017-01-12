@@ -25,8 +25,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import urlshortener.common.domain.ShortURL;
 import urlshortener.team.repository.ShortURLRepository;
-import urlshortener.common.web.UrlShortenerController;
-import urlshortener.team.domain.ShortName;
 
 @RestController
 @Order(Ordered.HIGHEST_PRECEDENCE)
@@ -38,15 +36,8 @@ public class ShortNameController {
 	private StatusService statusService;
 	@Autowired
 	protected ShortURLRepository shortURLRepository;
-		
-	private List<String> words;
-	private ShortName shortname;
 
-	public ShortNameController(){
-		shortname  = new ShortName();
-		words = shortname.getDictionary();
-	}
-
+	
 	private String extractIP(HttpServletRequest request) {
 		return request.getRemoteAddr();
 	}
@@ -76,17 +67,15 @@ public class ShortNameController {
         if (urlValidator.isValid(url)) {
 
             String finalId;
-            ShortURL l = shortURLRepository.findByKey(id);
             List<ShortURL> ListUrl = shortURLRepository.findByTarget(url);
 
             if (!(ListUrl.isEmpty())) {
                 shortURLRepository.delete(ListUrl.get(0).getHash());
             }
 
-            if (l == null & !id.equals("")) {
+            if (uniqueId(id)) {
 
-                finalId = id;
-                suggest(id);
+                finalId = id; 
 
                 ShortURL su = new ShortURL(finalId, url,
                         linkTo(methodOn(UrlShortenerControllerWithLogs.class).redirectTo(finalId, null)).toUri(), sponsor,
@@ -108,37 +97,15 @@ public class ShortNameController {
 
     }
 	
-	private boolean suggest(String UserWord) {
-
-		if (UserWord.isEmpty()) {
-			return false;
+	private boolean uniqueId(String id) {
+		
+		ShortURL l = shortURLRepository.findByKey(id);
+		
+		if (l == null & !id.equals("")) {
+            return true;
 		}
-		System.out.println("User word: " + UserWord);
-		boolean suggestionAdded = false;
-
-		for (String word : words) {
-			boolean coincidences = true;
-			for (int i = 0; i < UserWord.length(); i++) {
-
-				if (UserWord.length() <= word.length()) {
-					if (!UserWord.toLowerCase().startsWith(String.valueOf(word.toLowerCase().charAt(i)), i)) {
-						coincidences = false;
-						break;
-					}
-				}
-			}
-			if (coincidences) {
-				if (UserWord.length() < word.length()) {
-					addSuggestions(word);
-					suggestionAdded = true;
-				}
-			}
-		}
-		return suggestionAdded;
+		
+		return false;
 	}
-
-	private void addSuggestions(String word) {
-		System.out.println("suggest: " + word);
-		//TODO implementar la respuesta de las sugerencias en el cliente
-	}
+	
 }

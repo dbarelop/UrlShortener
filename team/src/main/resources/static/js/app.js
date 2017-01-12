@@ -6,6 +6,8 @@ $(document).ready(
 						
 						var onSuccess = function(msg) {
 
+							$("#shortnameV").val('');
+							
 							$("#result").html(
 									"<div class='alert alert-success lead'>"
 									+ "<a target='_blank' href='"
@@ -35,7 +37,7 @@ $(document).ready(
 								error : function() {
 									$("#result").html("<div class='alert alert-success lead'><p>"
 											+ $("#shortnameV").val() + " already exist or not valid</p></div>");
-}
+								}
 							});
 						}else{
 							$.ajax({

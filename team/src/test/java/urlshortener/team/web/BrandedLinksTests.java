@@ -47,7 +47,7 @@ public class BrandedLinksTests {
 
 	@Test
 	public void b_testUniqueId() throws Exception {
-		ResponseEntity<String> entity = postBrandedLink("http://example.com/","id");
+		ResponseEntity<String> entity = postBrandedLink("http://example.com/server/","id");
 		assertThat(entity.getStatusCode(), is(HttpStatus.BAD_REQUEST));
 	}
 
