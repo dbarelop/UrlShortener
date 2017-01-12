@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 import urlshortener.common.domain.Click;
 import urlshortener.team.domain.ShortURL;
 import urlshortener.common.repository.ClickRepository;
+import urlshortener.team.domain.VCard;
 import urlshortener.team.repository.ShortURLRepository;
 
 @RestController
@@ -72,17 +73,17 @@ public class UrlShortenerControllerWithLogs {
 	@RequestMapping(value = "/link", method = RequestMethod.POST)
 	public ResponseEntity<ShortURL> shortener(@RequestParam("url") String url,
 											  @RequestParam(value = "sponsor", required = false) String sponsor,
-											  @RequestParam(value="vcardname", required = false) String vcardName,
-											  @RequestParam(value="vcardsurname", required = false) String vcardSurname,
-											  @RequestParam(value="vcardorganization", required = false) String vcardOrganization,
-											  @RequestParam(value="vcardtelephone", required = false) String vcardTelephone,
-											  @RequestParam(value="vcardemail", required = false) String vcardEmail,
+											  @RequestParam(value = "error", defaultValue = "L") String error,
+											  @RequestParam(value = "vcardname", required = false) String vcardName,
+											  @RequestParam(value = "vcardsurname", required = false) String vcardSurname,
+											  @RequestParam(value = "vcardorganization", required = false) String vcardOrganization,
+											  @RequestParam(value = "vcardtelephone", required = false) String vcardTelephone,
+											  @RequestParam(value = "vcardemail", required = false) String vcardEmail,
 											  HttpServletRequest request) {
 		logger.info("Requested new short for uri " + url);
 		statusService.verifyStatus(url);
-		ShortURL su = createAndSaveIfValid(url, sponsor, vcardName, vcardSurname,
-				vcardOrganization, vcardTelephone, vcardEmail,
-				UUID.randomUUID().toString(), request.getRemoteAddr());
+		VCard vcard = new VCard(vcardName, vcardSurname, vcardOrganization, vcardTelephone, vcardEmail, url);
+		ShortURL su = createAndSaveIfValid(url, sponsor, error, vcard, UUID.randomUUID().toString(), request.getRemoteAddr());
 		if (su != null) {
 			HttpHeaders h = new HttpHeaders();
 			h.setLocation(su.getUri());
@@ -92,9 +93,7 @@ public class UrlShortenerControllerWithLogs {
 		}
 	}
 	
-	private ShortURL createAndSaveIfValid(String url, String sponsor, String vcardName, String vcardSurname,
-										  String vcardOrganization, String vcardTelephone, String vcardEmail,
-										  String owner, String ip) {
+	private ShortURL createAndSaveIfValid(String url, String sponsor, String error, VCard vcard, String owner, String ip) {
 		UrlValidator urlValidator = new UrlValidator(new String[] { "http", "https" });
 		if (urlValidator.isValid(url)) {
 			String id = Hashing.murmur3_32().hashString(url, StandardCharsets.UTF_8).toString();
@@ -105,28 +104,11 @@ public class UrlShortenerControllerWithLogs {
 			su.setStatus(statusService.getStatus());
 			su.setBadStatusDate(statusService.getBadStatusDate());
 			try {
-				String myUrl = su.getUri().toString() + "/qrcode";
-				if (vcardName != null){
-					myUrl += "?vcardname=" + vcardName;
-					//myUrl.concat("?vcardname="+vcardName);
-					if(vcardSurname != null ){
-						myUrl += "&vcardsurname="+vcardSurname;
-					}
-					if(vcardOrganization!=null){
-						myUrl += "&vcardorganization="+vcardOrganization;
-					}
-					if(vcardTelephone!=null){
-						myUrl += "&vcardtelephone="+vcardTelephone;
-					}
-					if(vcardEmail!=null){
-						myUrl += "&vcardemail="+vcardEmail;
-					}
-				}
-				URI myURI = null;
-				myURI = new URI(myUrl);
-				su.setQRLink(myURI);
+				String qrUri = su.getUri().toString() + "/qrcode?error=" + error;
+				qrUri += (vcard.getName() != null ? vcard.getUrlEncodedParameters() : "");
+				su.setQRLink(new URI(qrUri));
 			} catch (URISyntaxException e) {
-				e.printStackTrace();
+				logger.error(e.getMessage(), e);
 			}
 			return shortURLRepository.save(su);
 		} else {

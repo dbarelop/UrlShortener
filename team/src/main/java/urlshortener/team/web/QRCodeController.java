@@ -3,10 +3,12 @@ package urlshortener.team.web;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.logging.Logger;
 
 import com.google.zxing.WriterException;
 
+import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,23 +27,18 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @RestController
 public class QRCodeController {
-	private static Logger logger = Logger.getLogger(QRCodeController.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(QRCodeController.class);
 
 	@Autowired
 	private QRCodeService qrService;
 	@Autowired
 	protected ShortURLRepository shortURLRepository;
 
-	/**
-	 * @param width - anchura del codigo QR (200 es adecuado)
-	 * @param height - altura del codigo QR (200 es adecuado)
-	 * @throws WriterException
-	 * @throws IOException
-	 */
 	@RequestMapping("/{hash}/qrcode")
 	public void qrCode (@PathVariable String hash,
 						@RequestParam(value="width", defaultValue="200") int width,
 						@RequestParam(value="height", defaultValue="200") int height,
+						@RequestParam(value="error", required = false) String error,
 						@RequestParam(value="vcardname", required = false) String vcardName,
 						@RequestParam(value="vcardsurname", required = false) String vcardSurname,
 						@RequestParam(value="vcardorganization", required = false) String vcardOrganization,
@@ -53,16 +50,25 @@ public class QRCodeController {
 		if (shortURL != null) {
 			URI uri = linkTo(methodOn(UrlShortenerControllerWithLogs.class).redirectTo(hash, null)).toUri();
 			OutputStream stream = response.getOutputStream();
-			response.setContentType(MediaType.IMAGE_PNG_VALUE);
 			try {
-				if (vcardName != null) {
-					VCard vCard = new VCard(vcardName, vcardSurname, vcardOrganization, vcardTelephone, vcardEmail, uri.toString());
-					qrService.generateQRCode(uri, vCard, width, height, stream);
-				} else {
-					qrService.generateQRCode(uri, width, height, stream);
+				ErrorCorrectionLevel errorCorrectionLevel = null;
+				if (error != null) {
+					switch (error) {
+						case "L": errorCorrectionLevel = ErrorCorrectionLevel.L; break;
+						case "M": errorCorrectionLevel = ErrorCorrectionLevel.M; break;
+						case "Q": errorCorrectionLevel = ErrorCorrectionLevel.Q; break;
+						case "H": errorCorrectionLevel = ErrorCorrectionLevel.H; break;
+					}
 				}
+				if (vcardName != null) {
+					VCard vcard = new VCard(vcardName, vcardSurname, vcardOrganization, vcardTelephone, vcardEmail, uri.toString());
+					qrService.generateQRCode(uri, vcard, width, height, stream, errorCorrectionLevel);
+				} else {
+					qrService.generateQRCode(uri, width, height, stream, errorCorrectionLevel);
+				}
+				response.setContentType(MediaType.IMAGE_PNG_VALUE);
 			} catch (IOException e) {
-				logger.warning("Error creating QR code: " + e.getMessage());
+				logger.error(e.getMessage(), e);
 				response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			}
 		}
