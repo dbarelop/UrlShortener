@@ -1,14 +1,19 @@
 buildscript {
     repositories {
         mavenCentral()
-        maven { url "http://repo.spring.io/release" }
+        maven { url 'http://repo.spring.io/release' }
     }
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.4.0.RELEASE")
+        classpath('org.springframework.boot:spring-boot-gradle-plugin:1.4.0.RELEASE')
+        classpath('se.transmode.gradle:gradle-docker:1.2')
     }
 }
-apply plugin: "spring-boot"
+
+group = 'unizar'
+
+apply plugin: 'spring-boot'
 apply plugin: 'eclipse-wtp'
+apply plugin: 'docker'
 
 eclipse {
     project {
@@ -17,17 +22,26 @@ eclipse {
 }
 
 dependencies {
+    // Common project
     compile project(':common')
+
+    // Spring Boot Thymeleaf template engine
     compile 'org.springframework.boot:spring-boot-starter-thymeleaf:1.4.0.RELEASE'
+    // Spring Boot WebSocket
     compile 'org.springframework.boot:spring-boot-starter-websocket:1.4.0.RELEASE'
+    // Spring Boot MongoDB
     compile 'org.springframework.boot:spring-boot-starter-data-mongodb:1.4.0.RELEASE'
+    // Spring security
     compile 'org.springframework.boot:spring-boot-starter-security:1.4.0.RELEASE'
     compile 'org.thymeleaf.extras:thymeleaf-extras-springsecurity4'
+    // QR code library
+    compile 'com.google.zxing:core:3.3.0'
+    compile 'com.google.zxing:javase:3.3.0'
 
-    // Provides the production database
+    // Production database
     runtime 'org.hsqldb:hsqldb'
 
-    // Provides java script libraries for static content
+    // JavaScript libraries for static content
     compile 'org.webjars:bootstrap:3.3.5'
     compile 'org.webjars:jquery:2.1.4'
     compile 'org.webjars:angularjs:1.5.8'
@@ -36,12 +50,20 @@ dependencies {
     compile 'org.webjars:stomp-websocket:2.3.3'
     compile 'org.webjars:sockjs-client:1.1.1'
 
-	// https://mvnrepository.com/artifact/com.google.zxing/core
-    compile group: 'com.google.zxing', name: 'core', version: '3.3.0'
-    compile group: 'com.google.zxing', name: 'javase', version: '3.3.0'
-
     // Testing framework
     testCompile 'org.springframework.boot:spring-boot-starter-test'
     testCompile 'org.apache.httpcomponents:httpclient:4.5.2'
     testCompile 'com.jayway.jsonpath:json-path:2.2.0'
+}
+
+task buildDocker (type: Docker, dependsOn: build) {
+    push = true
+    applicationName = jar.baseName
+    dockerfile = file('src/main/docker/Dockerfile')
+    doFirst {
+        copy {
+            from jar
+            into stageDir
+        }
+    }
 }
