@@ -51,6 +51,74 @@ angular.module("UrlShortenerApp.services")
 
         return service;
     })
+    
+    .service("SuggestService", function($q, $http, $timeout) {
+    	
+        var service = {}, listener = $q.defer(), socket = {
+            client: null,
+            stomp: null
+        };
+        
+        service.RECONNECT_TIMEOUT = 30000;
+        service.SOCKET_URL = "/suggest";
+        service.connected = false;
+        
+        service.receive = function() {
+            return listener.promise;
+        };
+
+        service.send = function() {
+            if (service.connected) {
+                socket.stomp.send(service.CHAT_BROKER, { priority: 9 }, JSON.stringify({
+                	shortName: branded
+                }));
+            }
+        };
+        
+        var reconnect = function() {
+            service.connected = false;
+            $timeout(function() {
+                initialize();
+            }, this.RECONNECT_TIMEOUT);
+        };
+        
+        var startListener = function() {
+            socket.stomp.subscribe(service.CHAT_TOPIC, function(data) {
+                listener.notify(JSON.parse(data.body));
+            });
+            service.connected = true;
+            service.send();
+        };
+        
+        var branded;
+        
+        service.initialize = function(brandedLink) {
+        	branded = brandedLink;
+            service.CHAT_TOPIC = "/topic/suggest/";
+            service.CHAT_BROKER = "/app/suggest/";
+            socket.client = new SockJS(service.SOCKET_URL);
+            socket.stomp = Stomp.over(socket.client);
+            socket.stomp.connect({}, startListener);
+            socket.stomp.onclose = reconnect;
+        };
+        
+        /*service.suggest = function(brandedLink) {
+            var deferred = $q.defer();
+            if (brandedLink) {
+                var path = "/suggest", params = { params: { shortName: brandedLink}};
+            }
+            
+            $http.get(path, null, params).then(function(data) {
+                deferred.resolve(data.data);
+            }, function(err) {
+                deferred.reject(err);
+            });
+            return deferred.promise;
+        };*/
+
+        return service;
+    })
+    
     .service("URLShortenerService", function($q, $http) {
         var service = {};
 

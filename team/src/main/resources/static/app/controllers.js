@@ -28,7 +28,7 @@ angular.module("UrlShortenerApp.controllers", ["chart.js"])
             MetricsService.initialize(hash);
         }
     })
-    .controller("URLShortenerCtrl", function($scope, $location, URLShortenerService) {
+    .controller("URLShortenerCtrl", function($scope, $location, URLShortenerService, SuggestService) {
         $scope.url = "";
         $scope.brandedLink = "";
         $scope.vcard = {
@@ -50,4 +50,13 @@ angular.module("UrlShortenerApp.controllers", ["chart.js"])
         };
         $scope.showVcard = false;
         $scope.showQr = false;
+        
+        if ($scope.brandedLink != "") {
+			SuggestService.initialize($scope.brandedLink).then(function(data) {
+                $scope.error = data;
+            }, function(err) {
+                $scope.error = "Unexpected error: " + err.data;
+            });
+		}
+        
     });

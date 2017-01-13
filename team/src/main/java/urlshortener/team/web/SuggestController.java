@@ -9,11 +9,15 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import urlshortener.team.message.ErrorMessage;
 import urlshortener.team.service.SuggestService;
 import urlshortener.team.service.SuggestSynonymService;
 
@@ -55,6 +59,19 @@ public class SuggestController {
 		} else {			
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
+	}
+	
+	@MessageMapping("/suggest")
+	@SendTo("/topic/suggest")
+	public Object getSuggesWebSocket(@DestinationVariable String id) {
+		LOG.info("Requested suggest for short name = " + id);		
+		List<String> s = suggest.suggest(id);
+
+		if (!s.isEmpty()) {
+			return new ErrorMessage("Suggest for word " + id + " not found");
+		}
+
+		return s;
 	}
 		
 }
