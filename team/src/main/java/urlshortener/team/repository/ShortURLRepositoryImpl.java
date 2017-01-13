@@ -30,6 +30,7 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
                 rs.getString("country"), rs.getString("user"));
         rowMapper.setLastStatus(rs.getInt("laststatus") == 0 ? null : HttpStatus.valueOf(rs.getInt("laststatus")));
         rowMapper.setLastCheck(rs.getDate("lastcheck"));
+        rowMapper.setAvailableSince(rs.getDate("availablesince"));
         return rowMapper;
     };
 
@@ -58,11 +59,11 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 	@Override
 	public ShortURL save(ShortURL su) {
 		try {
-			jdbc.update("INSERT INTO shorturl VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+			jdbc.update("INSERT INTO shorturl VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
 					su.getHash(), su.getTarget(), su.getSponsor(),
 					su.getCreated(), su.getOwner(), su.getSafe(),
-					su.getIP(), su.getCountry(), su.getLastStatus() != null ? su.getLastStatus().value() : null, su.getLastCheck(),
-					su.getUser());
+					su.getIP(), su.getCountry(), su.getLastStatus() != null ? su.getLastStatus().value() : null,
+					su.getLastCheck(), su.getAvailableSince(), su.getUser());
 		} catch (DuplicateKeyException e) {
 			log.error("When insert for key " + su.getHash(), e);
 			return su;
@@ -93,10 +94,11 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 			jdbc.update(
 					"update shorturl set target=?, sponsor=?, created=?, "
 					+ "owner=?, safe=?, ip=?, country=?, laststatus=?,"
-					+ "lastcheck=? where hash=?",
+					+ "lastcheck=?, availablesince=? where hash=?",
 					su.getTarget(), su.getSponsor(), su.getCreated(),
 					su.getOwner(), su.getSafe(), su.getIP(),
-					su.getCountry(), su.getLastStatus() != null ? su.getLastStatus().value() : null, su.getLastCheck(), su.getHash());
+					su.getCountry(), su.getLastStatus() != null ? su.getLastStatus().value() : null,
+					su.getLastCheck(), su.getAvailableSince(), su.getHash());
 		} catch (Exception e) {
 			log.error("When update for hash " + su.getHash(), e);
 		}

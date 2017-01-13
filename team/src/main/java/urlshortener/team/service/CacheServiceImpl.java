@@ -56,19 +56,20 @@ public class CacheServiceImpl implements CacheService {
 			ResponseEntity<String> result = restTemplate.exchange(shortURL.getTarget(), HttpMethod.GET, null, String.class);
 			shortURL.setLastStatus(result.getStatusCode());
 			if (result.getStatusCode() == HttpStatus.OK) {
+				shortURL.setAvailableSince(new Date());
 				cacheStaticPage(result, shortURL);
 			}
 		} catch (RestClientException e) {
 			logger.info("** " + shortURL.getTarget() + " (" + shortURL.getHash() + ") down");
 			shortURL.setLastStatus(null);
+			shortURL.setLastCheck(new Date());
 		}
-		shortURL.setLastCheck(new Date());
 		shortURLRepository.update(shortURL);
 	}
 	
 	private void cacheStaticPage(ResponseEntity<String> result, ShortURL shortURL) {
 		logger.info("** Storing cache version of " + shortURL.getTarget());
-		CachedPage cachedPage = new CachedPage(shortURL.getHash(), shortURL.getLastCheck(), shortURL.getTarget(), result.getBody());
+		CachedPage cachedPage = new CachedPage(shortURL.getHash(), shortURL.getAvailableSince(), shortURL.getTarget(), result.getBody());
 		cachedPageRepository.save(cachedPage);
 	}
 }

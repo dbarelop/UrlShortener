@@ -18,6 +18,7 @@ public class ShortURL {
 	private String country;
 	private HttpStatus lastStatus;
 	private Date lastCheck;
+	private Date availableSince;
 	private URI qrLink;
 	private String user;
 
@@ -83,6 +84,10 @@ public class ShortURL {
 	public Date getLastCheck() {
 		return lastCheck;
 	}
+	
+	public Date getAvailableSince() {
+		return availableSince;
+	}
 
 	public URI getQRLink() {
 		return qrLink;
@@ -98,6 +103,10 @@ public class ShortURL {
 	
 	public void setLastCheck(Date lastCheck) {
 		this.lastCheck = lastCheck;
+	}
+	
+	public void setAvailableSince(Date availableSince) {
+		this.availableSince = availableSince;
 	}
 
 	public String getUser() {
