@@ -57,6 +57,7 @@ public class CacheServiceImpl implements CacheService {
 			shortURL.setLastStatus(result.getStatusCode());
 			if (result.getStatusCode() == HttpStatus.OK) {
 				shortURL.setAvailableSince(new Date());
+				shortURL.setLastCheck(null);
 				cacheStaticPage(result, shortURL);
 			}
 		} catch (RestClientException e) {

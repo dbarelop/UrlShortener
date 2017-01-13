@@ -27,7 +27,7 @@
 						<!--/*@thymesVar id="date" type="java.util.Date"*/-->
 						<!--/*@thymesVar id="target" type="java.lang.String"*/-->
 						<!--/*@thymesVar id="hash" type="java.lang.String"*/-->
-                        <li class="list-group-item"><strong>Offline since:</strong> <h4 th:text="${{date}}"></h4></li>
+                        <li class="list-group-item"><strong>Offline since:</strong> <h4 th:if="${date != null}" th:text="${#dates.format(date,'d-MM-yyyy HH:mm:ss z')}"></h4></li>
                         <li class="list-group-item"><strong>Target URL:</strong> <a th:href="${target}" th:text="${target}"></a></li>
                         <li class="list-group-item"><strong>Cache:</strong> <a onClick="display()" th:href="${hash}" th:text="${hash}" th:target="iframe_a"></a></li>
                     </ul>
@@ -37,7 +37,7 @@
             <div id="div_iframe" style="display:none;">
 	            <p class="lead">
 	            	This is URLShortener's cache of <a th:href="${target}" th:text="${target}"></a>. 
-	            	It's a snapshot of the page appeared on <mark th:text="${{dateAvailable}}"></mark>.
+	            	It's a snapshot of the page appeared on <mark th:if="${dateAvailable != null}" th:text="${#calendars.format(dateAvailable,'d-MM-yyyy HH:mm:ss z')}">{{dateAvailable}}</mark>.
 	           	</p>
 				<iframe height="400px" width="100%" th:name="iframe_a"></iframe>
 			</div>
