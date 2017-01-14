@@ -60,8 +60,8 @@ public class RedirectionController {
 
 	private void createAndSaveClick(String hash, String ip, UserAgent userAgent) {
 		Click cl = new Click(null, hash, new Date(), null, userAgent.getBrowser().toString(), userAgent.getOperatingSystem().toString(), ip, null);
-		cl=clickRepository.save(cl);
-		logger.info(cl!=null?"["+hash+"] saved with id ["+cl.getId()+"]":"["+hash+"] was not saved");
+		cl = clickRepository.save(cl);
+		logger.info(cl != null ? "[" + hash + "] saved with id [" + cl.getId() + "]" : "[" + hash + "] was not saved");
 	}
 
 	private UserAgent extractUserAgent(HttpServletRequest request) {

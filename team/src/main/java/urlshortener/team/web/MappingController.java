@@ -31,15 +31,6 @@ public class MappingController {
     public String metrics() {
         return "metrics";
     }
-    
-    @RequestMapping(value = "/404/{hash}", method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)
-    public String badStatus(@PathVariable String hash, Model model) {
-    	ShortURL shortURL = shortURLRepository.findByKey(hash);
-        model.addAttribute("cacheUri", linkTo(methodOn(RedirectionController.class).redirectTo("cache/" + shortURL.getHash(), null)).toUri());
-    	model.addAttribute("lastCheckDate", shortURL.getLastCheckDate());
-        model.addAttribute("cacheDate", shortURL.getCacheDate());
-    	return "404";
-    }
 
     @RequestMapping(value = "/login", method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)
     public String login() {

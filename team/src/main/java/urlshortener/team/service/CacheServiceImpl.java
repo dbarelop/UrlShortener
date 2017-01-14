@@ -49,6 +49,11 @@ public class CacheServiceImpl implements CacheService {
 	}
 
 	@Override
+	public boolean isCached(String hash) {
+		return cachedPageRepository.exists(hash);
+	}
+
+	@Override
 	@Async
 	public void verifyStatus(ShortURL shortURL) {
 		RestTemplate restTemplate = new RestTemplate();

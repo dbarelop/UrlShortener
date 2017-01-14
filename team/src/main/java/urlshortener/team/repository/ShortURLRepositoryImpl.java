@@ -20,8 +20,7 @@ import urlshortener.team.domain.ShortURL;
 @Repository
 public class ShortURLRepositoryImpl implements ShortURLRepository {
 
-	private static final Logger log = LoggerFactory
-			.getLogger(ShortURLRepositoryImpl.class);
+	private static final Logger log = LoggerFactory.getLogger(ShortURLRepositoryImpl.class);
 
 	private static final RowMapper<ShortURL> rowMapper = (rs, rowNum) -> {
 		ShortURL rowMapper = new ShortURL();

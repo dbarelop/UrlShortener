@@ -13,18 +13,29 @@
 <!--/*@thymesVar id="lastCheckDate" type="java.util.Date"*/-->
 <!--/*@thymesVar id="cacheDate" type="java.util.Date"*/-->
 <!--/*@thymesVar id="cacheUri" type="java.net.URI"*/-->
-<div class="container-full">
+<div th:if="${cacheUri} != null" class="container-full">
 	<div class="row" style="background: #f5f5f5 !important;">
 		<div class="col-sm-offset-1 col-sm-8">
 			<p class="lead">
-				The requested URL is currently offline (last check on <span th:if="${lastCheckDate} != null" th:text="${#dates.format(lastCheckDate, 'yyyy-MM-dd HH:mm:ss z')}"></span>).
+				The requested URL is currently offline (last check on <span th:text="${#dates.format(lastCheckDate, 'yyyy-MM-dd HH:mm:ss z')}"></span>).
 				<br />
-				This is a cached snapshot from <mark th:if="${cacheDate} != null" th:text="${#dates.format(cacheDate,'yyyy-MM-dd HH:mm:ss z')}"></mark>
+				This is a cached snapshot from <mark th:text="${#dates.format(cacheDate,'yyyy-MM-dd HH:mm:ss z')}"></mark>
 			</p>
 		</div>
 	</div>
 	<div class="row">
 		<iframe th:src="${cacheUri}" style="position: absolute; height: 100%; width: 100%"></iframe>
+	</div>
+</div>
+<div th:if="${cacheUri} == null" class="container-full">
+	<div class="row" style="background: #f5f5f5 !important;">
+		<div class="col-sm-offset-1 col-sm-8">
+			<p class="lead">
+				The requested URL is currently offline<span th:if="${lastCheckDate} != null"> (last check on <span th:text="${#dates.format(lastCheckDate, 'yyyy-MM-dd HH:mm:ss z')}"></span>).</span>
+				<br />
+				Unfortunately, we do not have any cached version of the site :(
+			</p>
+		</div>
 	</div>
 </div>
 </body>

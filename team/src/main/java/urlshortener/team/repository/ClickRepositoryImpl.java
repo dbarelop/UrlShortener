@@ -33,7 +33,7 @@ public class ClickRepositoryImpl extends urlshortener.common.repository.ClickRep
         try {
             return jdbc.queryForObject(query, args.toArray(), Long.class);
         } catch (Exception e) {
-            log.debug("When counting unique visitors for hash" + hash, e);
+            log.error("When counting unique visitors for hash" + hash, e);
         }
         return -1L;
     }
@@ -50,7 +50,7 @@ public class ClickRepositoryImpl extends urlshortener.common.repository.ClickRep
         try {
             return jdbc.queryForObject(query, args.toArray(), Long.class);
         } catch (Exception e) {
-            log.debug("When counting unique visitors for hash" + hash, e);
+            log.error("When counting unique visitors for hash" + hash, e);
         }
         return -1L;
     }
@@ -76,7 +76,7 @@ public class ClickRepositoryImpl extends urlshortener.common.repository.ClickRep
                 return res;
             });
         } catch (Exception e) {
-            log.debug("When counting unique visitors for hash" + hash, e);
+            log.error("When counting unique visitors for hash" + hash, e);
         }
         return null;
     }
@@ -102,7 +102,7 @@ public class ClickRepositoryImpl extends urlshortener.common.repository.ClickRep
                 return res;
             });
         } catch (Exception e) {
-            log.debug("When counting unique visitors for hash" + hash, e);
+            log.error("When counting unique visitors for hash" + hash, e);
         }
         return null;
     }

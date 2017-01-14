@@ -7,5 +7,6 @@ public interface CacheService {
 
     void periodicallyVerifyStatus();
     CachedPage getCachedPage(String hash);
+    boolean isCached(String hash);
     void verifyStatus(ShortURL shortURL);
 }
