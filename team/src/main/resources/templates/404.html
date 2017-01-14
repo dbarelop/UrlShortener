@@ -9,45 +9,23 @@
 	<script type="text/javascript" th:src="@{/webjars/jquery/2.1.4/jquery.min.js}"></script>
 	<script type="text/javascript" th:src="@{/webjars/bootstrap/3.3.5/js/bootstrap.min.js}"></script>
 </head>
-<body style="padding-top: 70px;">
-<div th:replace="fragments/header :: header"></div>
+<body>
+<!--/*@thymesVar id="lastCheckDate" type="java.util.Date"*/-->
+<!--/*@thymesVar id="cacheDate" type="java.util.Date"*/-->
+<!--/*@thymesVar id="cacheUri" type="java.net.URI"*/-->
 <div class="container-full">
-	<div class="row">
-		<div class="col-sm-offset-2 col-sm-8 text-center">
-			<h1>URL 404</h1>
-			<p class="lead">A front-end example page to display date since URL is offline</p>
-			<br />
-			<div class="panel panel-default">
-                <div class="panel-heading">
-					<!--/*@thymesVar id="uri" type="java.net.URI"*/-->
-                	<h3><a th:href="${uri}" th:text="${uri}"></a></h3>
-               	</div>
-                <div class="panel-body">
-                    <ul class='list-group'>
-						<!--/*@thymesVar id="date" type="java.util.Date"*/-->
-						<!--/*@thymesVar id="target" type="java.lang.String"*/-->
-						<!--/*@thymesVar id="hash" type="java.lang.String"*/-->
-                        <li class="list-group-item"><strong>Offline since:</strong> <h4 th:if="${date != null}" th:text="${#dates.format(date,'d-MM-yyyy HH:mm:ss z')}"></h4></li>
-                        <li class="list-group-item"><strong>Target URL:</strong> <a th:href="${target}" th:text="${target}"></a></li>
-                        <li class="list-group-item"><strong>Cache:</strong> <a onClick="display()" th:href="${hash}" th:text="${hash}" th:target="iframe_a"></a></li>
-                    </ul>
-                </div>
-            </div>
-            <br />
-            <div id="div_iframe" style="display:none;">
-	            <p class="lead">
-	            	This is URLShortener's cache of <a th:href="${target}" th:text="${target}"></a>. 
-	            	It's a snapshot of the page appeared on <mark th:if="${dateAvailable != null}" th:text="${#calendars.format(dateAvailable,'d-MM-yyyy HH:mm:ss z')}">{{dateAvailable}}</mark>.
-	           	</p>
-				<iframe height="400px" width="100%" th:name="iframe_a"></iframe>
-			</div>
+	<div class="row" style="background: #f5f5f5 !important;">
+		<div class="col-sm-offset-1 col-sm-8">
+			<p class="lead">
+				The requested URL is currently offline (last check on <span th:if="${lastCheckDate} != null" th:text="${#dates.format(lastCheckDate, 'yyyy-MM-dd HH:mm:ss z')}"></span>).
+				<br />
+				This is a cached snapshot from <mark th:if="${cacheDate} != null" th:text="${#dates.format(cacheDate,'yyyy-MM-dd HH:mm:ss z')}"></mark>
+			</p>
 		</div>
 	</div>
+	<div class="row">
+		<iframe th:src="${cacheUri}" style="position: absolute; height: 100%; width: 100%"></iframe>
+	</div>
 </div>
-<script type="text/javascript">
-function display() {
-	document.getElementById("div_iframe").style.display = "inline";
-}
-</script>
 </body>
 </html>

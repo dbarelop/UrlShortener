@@ -101,7 +101,7 @@ public class UrlShortenerController {
             try {
                 String qrUri = su.getUri().toString() + "/qrcode?error=" + error;
                 qrUri += (vcard.getName() != null ? vcard.getUrlEncodedParameters() : "");
-                su.setQRLink(new URI(qrUri));
+                su.setQrLink(new URI(qrUri));
             } catch (URISyntaxException e) {
                 logger.error(e.getMessage(), e);
             }

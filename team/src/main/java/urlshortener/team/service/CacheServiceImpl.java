@@ -24,7 +24,7 @@ import urlshortener.team.repository.ShortURLRepository;
 public class CacheServiceImpl implements CacheService {
 
 	private static final Logger logger = LoggerFactory.getLogger(CacheServiceImpl.class);
-	private static final long CHECK_PERIOD = 60 * 1000;		// 1 minute
+	private static final long CHECK_PERIOD = 10 * 1000;		// 1 minute
 
 	@Autowired
 	private ShortURLRepository shortURLRepository;
@@ -52,25 +52,24 @@ public class CacheServiceImpl implements CacheService {
 	@Async
 	public void verifyStatus(ShortURL shortURL) {
 		RestTemplate restTemplate = new RestTemplate();
+		shortURL.setLastCheckDate(new Date());
 		try {
 			ResponseEntity<String> result = restTemplate.exchange(shortURL.getTarget(), HttpMethod.GET, null, String.class);
 			shortURL.setLastStatus(result.getStatusCode());
 			if (result.getStatusCode() == HttpStatus.OK) {
-				shortURL.setAvailableSince(new Date());
-				shortURL.setLastCheck(null);
+				shortURL.setCacheDate(new Date());
 				cacheStaticPage(result, shortURL);
 			}
 		} catch (RestClientException e) {
 			logger.info("** " + shortURL.getTarget() + " (" + shortURL.getHash() + ") down");
 			shortURL.setLastStatus(null);
-			shortURL.setLastCheck(new Date());
 		}
 		shortURLRepository.update(shortURL);
 	}
 	
 	private void cacheStaticPage(ResponseEntity<String> result, ShortURL shortURL) {
 		logger.info("** Storing cache version of " + shortURL.getTarget());
-		CachedPage cachedPage = new CachedPage(shortURL.getHash(), shortURL.getAvailableSince(), shortURL.getTarget(), result.getBody());
+		CachedPage cachedPage = new CachedPage(shortURL.getHash(), shortURL.getCacheDate(), shortURL.getTarget(), result.getBody());
 		cachedPageRepository.save(cachedPage);
 	}
 }

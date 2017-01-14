@@ -17,8 +17,8 @@ public class ShortURL {
 	private String ip;
 	private String country;
 	private HttpStatus lastStatus;
-	private Date lastCheck;
-	private Date availableSince;
+	private Date lastCheckDate;
+	private Date cacheDate;
 	private URI qrLink;
 	private String user;
 
@@ -45,68 +45,104 @@ public class ShortURL {
 		return hash;
 	}
 
+	public void setHash(String hash) {
+		this.hash = hash;
+	}
+
 	public String getTarget() {
 		return target;
+	}
+
+	public void setTarget(String target) {
+		this.target = target;
 	}
 
 	public URI getUri() {
 		return uri;
 	}
 
-	public Date getCreated() {
-		return created;
-	}
-
-	public String getOwner() {
-		return owner;
+	public void setUri(URI uri) {
+		this.uri = uri;
 	}
 
 	public String getSponsor() {
 		return sponsor;
 	}
 
+	public void setSponsor(String sponsor) {
+		this.sponsor = sponsor;
+	}
+
+	public Date getCreated() {
+		return created;
+	}
+
+	public void setCreated(Date created) {
+		this.created = created;
+	}
+
+	public String getOwner() {
+		return owner;
+	}
+
+	public void setOwner(String owner) {
+		this.owner = owner;
+	}
+
 	public Boolean getSafe() {
 		return safe;
 	}
 
-	public String getIP() {
+	public void setSafe(Boolean safe) {
+		this.safe = safe;
+	}
+
+	public String getIp() {
 		return ip;
+	}
+
+	public void setIp(String ip) {
+		this.ip = ip;
 	}
 
 	public String getCountry() {
 		return country;
 	}
-	
+
+	public void setCountry(String country) {
+		this.country = country;
+	}
+
 	public HttpStatus getLastStatus() {
 		return lastStatus;
 	}
-	
-	public Date getLastCheck() {
-		return lastCheck;
-	}
-	
-	public Date getAvailableSince() {
-		return availableSince;
-	}
 
-	public URI getQRLink() {
-		return qrLink;
-	}
-
-	public void setQRLink(URI qrLink) {
-		this.qrLink = qrLink;
-	}
-	
 	public void setLastStatus(HttpStatus lastStatus) {
 		this.lastStatus = lastStatus;
 	}
-	
-	public void setLastCheck(Date lastCheck) {
-		this.lastCheck = lastCheck;
+
+	public Date getLastCheckDate() {
+		return lastCheckDate;
 	}
-	
-	public void setAvailableSince(Date availableSince) {
-		this.availableSince = availableSince;
+
+	public void setLastCheckDate(Date lastCheckDate) {
+		this.lastCheckDate = lastCheckDate;
+	}
+
+	public Date getCacheDate() {
+		return cacheDate;
+	}
+
+	public void setCacheDate(Date cacheDate) {
+		this.cacheDate = cacheDate;
+	}
+
+	public URI getQrLink() {
+		return qrLink;
+	}
+
+	public void setQrLink(URI qrLink) {
+		this.qrLink = qrLink;
 	}
 
 	public String getUser() {
