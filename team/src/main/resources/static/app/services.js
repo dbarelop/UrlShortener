@@ -54,6 +54,7 @@ angular.module("UrlShortenerApp.services")
     
     .service("SuggestService", function($q, $http, $timeout) {
     	var branded;
+
         var service = {}, listener = $q.defer(), socket = {
             client: null,
             stomp: null
@@ -99,7 +100,7 @@ angular.module("UrlShortenerApp.services")
             socket.stomp.connect({}, startListener);
             socket.stomp.onclose = reconnect;
         };
-        
+
         return service;
     })
     

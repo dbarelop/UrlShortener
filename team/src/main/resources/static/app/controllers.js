@@ -50,7 +50,7 @@ angular.module("UrlShortenerApp.controllers", ["chart.js"])
         };
         $scope.showVcard = false;
         $scope.showQr = false;
-        
+
         $scope.suggest = function() {  	
         	if ($scope.brandedLink !== "") {        		
         		SuggestService.receive().then(null, null, function (data) {
@@ -64,6 +64,6 @@ angular.module("UrlShortenerApp.controllers", ["chart.js"])
         	}else{
         		$scope.shortURL = "";
         	}
-        }      
+        } 
         
     });
