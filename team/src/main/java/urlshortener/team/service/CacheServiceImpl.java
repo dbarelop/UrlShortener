@@ -17,19 +17,23 @@ import org.springframework.web.client.RestTemplate;
 
 import urlshortener.team.domain.ShortURL;
 import urlshortener.team.domain.CachedPage;
+import urlshortener.team.domain.VerificationRule;
 import urlshortener.team.repository.CachedPageRepository;
+import urlshortener.team.repository.RuleRepository;
 import urlshortener.team.repository.ShortURLRepository;
 
 @Service
 public class CacheServiceImpl implements CacheService {
 
 	private static final Logger logger = LoggerFactory.getLogger(CacheServiceImpl.class);
-	private static final long CHECK_PERIOD = 10 * 1000;		// 1 minute
+	private static final long CHECK_PERIOD = 120 * 1000;		// 2 minutes
 
 	@Autowired
 	private ShortURLRepository shortURLRepository;
 	@Autowired
 	private CachedPageRepository cachedPageRepository;
+	@Autowired
+	private RuleRepository ruleRepository;
 
 	@Override
 	@Scheduled(fixedRate = CHECK_PERIOD)
@@ -62,8 +66,16 @@ public class CacheServiceImpl implements CacheService {
 			ResponseEntity<String> result = restTemplate.exchange(shortURL.getTarget(), HttpMethod.GET, null, String.class);
 			shortURL.setLastStatus(result.getStatusCode());
 			if (result.getStatusCode() == HttpStatus.OK) {
-				shortURL.setCacheDate(new Date());
-				cacheStaticPage(result, shortURL);
+				List<VerificationRule> rules = ruleRepository.findByHash(shortURL.getHash());
+				boolean passesRules = rules.parallelStream().allMatch(r -> r.validate(result.getBody()));
+				if (passesRules) {
+					shortURL.setValid(true);
+					shortURL.setCacheDate(new Date());
+					cacheStaticPage(result, shortURL);
+				} else {
+					logger.info("** " + shortURL.getTarget() + " (" + shortURL.getHash() + ") didn't pass the user rules verification");
+					shortURL.setValid(false);
+				}
 			}
 		} catch (RestClientException e) {
 			logger.info("** " + shortURL.getTarget() + " (" + shortURL.getHash() + ") down");

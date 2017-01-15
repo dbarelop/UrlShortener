@@ -36,11 +36,11 @@ dependencies {
     compile 'org.webjars:stomp-websocket:2.3.3'
     compile 'org.webjars:sockjs-client:1.1.1'
 
-	//Provides suggest service
+    // Provides suggest service
     compile 'com.google.code.gson:gson:2.8.0'    	
- 	compile 'org.webjars.bower:jquery-typeahead:2.2.1'
+    compile 'org.webjars.bower:jquery-typeahead:2.2.1'
 
-	// https://mvnrepository.com/artifact/com.google.zxing/core
+    // https://mvnrepository.com/artifact/com.google.zxing/core
     compile group: 'com.google.zxing', name: 'core', version: '3.3.0'
     compile group: 'com.google.zxing', name: 'javase', version: '3.3.0'
 

@@ -77,4 +77,49 @@ angular.module("UrlShortenerApp.services")
         };
 
         return service;
+    })
+    .service("UserLinksService", function($q, $http) {
+        var service = {};
+
+        service.getRules = function(hash) {
+            var deferred = $q.defer();
+            $http.get("/" + hash + "/rules").then(function(data) {
+                deferred.resolve(data.data);
+            }, function(err) {
+                deferred.reject(err);
+            });
+            return deferred.promise;
+        };
+
+        service.addRule = function(hash, rule) {
+            var deferred = $q.defer();
+            $http.post("/" + hash + "/rules", rule).then(function(data) {
+                deferred.resolve(data.data);
+            }, function(err) {
+                deferred.reject(err);
+            });
+            return deferred.promise;
+        };
+
+        service.updateRule = function(hash, rule) {
+            var deferred = $q.defer();
+            $http.put("/" + hash + "/rules/" + rule.id, rule).then(function() {
+                deferred.resolve();
+            }, function(err) {
+                deferred.error(err);
+            });
+            return deferred.promise;
+        };
+
+        service.deleteRule = function(hash, rule) {
+            var deferred = $q.defer();
+            $http.delete("/" + hash + "/rules/" + rule.id).then(function() {
+                deferred.resolve();
+            }, function(err) {
+                deferred.error(err);
+            });
+            return deferred.promise();
+        };
+
+        return service;
     });

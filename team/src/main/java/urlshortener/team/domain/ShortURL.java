@@ -21,6 +21,7 @@ public class ShortURL {
 	private Date cacheDate;
 	private URI qrLink;
 	private String user;
+	private boolean valid;
 
 	public ShortURL(String hash, String target, URI uri, String sponsor,
 					Date created, String owner, Boolean safe, String ip,
@@ -36,6 +37,7 @@ public class ShortURL {
 		this.country = country;
 		this.user = user;
 		this.lastStatus = HttpStatus.OK;
+		this.valid = true;
 	}
 
 	public ShortURL() {
@@ -151,5 +153,13 @@ public class ShortURL {
 
 	public void setUser(String user) {
 		this.user = user;
+	}
+
+	public boolean isValid() {
+		return valid;
+	}
+
+	public void setValid(boolean valid) {
+		this.valid = valid;
 	}
 }

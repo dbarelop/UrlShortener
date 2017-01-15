@@ -50,4 +50,29 @@ angular.module("UrlShortenerApp.controllers", ["chart.js"])
         };
         $scope.showVcard = false;
         $scope.showQr = false;
+    })
+    .controller("UserLinksController", function($scope, UserLinksService) {
+
+        $scope.initRules = function(hash) {
+            $scope.hash = hash;
+            UserLinksService.getRules($scope.hash).then(function(rules) {
+                $scope.rules = rules;
+                $scope.newRule = {
+                    operation: "none"
+                };
+            }, function(err) {
+                console.log(err);
+            });
+        };
+
+        $scope.addRule = function() {
+            UserLinksService.addRule($scope.hash, $scope.newRule).then(function() {
+                $scope.rules.push($scope.newRule);
+                $scope.newRule = {
+                    operation: "none"
+                };
+            }, function(err) {
+                console.log(err);
+            });
+        };
     });
