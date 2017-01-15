@@ -15,7 +15,8 @@ CREATE TABLE SHORTURL(
 	IP			  VARCHAR(20),							-- IP
 	COUNTRY		VARCHAR(50),							-- Country
   LASTSTATUS INTEGER,                 -- Last check status
-  LASTCHECK	TIMESTAMP,                -- Last check date
+  LASTCHECKDATE	TIMESTAMP,            -- Last check date
+  CACHEDATE	TIMESTAMP,                -- Cached version date
   USER  		VARCHAR(20)								-- User who created the short url
 );
 

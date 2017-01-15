@@ -31,17 +31,6 @@ public class MappingController {
     public String metrics() {
         return "metrics";
     }
-    
-    @RequestMapping(value = "/404/{hash}", method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)
-    public String badStatus(@PathVariable String hash, Model model) {
-    	ShortURL shortURL = shortURLRepository.findByKey(hash);
-    	model.addAttribute("uri", linkTo(methodOn(RedirectionController.class).redirectTo(shortURL.getHash(), null)).toUri());
-        model.addAttribute("date", shortURL.getLastCheck());
-        model.addAttribute("target", shortURL.getTarget());
-        // TODO: remove hardcoded port and host
-        model.addAttribute("hash", "http://localhost:8080/cache/" + shortURL.getHash());
-    	return "404";
-    }
 
     @RequestMapping(value = "/login", method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)
     public String login() {
