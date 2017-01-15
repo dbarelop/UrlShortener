@@ -50,4 +50,6 @@ angular.module("UrlShortenerApp.controllers", ["chart.js"])
         };
         $scope.showVcard = false;
         $scope.showQr = false;
+    })
+    .controller("UserLinksController", function($scope, $http) {
     });
