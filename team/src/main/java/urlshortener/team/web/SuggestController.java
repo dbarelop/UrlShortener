@@ -1,6 +1,8 @@
 package urlshortener.team.web;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,12 +67,17 @@ public class SuggestController {
 	@SendTo("/topic/suggest")
 	public Object getSuggesWebSocket(SuggestRequestMessage message) {
 		LOG.info("Requested suggest for short name = " + message.getId());		
-		List<String> s = suggest.suggest(message.getId());
 		
-		if (s.isEmpty()) {			
+		Map<String, List<String>> suggestions =  new HashMap<String, List<String>>();
+		List<String> sug = suggest.suggest(message.getId());
+		List<String> synonym = suggestSynonym.suggestSynonym(message.getId());
+		suggestions.put("suggestion", sug);
+		suggestions.put("synonyms", synonym);
+		
+		if (suggestions.isEmpty()) {			
 			return new ErrorMessage("Suggest for word " + message.getId() + " not found");
 		}
-		return s;
+		return suggestions;
 	}
 		
 }

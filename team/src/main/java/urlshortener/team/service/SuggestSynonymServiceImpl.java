@@ -31,8 +31,8 @@ public class SuggestSynonymServiceImpl implements SuggestSynonymService {
 	public List<String> suggestSynonym(String userWord) {
 
 		List<String> suggestSynonym  = new LinkedList<String>();
-
-		if (userWord.isEmpty()) {
+		
+		if (userWord.length()>2) {
 
 			//API credentials 
 			String X_Mashape_Key = "mashape-key=YEJqDhxdT6mshmh7zzc6Kw42nBjpp1YGIQGjsnerzCX5Cw3rW1";

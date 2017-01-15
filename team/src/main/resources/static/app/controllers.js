@@ -1,4 +1,4 @@
-angular.module("UrlShortenerApp.controllers", ["chart.js"])
+angular.module("UrlShortenerApp.controllers", ["chart.js","ui.bootstrap"] )
     .controller("MetricsCtrl", function($scope, $location, MetricsService) {
         $scope.browsersChart = {
             labels: [],
@@ -51,13 +51,14 @@ angular.module("UrlShortenerApp.controllers", ["chart.js"])
         $scope.showVcard = false;
         $scope.showQr = false;
 
+        // llamado inicialmente para probar la respuesta con websockets
         $scope.suggest = function() {  	
         	if ($scope.brandedLink !== "") {        		
         		SuggestService.receive().then(null, null, function (data) {
         			if (data.error) {
         				$scope.error = data.error;
-        			} else {
-        				$scope.shortURL = data;          
+        			} else {        				
+        				$scope.shortURL  = data;        			
         			}
         		});
         		SuggestService.initialize($scope.brandedLink);
@@ -65,5 +66,13 @@ angular.module("UrlShortenerApp.controllers", ["chart.js"])
         		$scope.shortURL = "";
         	}
         } 
+        
+        //con este estaba probando el typeahead
+        $scope.getSuggest = function(val){
+        	SuggestService.initialize(val);
+        	SuggestService.receive().then(null, null, function (data) {
+    			return data;
+    		});
+        }
         
     });

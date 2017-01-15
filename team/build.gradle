@@ -39,6 +39,13 @@ dependencies {
 	//Provides suggest service
     compile 'com.google.code.gson:gson:2.8.0'    	
  	compile 'org.webjars.bower:jquery-typeahead:2.2.1'
+ 	
+ 	// https://mvnrepository.com/artifact/org.webjars/angular-ui-bootstrap
+	compile group: 'org.webjars', name: 'angular-ui-bootstrap', version: '2.2.0'
+
+	// https://mvnrepository.com/artifact/org.webjars/angular-strap
+	compile group: 'org.webjars', name: 'angular-strap', version: '2.3.4'
+	
 
 	// https://mvnrepository.com/artifact/com.google.zxing/core
     compile group: 'com.google.zxing', name: 'core', version: '3.3.0'

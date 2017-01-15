@@ -52,15 +52,14 @@ angular.module("UrlShortenerApp.services")
         return service;
     })
     
-    .service("SuggestService", function($q, $http, $timeout) {
+    .service("SuggestService", function($q, $http) {
     	var branded;
 
         var service = {}, listener = $q.defer(), socket = {
             client: null,
             stomp: null
         };
-        
-        service.RECONNECT_TIMEOUT = 30000;
+
         service.SOCKET_URL = "/suggest";
         service.connected = false;
         
@@ -74,13 +73,6 @@ angular.module("UrlShortenerApp.services")
                 		JSON.stringify({id: branded
                 }));
             }
-        };
-        
-        var reconnect = function() {
-            service.connected = false;
-            $timeout(function() {
-                initialize();
-            }, this.RECONNECT_TIMEOUT);
         };
         
         var startListener = function() {
@@ -98,7 +90,6 @@ angular.module("UrlShortenerApp.services")
             socket.client = new SockJS(service.SOCKET_URL);
             socket.stomp = Stomp.over(socket.client);
             socket.stomp.connect({}, startListener);
-            socket.stomp.onclose = reconnect;
         };
 
         return service;
