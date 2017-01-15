@@ -7,6 +7,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import urlshortener.common.repository.ClickRepository;
 import urlshortener.common.repository.ClickRepositoryImpl;
+import urlshortener.team.repository.RuleRepository;
+import urlshortener.team.repository.RuleRepositoryImpl;
 import urlshortener.team.repository.ShortURLRepository;
 import urlshortener.team.repository.ShortURLRepositoryImpl;
 
@@ -24,6 +26,11 @@ public class PersistenceContext {
 	@Bean
 	ClickRepository clickRepository() {
 		return new ClickRepositoryImpl(jdbc);
+	}
+
+	@Bean
+	RuleRepository ruleRepository() {
+		return new RuleRepositoryImpl(jdbc);
 	}
 
 }

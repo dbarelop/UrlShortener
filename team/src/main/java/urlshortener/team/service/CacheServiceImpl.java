@@ -24,7 +24,7 @@ import urlshortener.team.repository.ShortURLRepository;
 public class CacheServiceImpl implements CacheService {
 
 	private static final Logger logger = LoggerFactory.getLogger(CacheServiceImpl.class);
-	private static final long CHECK_PERIOD = 10 * 1000;		// 1 minute
+	private static final long CHECK_PERIOD = 120 * 1000;		// 2 minutes
 
 	@Autowired
 	private ShortURLRepository shortURLRepository;
