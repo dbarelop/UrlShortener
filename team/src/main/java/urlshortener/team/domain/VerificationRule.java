@@ -1,5 +1,8 @@
 package urlshortener.team.domain;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class VerificationRule {
 
     private Long id;
@@ -47,5 +50,14 @@ public class VerificationRule {
 
     public void setHash(String hash) {
         this.hash = hash;
+    }
+
+    public boolean validate(String body) {
+        switch (operation) {
+            case CONTAINS: return body.contains(text);
+            case NOT_CONTAINS: return !body.contains(text);
+            case TITLE_EQUALS: return body.contains("<title>" + text + "</title>");
+        }
+        return false;
     }
 }

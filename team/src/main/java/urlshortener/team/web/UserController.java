@@ -20,6 +20,9 @@ import urlshortener.team.repository.ShortURLRepository;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+
 @Controller
 @Order(Ordered.HIGHEST_PRECEDENCE)
 // TODO: add security to AngularJS REST calls!
@@ -37,6 +40,7 @@ public class UserController {
     public String getUserLinks(Model model) {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         List<ShortURL> userLinks = shortURLRepository.findByUser(user.getUsername());
+        userLinks.forEach(l -> l.setUri(linkTo(methodOn(RedirectionController.class).redirectTo(l.getHash(), null)).toUri()));
         model.addAttribute("user", user);
         model.addAttribute("userLinks", userLinks);
         model.addAttribute("ruleOperations", Arrays.asList(VerificationRuleOperation.values()));

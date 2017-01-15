@@ -47,6 +47,9 @@ public class RedirectionController {
 			if (l.getLastStatus() == null || l.getLastStatus() != HttpStatus.OK) {
 				logger.info("** " + l.getTarget() + " was down during last test");
 				response = badStatus(l);
+			} else if (!l.isValid()) {
+				logger.info("** " + l.getTarget() + " didn't pass the last validation (user rules)");
+				response = badStatus(l);
 			} else {
 				response = createSuccessfulRedirectToResponse(l);
 			}

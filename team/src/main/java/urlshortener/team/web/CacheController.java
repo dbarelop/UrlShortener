@@ -48,7 +48,7 @@ public class CacheController {
     @RequestMapping(value = "/404/{hash}", method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)
     public String badStatus(@PathVariable String hash, Model model) {
         ShortURL shortURL = shortURLRepository.findByKey(hash);
-        if (shortURL != null && shortURL.getLastStatus() != HttpStatus.OK) {
+        if (shortURL != null && (shortURL.getLastStatus() != HttpStatus.OK || !shortURL.isValid())) {
             if (shortURL.getCacheDate() != null) {
                 model.addAttribute("cacheUri", linkTo(methodOn(RedirectionController.class).redirectTo("cache/" + shortURL.getHash(), null)).toUri());
                 model.addAttribute("cacheDate", shortURL.getCacheDate());

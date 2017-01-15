@@ -31,7 +31,7 @@
 	<div class="row" style="background: #f5f5f5 !important;">
 		<div class="col-sm-offset-1 col-sm-8">
 			<p class="lead">
-				The requested URL is currently offline<span th:if="${lastCheckDate} != null"> (last check on <span th:text="${#dates.format(lastCheckDate, 'yyyy-MM-dd HH:mm:ss z')}"></span>).</span>
+				The requested URL is currently offline or didn't pass the user verification rules<span th:if="${lastCheckDate} != null"> (last check on <span th:text="${#dates.format(lastCheckDate, 'yyyy-MM-dd HH:mm:ss z')}"></span>).</span>
 				<br />
 				Unfortunately, we do not have any cached version of the site :(
 			</p>
