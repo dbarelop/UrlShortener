@@ -17,7 +17,7 @@ CREATE TABLE SHORTURL(
   LASTSTATUS INTEGER,                 -- Last check status
   LASTCHECKDATE	TIMESTAMP,            -- Last check date
   CACHEDATE	TIMESTAMP,                -- Cached version date
-  USER  		VARCHAR(20)								-- User who created the short url
+	USERNAME	VARCHAR(20)								-- User who created the short url
 );
 
 -- Click

@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 import urlshortener.team.domain.ShortURL;
 import urlshortener.team.domain.VCard;
 import urlshortener.team.repository.ShortURLRepository;
-import urlshortener.team.service.CacheService;
 import urlshortener.team.service.ShortNameService;
 
 import javax.servlet.http.HttpServletRequest;

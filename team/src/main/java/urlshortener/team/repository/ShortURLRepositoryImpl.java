@@ -32,7 +32,7 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 		rowMapper.setSafe(rs.getBoolean("safe"));
 		rowMapper.setIp(rs.getString("ip"));
 		rowMapper.setCountry(rs.getString("country"));
-		rowMapper.setUser(rs.getString("user"));
+		rowMapper.setUser(rs.getString("username"));
         rowMapper.setLastStatus(rs.getInt("laststatus") == 0 ? null : HttpStatus.valueOf(rs.getInt("laststatus")));
         rowMapper.setLastCheckDate(rs.getTimestamp("lastcheckdate"));
         rowMapper.setCacheDate(rs.getTimestamp("cachedate"));
@@ -146,6 +146,18 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 	public List<ShortURL> findAll() {
 		try {
 			return jdbc.query("SELECT * FROM shorturl", rowMapper);
+		} catch (EmptyResultDataAccessException e) {
+			return null;
+		} catch (Exception e) {
+			log.error("When select all from shorturl", e);
+			return null;
+		}
+	}
+
+	@Override
+	public List<ShortURL> findByUser(String username) {
+		try {
+			return jdbc.query("SELECT * FROM shorturl WHERE username = ?", new Object[] { username }, rowMapper);
 		} catch (EmptyResultDataAccessException e) {
 			return null;
 		} catch (Exception e) {
