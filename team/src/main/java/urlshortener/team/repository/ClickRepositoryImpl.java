@@ -106,4 +106,15 @@ public class ClickRepositoryImpl extends urlshortener.common.repository.ClickRep
         }
         return null;
     }
+
+    @Override
+    public Date lastVisitDate(String ip) {
+        String query = "select created from click where ip = ? order by created desc limit 1";
+        try {
+            return jdbc.queryForObject(query, new String[] { ip }, Date.class);
+        } catch (Exception e) {
+            log.error("When finding last visit of " + ip, e);
+        }
+        return null;
+    }
 }

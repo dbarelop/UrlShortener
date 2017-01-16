@@ -35,6 +35,7 @@ dependencies {
     compile 'org.webjars:angular-chart.js:1.0.3'
     compile 'org.webjars:stomp-websocket:2.3.3'
     compile 'org.webjars:sockjs-client:1.1.1'
+    compile 'org.webjars:bootstrap-datepicker:1.6.4'
 
     // Provides suggest service
     compile 'com.google.code.gson:gson:2.8.0'    	

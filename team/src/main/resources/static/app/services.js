@@ -5,7 +5,9 @@ angular.module("UrlShortenerApp.services")
             stomp: null
         };
 
-        var hash;
+        service.hash;
+        service.startDate = null;
+        service.endDate = null;
 
         service.RECONNECT_TIMEOUT = 30000;
         service.SOCKET_URL = "/metrics";
@@ -15,21 +17,13 @@ angular.module("UrlShortenerApp.services")
             return listener.promise;
         };
 
-        service.send = function() {
-            if (service.connected) {
-                socket.stomp.send(service.CHAT_BROKER, { priority: 9 }, JSON.stringify({
-                    hash: hash,
-                    startDate: null,
-                    endDate: null
-                }));
-            }
-        };
-
-        var reconnect = function() {
+        service.reconnect = function() {
+            socket.stomp.disconnect();
             service.connected = false;
-            $timeout(function() {
-                initialize();
-            }, this.RECONNECT_TIMEOUT);
+            service.initialize(service.hash);
+            /*$timeout(function() {
+              service.initialize(hash);
+            }, this.RECONNECT_TIMEOUT);*/
         };
 
         var startListener = function() {
@@ -37,16 +31,23 @@ angular.module("UrlShortenerApp.services")
                 listener.notify(JSON.parse(data.body));
             });
             service.connected = true;
-            service.send();
+            if (service.connected) {
+                socket.stomp.send(service.CHAT_BROKER, { priority: 9 }, JSON.stringify({
+                    hash: service.hash,
+                    startDate: service.startDate,
+                    endDate: service.endDate
+                }));
+            }
         };
 
         service.initialize = function(hash) {
+            service.hash = hash;
             service.CHAT_TOPIC = "/topic/metrics/" + hash;
             service.CHAT_BROKER = "/app/metrics/" + hash;
             socket.client = new SockJS(service.SOCKET_URL);
             socket.stomp = Stomp.over(socket.client);
             socket.stomp.connect({}, startListener);
-            socket.stomp.onclose = reconnect;
+            socket.stomp.onclose = service.reconnect;
         };
 
         return service;

@@ -8,6 +8,54 @@ angular.module("UrlShortenerApp.controllers", ["chart.js"])
             labels: [],
             data: []
         };
+        $scope.from = "";
+        $scope.to = "";
+
+        var displayMetrics = function(metrics) {
+            if ($scope.metrics) {
+                // New metrics
+                var startDate = $scope.from ? new Date($scope.from) : null;
+                var endDate = $scope.to ? new Date($scope.to) : null;
+                if (endDate != null) {
+                    endDate.setDate(endDate.getDate() + 1);     // Add one day to include selected
+                }
+                if ((startDate == null || startDate <= new Date(metrics.date)) && (endDate == null || endDate >= new Date(metrics.date))) {
+                    $scope.metrics.clicks++;
+                    var i = $scope.browsersChart.labels.indexOf(metrics.browser);
+                    if (i == -1) {
+                        // New browser
+                        $scope.numBrowsers++;
+                        $scope.browsersChart.labels.push(metrics.browser);
+                        $scope.browsersChart.data.push(1);
+                    } else {
+                        $scope.browsersChart.data[i]++;
+                    }
+                    i = $scope.operatingSystemsChart.labels.indexOf(metrics.os);
+                    if (i == -1) {
+                        // New OS
+                        $scope.numOSs++;
+                        $scope.operatingSystemsChart.labels.push(metrics.os);
+                        $scope.operatingSystemsChart.data.push(1);
+                    } else {
+                        $scope.operatingSystemsChart.data[i]++;
+                    }
+                    if (!metrics.lastVisitDate || (startDate != null && startDate > new Date(metrics.lastVisitDate))) {
+                        // New visitor (or last visit date was before $scope.from)
+                        $scope.metrics.uniqueVisitors++;
+                    }
+                }
+            } else {
+                // Initial metrics
+                $scope.metrics = metrics;
+                $scope.uri = $location.protocol() + "://" + $location.host() + ($location.port() != 80 ? ":" + $location.port() : "") + "/" + $scope.metrics.hash;
+                $scope.numBrowsers = Object.keys($scope.metrics.clicksByBrowser).length;
+                $scope.numOSs = Object.keys($scope.metrics.clicksByOS).length;
+                $scope.browsersChart.labels = Object.keys($scope.metrics.clicksByBrowser);
+                $scope.browsersChart.data = Object.values($scope.metrics.clicksByBrowser);
+                $scope.operatingSystemsChart.labels = Object.keys($scope.metrics.clicksByOS);
+                $scope.operatingSystemsChart.data = Object.values($scope.metrics.clicksByOS);
+            }
+        };
 
         var hash = $location.absUrl().split(/[\s/]+/).pop();
         if (hash != "metrics") {
@@ -15,18 +63,18 @@ angular.module("UrlShortenerApp.controllers", ["chart.js"])
                 if (data.error) {
                     $scope.error = data.error;
                 } else {
-                    $scope.metrics = data;
-                    $scope.uri = $location.protocol() + "://" + $location.host() + ($location.port() != 80 ? ":" + $location.port() : "") + "/" + data.hash;
-                    $scope.numBrowsers = Object.keys(data.clicksByBrowser).length;
-                    $scope.numOSs = Object.keys(data.clicksByOS).length;
-                    $scope.browsersChart.labels = Object.keys(data.clicksByBrowser);
-                    $scope.browsersChart.data = Object.values(data.clicksByBrowser);
-                    $scope.operatingSystemsChart.labels = Object.keys(data.clicksByOS);
-                    $scope.operatingSystemsChart.data = Object.values(data.clicksByOS);
+                    displayMetrics(data);
                 }
             });
-            MetricsService.initialize(hash);
+            MetricsService.initialize(hash, $scope.from, $scope.to);
         }
+
+        $scope.newDateFilter = function() {
+            $scope.metrics = null;
+            MetricsService.startDate = $scope.from;
+            MetricsService.endDate = $scope.to;
+            MetricsService.reconnect();
+        };
     })
     .controller("URLShortenerCtrl", function($scope, $location, URLShortenerService) {
         $scope.url = "";

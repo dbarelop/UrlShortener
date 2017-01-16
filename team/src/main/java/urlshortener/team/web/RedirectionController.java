@@ -53,18 +53,19 @@ public class RedirectionController {
 			} else {
 				response = createSuccessfulRedirectToResponse(l);
 			}
-			createAndSaveClick(hash, request.getRemoteAddr(), extractUserAgent(request));
-			metricsController.notifyNewMetrics(hash);
+			Click click = createAndSaveClick(hash, request.getRemoteAddr(), extractUserAgent(request));
+			metricsController.notifyNewMetrics(click);
 			return response;
 		} else {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}
 
-	private void createAndSaveClick(String hash, String ip, UserAgent userAgent) {
+	private Click createAndSaveClick(String hash, String ip, UserAgent userAgent) {
 		Click cl = new Click(null, hash, new Date(), null, userAgent.getBrowser().toString(), userAgent.getOperatingSystem().toString(), ip, null);
 		cl = clickRepository.save(cl);
 		logger.info(cl != null ? "[" + hash + "] saved with id [" + cl.getId() + "]" : "[" + hash + "] was not saved");
+		return cl;
 	}
 
 	private UserAgent extractUserAgent(HttpServletRequest request) {

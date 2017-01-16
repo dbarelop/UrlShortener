@@ -16,7 +16,10 @@ import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import urlshortener.common.domain.Click;
+import urlshortener.team.domain.NewMetrics;
 import urlshortener.team.domain.ShortURL;
+import urlshortener.team.repository.ClickRepository;
 import urlshortener.team.repository.ShortURLRepository;
 import urlshortener.team.domain.Metrics;
 import urlshortener.team.message.ErrorMessage;
@@ -43,6 +46,8 @@ public class MetricsController {
     private ShortURLRepository shortURLRepository;
     @Autowired
     private MetricsServiceImpl service;
+    @Autowired
+    private ClickRepository clickRepository;
 
     @RequestMapping(value = "/metrics/{hash:(?!info).*}", method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)
     public String getMetricsHtml(@PathVariable String hash,
@@ -71,8 +76,9 @@ public class MetricsController {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return null;
         }
-        Date startDate = startDateStr != null ? parseDate(startDateStr) : null;
-        Date endDate = endDateStr != null ? parseDate(endDateStr) : null;
+        final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd");
+        Date startDate = startDateStr != null ? parseDate(startDateStr, SDF) : null;
+        Date endDate = endDateStr != null ? parseDate(endDateStr, SDF) : null;
         return service.getMetrics(shortURL, startDate, endDate);
     }
 
@@ -84,22 +90,23 @@ public class MetricsController {
         if (shortURL == null) {
             return new ErrorMessage("URL with hash " + hash + " not found");
         }
-        Date startDate = parseDate(message.getStartDate());
-        Date endDate = parseDate(message.getEndDate());
+        final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd");
+        Date startDate = parseDate(message.getStartDate(), SDF);
+        Date endDate = parseDate(message.getEndDate(), SDF);
         return service.getMetrics(shortURL, startDate, endDate);
     }
 
-    void notifyNewMetrics(String hash) {
-        logger.info("Notifying new metrics for hash " + hash);
-        Metrics metrics = service.getMetrics(shortURLRepository.findByKey(hash), null, null);
-        messagingTemplate.convertAndSend("/topic/metrics/" + hash, metrics);
+    void notifyNewMetrics(Click click) {
+        logger.info("Notifying new metrics for hash " + click.getHash());
+        NewMetrics newMetrics = new NewMetrics(click);
+        newMetrics.setLastVisitDate(clickRepository.lastVisitDate(click.getIp()));
+        messagingTemplate.convertAndSend("/topic/metrics/" + click.getHash(), newMetrics);
     }
 
-    private Date parseDate(String dateStr) {
+    private Date parseDate(String dateStr, final SimpleDateFormat SDF) {
         if (dateStr == null) {
             return null;
         }
-        final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd");
         try {
             return SDF.parse(dateStr);
         } catch (ParseException e) {
