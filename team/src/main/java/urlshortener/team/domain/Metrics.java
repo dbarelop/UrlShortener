@@ -16,6 +16,9 @@ public class Metrics {
     private Map<Browser, Long> clicksByBrowser;
     private Map<OperatingSystem, Long> clicksByOS;
 
+    public Metrics() {
+    }
+
     public Metrics(String hash, ShortURL shortURL, Long clicks, Long uniqueVisitors, Map<Browser, Long> clicksByBrowser, Map<OperatingSystem, Long> clicksByOS) {
         this.hash = hash;
         this.created = shortURL.getCreated();

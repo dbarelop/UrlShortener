@@ -62,7 +62,7 @@ public class MetricsController {
     public ResponseEntity<Void> redirect(@PathVariable String hash) throws URISyntaxException {
         HttpHeaders h = new HttpHeaders();
         h.setLocation(new URI("/metrics/" + hash));
-        return new ResponseEntity<>(h, HttpStatus.OK);
+        return new ResponseEntity<>(h, HttpStatus.NOT_ACCEPTABLE);
     }
 
     @RequestMapping(value = "/api/metrics/{hash}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
