@@ -38,7 +38,7 @@ public class CacheServiceTests {
 	@Test
 	public void testStatusOK() throws Exception {
 		ShortURL shortURL = shortURLRepository.save(ShortURLFixture.url4());
-		Thread.sleep(11*1000);
+		Thread.sleep(20*1000);
 		ResponseEntity<String> response = new TestRestTemplate()
 				.getForEntity("http://localhost:" + this.port + "/" + shortURL.getHash(), String.class);
 		assertThat(response.getStatusCode(), is(HttpStatus.TEMPORARY_REDIRECT));
@@ -48,7 +48,7 @@ public class CacheServiceTests {
 	@Test
 	public void testStatusNull() throws Exception {
 		ShortURL shortURL = shortURLRepository.save(ShortURLFixture.url3());
-		Thread.sleep(11*1000);
+		Thread.sleep(20*1000);
 		ResponseEntity<String> response = new TestRestTemplate()
 				.getForEntity("http://localhost:" + this.port + "/" + shortURL.getHash(), String.class);
 		assertThat(response.getStatusCode(), is(HttpStatus.TEMPORARY_REDIRECT));
@@ -61,7 +61,7 @@ public class CacheServiceTests {
 		ShortURL shortURL = shortURLRepository.save(ShortURLFixture.url2());
 		Thread.sleep(5*1000);
 		ruleRepository.save(VerificationRuleFixture.rule2());
-		Thread.sleep(11*1000);
+		Thread.sleep(20*1000);
 		ResponseEntity<String> response = new TestRestTemplate()
 				.getForEntity("http://localhost:" + this.port + "/" + shortURL.getHash(), String.class);
 		assertThat(response.getStatusCode(), is(HttpStatus.TEMPORARY_REDIRECT));
@@ -72,7 +72,7 @@ public class CacheServiceTests {
 	@Test
 	public void testStatusBadAndCacheServing() throws Exception {
 		ShortURL shortURL = shortURLRepository.save(ShortURLFixture.url5());
-		Thread.sleep(11*1000);
+		Thread.sleep(20*1000);
 		shortURL.setLastStatus(null);
 		shortURLRepository.update(shortURL);
 		ResponseEntity<String> response1 = new TestRestTemplate()
