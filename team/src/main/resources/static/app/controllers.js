@@ -101,14 +101,9 @@ angular.module("UrlShortenerApp.controllers", ["chart.js"])
 				$scope.synonymResp = "";
 				$scope.noResults = "";
             }, function(err) {
-                if (true) { // TODO compare error receive is for name or url
-                    $scope.needsSuggestion = true;
-					getSuggestions($scope.shortName);
-					$scope.noResults = "Short Name Already Exist";
-				} else {
-					$scope.error = "Unexpected error: " + err.data;
-				}
-
+                $scope.error = "Unexpected error: " + err.error;
+                $scope.needsSuggestion = true;
+                getSuggestions($scope.shortName);
             });
         };
 

@@ -109,7 +109,7 @@ angular.module("UrlShortenerApp.services")
             $http.post(path, null, params).then(function(data) {
                 deferred.resolve(data.data);
             }, function(err) {
-                deferred.reject(err);
+                deferred.reject(err.data);
             });
             return deferred.promise;
         };
@@ -124,7 +124,7 @@ angular.module("UrlShortenerApp.services")
             $http.get("/" + hash + "/rules").then(function(data) {
                 deferred.resolve(data.data);
             }, function(err) {
-                deferred.reject(err);
+                deferred.reject(err.data);
             });
             return deferred.promise;
         };
@@ -134,7 +134,7 @@ angular.module("UrlShortenerApp.services")
             $http.post("/" + hash + "/rules", rule).then(function(data) {
                 deferred.resolve(data.data);
             }, function(err) {
-                deferred.reject(err);
+                deferred.reject(err.data);
             });
             return deferred.promise;
         };
@@ -144,7 +144,7 @@ angular.module("UrlShortenerApp.services")
             $http.put("/" + hash + "/rules/" + rule.id, rule).then(function() {
                 deferred.resolve();
             }, function(err) {
-                deferred.error(err);
+                deferred.error(err.data);
             });
             return deferred.promise;
         };
@@ -154,9 +154,9 @@ angular.module("UrlShortenerApp.services")
             $http.delete("/" + hash + "/rules/" + rule.id).then(function() {
                 deferred.resolve();
             }, function(err) {
-                deferred.error(err);
+                deferred.error(err.data);
             });
-            return deferred.promise();
+            return deferred.promise;
         };
 
         return service;
