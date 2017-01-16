@@ -41,15 +41,15 @@
             <br />
             <div class="col-sm-offset-3 col-sm-6">
                 <div class="input-group input-daterange">
-                    <input type="text" class="form-control" placeholder="Starting date" ng-model="from" />
+                    <input type="text" class="form-control" placeholder="Starting date" ng-model="from" ng-change="newDateFilter()" />
                     <span class="input-group-addon">to</span>
-                    <input type="text" class="form-control" placeholder="End date" ng-model="to" />
+                    <input type="text" class="form-control" placeholder="End date" ng-model="to" ng-change="newDateFilter()" />
                 </div>
                 <script>
                     $('.input-daterange input').each(function() {
                         $(this).datepicker({
                             autoclose: true,
-                            format: "dd-mm-yyyy",
+                            format: "yyyy-mm-dd",
                             todayHighlight: true
                         });
                     });

@@ -15,4 +15,6 @@ public interface ClickRepository extends urlshortener.common.repository.ClickRep
     Map<Browser, Long> clicksForBrowserByHashBetween(String hash, Date startDate, Date endDate);
 
     Map<OperatingSystem, Long> clicksForOSByHashBetween(String hash, Date startDate, Date endDate);
+
+    Date lastVisitDate(String ip);
 }
