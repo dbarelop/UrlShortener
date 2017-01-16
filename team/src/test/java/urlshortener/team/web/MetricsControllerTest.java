@@ -52,7 +52,7 @@ public class MetricsControllerTest {
         performMetricsAssertions(metrics, 5, 1, 3, 2);
     }
 
-    /*@Test
+    @Test
     @Ignore
     public void contentNegotiationTest() {
         // Create short url
@@ -71,7 +71,7 @@ public class MetricsControllerTest {
         response = template.exchange(METRICS_URL, HttpMethod.GET, new HttpEntity(headers), Metrics.class);
         assertThat(response.getStatusCode(), is(HttpStatus.OK));
         performMetricsAssertions(response.getBody(), 0, 0, 0, 0);
-    }*/
+    }
 
     private ShortURL createShortURL(String url) {
         final String SHORTENER_URL = "http://localhost:" + port + "/link";
