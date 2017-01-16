@@ -39,14 +39,6 @@ public class CacheServiceTests {
 	}
 
 	@Test
-	public void testRulesInvalid() throws Exception {
-		Thread.sleep(11*1000);
-		ResponseEntity<String> response2 = new TestRestTemplate().getForEntity("http://localhost:" + this.port + "/hash1", String.class);
-		assertThat(response2.getStatusCode(), is(HttpStatus.TEMPORARY_REDIRECT));
-		assertThat(response2.getHeaders().getLocation(), is(new URI("http://localhost:" + this.port + "/404/hash1")));
-	}
-
-	@Test
 	public void z_testCacheServing() throws Exception {
 		ResponseEntity<String> response = new TestRestTemplate().getForEntity("http://localhost:" + this.port + "/cache/hash0", String.class);
 		assertTrue(response.hasBody());
