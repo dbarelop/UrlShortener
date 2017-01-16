@@ -20,6 +20,7 @@ dependencies {
     compile project(':common')
     compile 'org.springframework.boot:spring-boot-starter-thymeleaf:1.4.0.RELEASE'
     compile 'org.springframework.boot:spring-boot-starter-websocket:1.4.0.RELEASE'
+    compile 'org.springframework.boot:spring-boot-starter-data-mongodb:1.4.0.RELEASE'
     compile 'org.springframework.boot:spring-boot-starter-security:1.4.0.RELEASE'
     compile 'org.thymeleaf.extras:thymeleaf-extras-springsecurity4'
 
@@ -36,7 +37,11 @@ dependencies {
     compile 'org.webjars:sockjs-client:1.1.1'
     compile 'org.webjars:bootstrap-datepicker:1.6.4'
 
-	// https://mvnrepository.com/artifact/com.google.zxing/core
+    // Provides suggest service
+    compile 'com.google.code.gson:gson:2.8.0'    	
+    compile 'org.webjars.bower:jquery-typeahead:2.2.1'
+
+    // https://mvnrepository.com/artifact/com.google.zxing/core
     compile group: 'com.google.zxing', name: 'core', version: '3.3.0'
     compile group: 'com.google.zxing', name: 'javase', version: '3.3.0'
 

@@ -3,7 +3,7 @@ package urlshortener.team.domain;
 import eu.bitwalker.useragentutils.Browser;
 import eu.bitwalker.useragentutils.OperatingSystem;
 
-import java.sql.Date;
+import java.util.Date;
 import java.util.Map;
 
 public class Metrics {

@@ -22,5 +22,7 @@ public interface ShortURLRepository {
 
 	List<ShortURL> list(Long limit, Long offset);
 
-	List<ShortURL> listVerify();
+	List<ShortURL> findAll();
+
+    List<ShortURL> findByUser(String username);
 }

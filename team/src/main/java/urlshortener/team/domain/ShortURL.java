@@ -1,9 +1,9 @@
 package urlshortener.team.domain;
 
-import org.springframework.security.core.userdetails.User;
+import org.springframework.http.HttpStatus;
 
 import java.net.URI;
-import java.sql.Date;
+import java.util.Date;
 
 public class ShortURL {
 
@@ -13,17 +13,18 @@ public class ShortURL {
 	private String sponsor;
 	private Date created;
 	private String owner;
-	private Integer mode;
 	private Boolean safe;
 	private String ip;
 	private String country;
-	private Integer status;
-	private String badStatusDate;
+	private HttpStatus lastStatus;
+	private Date lastCheckDate;
+	private Date cacheDate;
 	private URI qrLink;
 	private String user;
+	private boolean valid;
 
 	public ShortURL(String hash, String target, URI uri, String sponsor,
-					Date created, String owner, Integer mode, Boolean safe, String ip,
+					Date created, String owner, Boolean safe, String ip,
 					String country, String user) {
 		this.hash = hash;
 		this.target = target;
@@ -31,11 +32,12 @@ public class ShortURL {
 		this.sponsor = sponsor;
 		this.created = created;
 		this.owner = owner;
-		this.mode = mode;
 		this.safe = safe;
 		this.ip = ip;
 		this.country = country;
 		this.user = user;
+		this.lastStatus = HttpStatus.OK;
+		this.valid = true;
 	}
 
 	public ShortURL() {
@@ -45,64 +47,104 @@ public class ShortURL {
 		return hash;
 	}
 
+	public void setHash(String hash) {
+		this.hash = hash;
+	}
+
 	public String getTarget() {
 		return target;
+	}
+
+	public void setTarget(String target) {
+		this.target = target;
 	}
 
 	public URI getUri() {
 		return uri;
 	}
 
-	public Date getCreated() {
-		return created;
-	}
-
-	public String getOwner() {
-		return owner;
-	}
-
-	public Integer getMode() {
-		return mode;
+	public void setUri(URI uri) {
+		this.uri = uri;
 	}
 
 	public String getSponsor() {
 		return sponsor;
 	}
 
+	public void setSponsor(String sponsor) {
+		this.sponsor = sponsor;
+	}
+
+	public Date getCreated() {
+		return created;
+	}
+
+	public void setCreated(Date created) {
+		this.created = created;
+	}
+
+	public String getOwner() {
+		return owner;
+	}
+
+	public void setOwner(String owner) {
+		this.owner = owner;
+	}
+
 	public Boolean getSafe() {
 		return safe;
 	}
 
-	public String getIP() {
+	public void setSafe(Boolean safe) {
+		this.safe = safe;
+	}
+
+	public String getIp() {
 		return ip;
+	}
+
+	public void setIp(String ip) {
+		this.ip = ip;
 	}
 
 	public String getCountry() {
 		return country;
 	}
-	
-	public Integer getStatus() {
-		return status;
-	}
-	
-	public String getBadStateDate() {
-		return badStatusDate;
+
+	public void setCountry(String country) {
+		this.country = country;
 	}
 
-	public URI getQRLink() {
+	public HttpStatus getLastStatus() {
+		return lastStatus;
+	}
+
+	public void setLastStatus(HttpStatus lastStatus) {
+		this.lastStatus = lastStatus;
+	}
+
+	public Date getLastCheckDate() {
+		return lastCheckDate;
+	}
+
+	public void setLastCheckDate(Date lastCheckDate) {
+		this.lastCheckDate = lastCheckDate;
+	}
+
+	public Date getCacheDate() {
+		return cacheDate;
+	}
+
+	public void setCacheDate(Date cacheDate) {
+		this.cacheDate = cacheDate;
+	}
+
+	public URI getQrLink() {
 		return qrLink;
 	}
 
-	public void setQRLink(URI qrLink) {
+	public void setQrLink(URI qrLink) {
 		this.qrLink = qrLink;
-	}
-	
-	public void setStatus(Integer status) {
-		this.status = status;
-	}
-	
-	public void setBadStatusDate(String badStatusDate) {
-		this.badStatusDate = badStatusDate;
 	}
 
 	public String getUser() {
@@ -111,5 +153,13 @@ public class ShortURL {
 
 	public void setUser(String user) {
 		this.user = user;
+	}
+
+	public boolean isValid() {
+		return valid;
+	}
+
+	public void setValid(boolean valid) {
+		this.valid = valid;
 	}
 }

@@ -22,7 +22,6 @@ import urlshortener.team.domain.Metrics;
 import urlshortener.team.message.ErrorMessage;
 import urlshortener.team.message.MetricsRequestMessage;
 import urlshortener.team.service.MetricsServiceImpl;
-import urlshortener.team.repository.ShortURLRepository;
 
 import javax.servlet.http.HttpServletResponse;
 import java.net.URI;

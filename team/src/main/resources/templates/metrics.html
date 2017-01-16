@@ -67,7 +67,7 @@
                     <div class="panel-body">
                         <ul class='list-group'>
                             <li class="list-group-item"><strong>Clicks</strong> <span class="badge">{{metrics.clicks}}</span></li>
-                            <li class="list-group-item"><strong>Creation date:</strong> {{metrics.created}}</li>
+                            <li class="list-group-item"><strong>Creation date:</strong> {{metrics.created | date:'yyyy-MM-dd HH:mm:ss'}}</li>
                             <li class="list-group-item"><strong>Target URL:</strong> <a href="{{metrics.target}}">{{metrics.target}}</a></li>
                             <li class="list-group-item"><strong>Unique visitors:</strong> <span class="badge">{{metrics.uniqueVisitors}}</span></li>
                             <li class="list-group-item"><strong>Different browsers:</strong> <span class="badge">{{numBrowsers}}</span></li>
