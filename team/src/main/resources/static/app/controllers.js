@@ -77,7 +77,7 @@ angular.module("UrlShortenerApp.controllers", ["chart.js"])
         };
     })
     .controller("URLShortenerCtrl", function($scope, $location, URLShortenerService, SuggestService) {
-    	var needsSuggestion;
+    	$scope.needsSuggestion;
     	$scope.url = "";
         $scope.shortName = "";
         $scope.vcard = {
@@ -96,13 +96,13 @@ angular.module("UrlShortenerApp.controllers", ["chart.js"])
             $scope.error = "";
             URLShortenerService.shortenUrl($scope.url, $scope.shortName, $scope.vcard, $scope.qrErrorLevel).then(function(data) {
                 $scope.shortURL = data;
-                needsSuggestion = false;
+                $scope.needsSuggestion = false;
                 $scope.suggestResp = "";
 				$scope.synonymResp = "";
 				$scope.noResults = "";
             }, function(err) {
                 if (true) { // TODO compare error receive is for name or url
-                	needsSuggestion = true;
+                    $scope.needsSuggestion = true;
 					getSuggestions($scope.shortName);
 					$scope.noResults = "Short Name Already Exist";
 				} else {
@@ -113,13 +113,13 @@ angular.module("UrlShortenerApp.controllers", ["chart.js"])
         };
 
         $scope.getSuggestions = function(e) {
-        	if (needsSuggestion) {
+        	if ($scope.needsSuggestion) {
         		getSuggestions($scope.shortName + e.key);
         	}
         };
 
         $scope.backspaceEvent = function(e) {
-            if (e.keyCode === 8 && needsSuggestion) {
+            if (e.keyCode === 8 && $scope.needsSuggestion) {
                 var x = $scope.shortName.substr(0, $scope.shortName.length);
                 getSuggestions($scope.shortName.substr(0, $scope.shortName.length));
             }
