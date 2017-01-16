@@ -2,9 +2,10 @@ package urlshortener.team.service;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,26 +15,29 @@ import urlshortener.team.domain.ShortURL;
 import urlshortener.team.repository.ShortURLRepository;
 
 @Service
-public class SuggestServiceImpl implements SuggestService {
+public class SuggestionServiceImpl implements SuggestionService {
 
-	private static final Logger LOG = LoggerFactory.getLogger(SuggestServiceImpl.class);
+	private static final Logger LOG = LoggerFactory.getLogger(SuggestionServiceImpl.class);
 	
 	@Autowired
 	protected ShortURLRepository shortURLRepository;
+	@Autowired
+	private SynonymService synonymService;
 	
 	private List<String> words;	
 	
-	public SuggestServiceImpl() {
+	public SuggestionServiceImpl() {
 		fillDictionary();
 	}
 
 	@Override
-	public List<String> suggest(String userWord) {
+	public List<String> getSuggestions(String userWord) {
 
-		List<String> suggest = new LinkedList<String>();
+		//List<String> suggestions = words.stream().sorted(Comparator.comparingInt(s -> StringUtils.getLevenshteinDistance(s, userWord))).limit(10).collect(Collectors.toList());
+
+		List<String> similar = new ArrayList<>();
 		
 		if (!userWord.isEmpty()) {
-			
 			for (String word : words) {
 				boolean coincidences = true;
 				for (int i = 0; i < userWord.length(); i++) {
@@ -48,30 +52,40 @@ public class SuggestServiceImpl implements SuggestService {
 				if (coincidences) {
 					if (userWord.length() < word.length()) {
 						if (uniqueId(word)) {
-							suggest.add(word);
-							if (suggest.size() > 5) {
-								return suggest;
+							similar.add(word);
+							if (similar.size() > 3) {
+								return similar;
 							}
 						}					
 					}
 				}
 			}
 		}
-		return suggest;
+
+		// Sort suggestions using Levenshtein's distance algorithm
+		similar.sort(Comparator.comparingInt(s -> StringUtils.getLevenshteinDistance(s, userWord)));
+
+		List<String> synonyms = synonymService.getSynonyms(userWord);
+
+		List<String> suggestions = new ArrayList<>();
+		suggestions.addAll(similar);
+		suggestions.addAll(synonyms);
+
+		return suggestions;
 	}
 	
 	private void fillDictionary(){
 
-		words = new LinkedList<String>();
+		words = new LinkedList<>();
 		String file = "src/main/resources/wordsEn.txt";
 		try {
 			FileReader fr = new FileReader(file);
 			BufferedReader br = new BufferedReader(fr);
 
-			String linea;
-			while((linea = br.readLine()) != null)
-				if(linea!=null && linea.length()>0)        	
-					words.add(linea);
+			String line;
+			while((line = br.readLine()) != null)
+				if(line.length() > 0)
+					words.add(line);
 
 			fr.close();
 		}

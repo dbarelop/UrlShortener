@@ -76,9 +76,10 @@ angular.module("UrlShortenerApp.controllers", ["chart.js"])
             MetricsService.reconnect();
         };
     })
-    .controller("URLShortenerCtrl", function($scope, $location, URLShortenerService) {
-        $scope.url = "";
-        $scope.brandedLink = "";
+    .controller("URLShortenerCtrl", function($scope, $location, URLShortenerService, SuggestService) {
+    	$scope.needsSuggestion;
+    	$scope.url = "";
+        $scope.shortName = "";
         $scope.vcard = {
             vcardName: "",
             vcardSurname: "",
@@ -87,39 +88,87 @@ angular.module("UrlShortenerApp.controllers", ["chart.js"])
             vcardEmail: ""
         };
         $scope.qrErrorLevel = "";
+        $scope.showVcard = false;
+        $scope.showQr = false;
+
         $scope.shorten = function() {
             $scope.shortURL = "";
             $scope.error = "";
-            URLShortenerService.shortenUrl($scope.url, $scope.brandedLink, $scope.vcard, $scope.qrErrorLevel).then(function(data) {
+            URLShortenerService.shortenUrl($scope.url, $scope.shortName, $scope.vcard, $scope.qrErrorLevel).then(function(data) {
                 $scope.shortURL = data;
+                $scope.needsSuggestion = false;
+                $scope.suggestResp = "";
+				$scope.synonymResp = "";
+				$scope.noResults = "";
             }, function(err) {
-                $scope.error = "Unexpected error: " + err.data;
+                if (true) { // TODO compare error receive is for name or url
+                    $scope.needsSuggestion = true;
+					getSuggestions($scope.shortName);
+					$scope.noResults = "Short Name Already Exist";
+				} else {
+					$scope.error = "Unexpected error: " + err.data;
+				}
+
             });
         };
-        $scope.showVcard = false;
-        $scope.showQr = false;
+
+        $scope.getSuggestions = function(e) {
+        	if ($scope.needsSuggestion) {
+        		getSuggestions($scope.shortName + e.key);
+        	}
+        };
+
+        $scope.backspaceEvent = function(e) {
+            if (e.keyCode === 8 && $scope.needsSuggestion) {
+                var x = $scope.shortName.substr(0, $scope.shortName.length);
+                getSuggestions($scope.shortName.substr(0, $scope.shortName.length));
+            }
+        };
+
+        $scope.setShortName = function(shortName) {
+            $scope.shortName = shortName;
+        };
+
+        var getSuggestions = function(shortName) {
+            if (shortName) {
+                SuggestService.getSuggestions(shortName).then(null, null, function (suggestions) {
+                    if (suggestions.error) {
+                        $scope.suggestions_err = suggestions.error;
+                        $scope.suggestions = "";
+                    } else {
+                        $scope.suggestions_err = "";
+                        $scope.suggestions = suggestions;
+                    }
+                });
+            } else {
+                $scope.suggestions = "";
+                $scope.suggestions_err = "";
+            }
+        };
+
+        SuggestService.initialize();
     })
     .controller("UserLinksController", function($scope, UserLinksService) {
 
-        $scope.initRules = function(hash) {
+        $scope.initRules = function (hash) {
             $scope.hash = hash;
-            UserLinksService.getRules($scope.hash).then(function(rules) {
+            UserLinksService.getRules($scope.hash).then(function (rules) {
                 $scope.rules = rules;
                 $scope.newRule = {
                     operation: "none"
                 };
-            }, function(err) {
+            }, function (err) {
                 console.log(err);
             });
         };
 
-        $scope.addRule = function() {
-            UserLinksService.addRule($scope.hash, $scope.newRule).then(function() {
+        $scope.addRule = function () {
+            UserLinksService.addRule($scope.hash, $scope.newRule).then(function () {
                 $scope.rules.push($scope.newRule);
                 $scope.newRule = {
                     operation: "none"
                 };
-            }, function(err) {
+            }, function (err) {
                 console.log(err);
             });
         };

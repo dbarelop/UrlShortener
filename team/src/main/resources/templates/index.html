@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
 	<title>URL Shortener</title>
@@ -12,6 +12,13 @@
 	<!-- TODO: chart.js not needed -->
 	<script type="text/javascript" th:src="@{/webjars/chartjs/2.1.3/Chart.js}"></script>
 	<script type="text/javascript" th:src="@{/webjars/angular-chart.js/1.0.3/angular-chart.min.js}"></script>
+	<script type="text/javascript" th:src="@{/webjars/sockjs-client/1.1.1/sockjs.js}"></script>
+    <script type="text/javascript" th:src="@{/webjars/stomp-websocket/2.3.3/stomp.js}"></script>
+	<script type="text/javascript" th:src="@{/webjars/angular-ui-bootstrap/2.2.0/ui-bootstrap-tpls.min.js}"></script>
+	<script type="text/javascript" th:src="@{/webjars/angularjs/1.5.8/angular-animate.min.js}"></script>
+	<script type="text/javascript" th:src="@{/webjars/angularjs/1.5.8/angular-sanitize.min.js}"></script>	
+	<script type="text/javascript" th:src="@{/webjars/angular-strap/2.3.4/angular-strap.min.js}"></script>
+	<script type="text/javascript" th:src="@{/webjars/angular-strap/2.3.4/angular-strap.tpl.min.js}"></script>
 	<script type="text/javascript" th:src="@{/app/app.js}"></script>
 	<script type="text/javascript" th:src="@{/app/controllers.js}"></script>
 	<script type="text/javascript" th:src="@{/app/services.js}"></script>
@@ -33,7 +40,9 @@
 				</div>
 				<br />
 				<div class="col-sm-offset-4 col-sm-4">
-					<input type="text" class="center-block form-control input-lg" title="Enter a Short Name" placeholder="Enter a Short Name" ng-model="brandedLink" />
+					<input type="text" class="center-block form-control input-lg " title="Enter a Short Name" 	
+					placeholder="Enter a Short Name" ng-model="shortName" ng-keypress="getSuggestions($event)" ng-keyup="backspaceEvent($event)" />
+     				<div ng-model="noResults">{{noResults}}</div>
 				</div>
 				<div class="col-sm-offset-4 col-sm-4">
 					<br />
@@ -47,7 +56,7 @@
 				</div>
 				<div class="col-sm-offset-4 col-sm-4">
 					<br />
-					<button class="btn btn-lg btn-primary" type="button" ng-click="showVcard = !showVCard">vCard</button>
+					<button class="btn btn-lg btn-primary" type="button" ng-click="showVcard = !showVcard">vCard</button>
 				</div>
 				<div class="col-lg-12 text-center" ng-show="showVcard">
 					<div class="col-sm-offset-4 col-sm-4">
@@ -79,6 +88,22 @@
 			<div class="col-sm-offset-4 col-sm-4 text-center">
 				<br />
 				<div class='alert alert-danger lead'>{{error}}</div>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<br />
+		<div class="col-lg-12 text-center" ng-show="needsSuggestion">
+			<div class="col-sm-offset-4 col-sm-4 text-center" ng-if="suggestions">
+				<h5>Suggestions</h5>
+				<br />
+				<div ng-repeat="s in suggestions">
+					<div><button class="btn btn-default" style="margin-bottom:5px;" ng-click="setShortName(s)">{{s}}</button></div>
+				</div>
+	    	</div>
+			<div class="col-sm-offset-4 col-sm-4 text-center" ng-if="suggestions_err">
+				<h5>No suggestions found for {{shortName}}</h5>
+				<br />
 			</div>
 		</div>
 	</div>
