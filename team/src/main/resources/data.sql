@@ -4,7 +4,8 @@ INSERT INTO SHORTURL (HASH, TARGET, SPONSOR, CREATED, OWNER, SAFE, IP, COUNTRY, 
   ('hash1', 'http://www.w3schools.com/bootstrap/bootstrap_list_groups.asp', NULL, '2017-01-02 03:04:05', NULL, NULL, '155.210.233.183', NULL, 200, NULL, NULL, 'user'),
   ('hash2', 'http://stackoverflow.com/questions/13744779/exporting-intellij-idea-ui-form-to-eclipse', NULL, '2017-01-02 03:04:05', NULL, NULL, '155.210.233.183', NULL, 200, NULL, NULL, 'user'),
   ('hash3', 'http://stackoverflow.com/questions/24185378/intellij-idea-13-ui-designer-and-automatic-gradle-building', NULL, '2017-01-02 03:04:05', NULL, NULL, '155.210.233.183', NULL, 200, NULL, NULL, 'user'),
-  ('hash4', 'http://stackoverflow.com/questions/12775170/how-do-i-create-a-new-swing-app-in-intellij-idea-community-edition', NULL, '2017-01-02 03:04:05', NULL, NULL, '155.210.233.183', NULL, 200, NULL, NULL, 'user');
+  ('hash4', 'http://stackoverflow.com/questions/12775170/how-do-i-create-a-new-swing-app-in-intellij-idea-community-edition', NULL, '2017-01-02 03:04:05', NULL, NULL, '155.210.233.183', NULL, 200, NULL, NULL, 'user'),
+  ('hash5', 'https://moodle2.unzar.es/add/', NULL, '2017-01-02 03:04:05', NULL, NULL, '155.210.233.183', NULL, 400, '2017-01-10 03:04:05', '2017-01-10 03:04:05', NULL);
 
 INSERT INTO CLICK (HASH, CREATED, REFERRER, BROWSER, PLATFORM, IP, COUNTRY) VALUES
   ('hash0', '2017-02-03 04:05:06', NULL, 'FIREFOX', 'LINUX', '155.210.233.183', NULL),

@@ -9,8 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 
 import java.net.URI;
 
@@ -28,20 +26,16 @@ public class CacheServiceTests {
     
 	@Test
 	public void a_testStatusOK() throws Exception {
-		postBrandedLink("https://www.facebook.com/","facebook");
-		Thread.sleep(11*1000);
-		ResponseEntity<String> response = new TestRestTemplate().getForEntity("http://localhost:" + this.port + "/facebook", String.class);
+		ResponseEntity<String> response = new TestRestTemplate().getForEntity("http://localhost:" + this.port + "/hash0", String.class);
 		assertThat(response.getStatusCode(), is(HttpStatus.TEMPORARY_REDIRECT));
-		assertThat(response.getHeaders().getLocation(), is(new URI("https://www.facebook.com/")));
+		assertThat(response.getHeaders().getLocation(), is(new URI("https://moodle2.unizar.es/add/")));
 	}
 	
 	@Test
 	public void testStatusNull() throws Exception {
-		postBrandedLink("https://www.facebok.com/","id1");
-		Thread.sleep(11*1000);
-		ResponseEntity<String> response = new TestRestTemplate().getForEntity("http://localhost:" + this.port + "/id1", String.class);
+		ResponseEntity<String> response = new TestRestTemplate().getForEntity("http://localhost:" + this.port + "/hash5", String.class);
 		assertThat(response.getStatusCode(), is(HttpStatus.TEMPORARY_REDIRECT));
-		assertThat(response.getHeaders().getLocation(), is(new URI("http://localhost:" + this.port + "/404/id1")));
+		assertThat(response.getHeaders().getLocation(), is(new URI("http://localhost:" + this.port + "/404/hash5")));
 	}
 
 	@Test
@@ -54,16 +48,9 @@ public class CacheServiceTests {
 
 	@Test
 	public void z_testCacheServing() throws Exception {
-		Thread.sleep(11*1000);
-		ResponseEntity<String> response = new TestRestTemplate().getForEntity("http://localhost:" + this.port + "/cache/facebook", String.class);
+		ResponseEntity<String> response = new TestRestTemplate().getForEntity("http://localhost:" + this.port + "/cache/hash0", String.class);
 		assertTrue(response.hasBody());
 		assertThat(response.getStatusCode(), is(HttpStatus.OK));
 		assertThat(response.getHeaders().getLocation(), is(nullValue()));
-	}
-	
-	private ResponseEntity<String> postBrandedLink(String url, String id) {
-		MultiValueMap<String, Object> parts = new LinkedMultiValueMap<>();
-		parts.add("url", url); parts.add("shortName", id);
-		return new TestRestTemplate().postForEntity("http://localhost:" + this.port + "/brandedLink", parts, String.class);
 	}
 }
