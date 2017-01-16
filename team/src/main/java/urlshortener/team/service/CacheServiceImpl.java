@@ -58,7 +58,6 @@ public class CacheServiceImpl implements CacheService {
 	}
 
 	@Override
-	@Async
 	public void verifyStatus(ShortURL shortURL) {
 		RestTemplate restTemplate = new RestTemplate();
 		shortURL.setLastCheckDate(new Date());
