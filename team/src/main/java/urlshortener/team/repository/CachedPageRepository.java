@@ -5,4 +5,5 @@ import urlshortener.team.domain.CachedPage;
 
 public interface CachedPageRepository extends MongoRepository<CachedPage, String> {
     CachedPage findById(String hash);
+    boolean exists(String hash);
 }

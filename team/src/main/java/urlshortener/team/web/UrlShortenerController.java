@@ -64,15 +64,15 @@ public class UrlShortenerController {
 
     @RequestMapping(value = "/brandedLink", method = RequestMethod.POST)
     public ResponseEntity<?> shorten(@RequestParam("url") String url,
-                                            @RequestParam(value = "shortName", required = false) String shortName,
-                                            @RequestParam(value = "sponsor", required = false) String sponsor,
-                                            @RequestParam(value="error", defaultValue = "L") String error,
-                                            @RequestParam(value = "vcardname", required = false) String vcardName,
-                                            @RequestParam(value = "vcardsurname", required = false) String vcardSurname,
-                                            @RequestParam(value = "vcardorganization", required = false) String vcardOrganization,
-                                            @RequestParam(value = "vcardtelephone", required = false) String vcardTelephone,
-                                            @RequestParam(value = "vcardemail", required = false) String vcardEmail,
-                                            HttpServletRequest request) {
+                                     @RequestParam(value = "shortName", required = false) String shortName,
+                                     @RequestParam(value = "sponsor", required = false) String sponsor,
+                                     @RequestParam(value="error", defaultValue = "L") String error,
+                                     @RequestParam(value = "vcardname", required = false) String vcardName,
+                                     @RequestParam(value = "vcardsurname", required = false) String vcardSurname,
+                                     @RequestParam(value = "vcardorganization", required = false) String vcardOrganization,
+                                     @RequestParam(value = "vcardtelephone", required = false) String vcardTelephone,
+                                     @RequestParam(value = "vcardemail", required = false) String vcardEmail,
+                                     HttpServletRequest request) {
         logger.info("Requested new short for uri " + url + " and short name " + shortName);
         VCard vcard = new VCard(vcardName, vcardSurname, vcardOrganization, vcardTelephone, vcardEmail, url);
         if (shortURLRepository.findByKey(shortName) == null) {
@@ -81,12 +81,12 @@ public class UrlShortenerController {
                 HttpHeaders h = new HttpHeaders();
                 h.setLocation(su.getUri());
                 return new ResponseEntity<>(su, h, HttpStatus.CREATED);
-            }else{
-            	return new ResponseEntity<>("url no valid",HttpStatus.BAD_REQUEST);
+            } else {
+            	return new ResponseEntity<>("Invalid URI", HttpStatus.BAD_REQUEST);
             }
-        } else {        	
+        } else {
             logger.info("Requested short name already exists");
-            return new ResponseEntity<>(new ErrorMessage("Requested shortname already exists"),HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ErrorMessage("Requested shortname already exists"), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -99,7 +99,7 @@ public class UrlShortenerController {
             try {
                 String qrUri = su.getUri().toString() + "/qrcode?error=" + error;
                 qrUri += (vcard.getName() != null ? vcard.getUrlEncodedParameters() : "");
-                su.setQRLink(new URI(qrUri));
+                su.setQrLink(new URI(qrUri));
             } catch (URISyntaxException e) {
                 logger.error(e.getMessage(), e);
             }

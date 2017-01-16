@@ -35,20 +35,20 @@ dependencies {
     compile 'org.webjars:angular-chart.js:1.0.3'
     compile 'org.webjars:stomp-websocket:2.3.3'
     compile 'org.webjars:sockjs-client:1.1.1'
+    compile 'org.webjars:bootstrap-datepicker:1.6.4'
 
-	//Provides suggest service
+    // Provides suggest service
     compile 'com.google.code.gson:gson:2.8.0'    	
- 	compile 'org.webjars.bower:jquery-typeahead:2.2.1'
     compile 'org.apache.commons:commons-lang3:3.5'
- 	
+
  	// https://mvnrepository.com/artifact/org.webjars/angular-ui-bootstrap
 	compile group: 'org.webjars', name: 'angular-ui-bootstrap', version: '2.2.0'
 
 	// https://mvnrepository.com/artifact/org.webjars/angular-strap
 	compile group: 'org.webjars', name: 'angular-strap', version: '2.3.4'
-	
 
-	// https://mvnrepository.com/artifact/com.google.zxing/core
+
+    // https://mvnrepository.com/artifact/com.google.zxing/core
     compile group: 'com.google.zxing', name: 'core', version: '3.3.0'
     compile group: 'com.google.zxing', name: 'javase', version: '3.3.0'
 

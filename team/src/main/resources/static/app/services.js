@@ -5,7 +5,9 @@ angular.module("UrlShortenerApp.services")
             stomp: null
         };
 
-        var hash;
+        service.hash;
+        service.startDate = null;
+        service.endDate = null;
 
         service.RECONNECT_TIMEOUT = 30000;
         service.SOCKET_URL = "/metrics";
@@ -15,21 +17,13 @@ angular.module("UrlShortenerApp.services")
             return listener.promise;
         };
 
-        service.send = function() {
-            if (service.connected) {
-                socket.stomp.send(service.CHAT_BROKER, { priority: 9 }, JSON.stringify({
-                    hash: hash,
-                    startDate: null,
-                    endDate: null
-                }));
-            }
-        };
-
-        var reconnect = function() {
+        service.reconnect = function() {
+            socket.stomp.disconnect();
             service.connected = false;
-            $timeout(function() {
-                initialize();
-            }, this.RECONNECT_TIMEOUT);
+            service.initialize(service.hash);
+            /*$timeout(function() {
+              service.initialize(hash);
+            }, this.RECONNECT_TIMEOUT);*/
         };
 
         var startListener = function() {
@@ -37,16 +31,23 @@ angular.module("UrlShortenerApp.services")
                 listener.notify(JSON.parse(data.body));
             });
             service.connected = true;
-            service.send();
+            if (service.connected) {
+                socket.stomp.send(service.CHAT_BROKER, { priority: 9 }, JSON.stringify({
+                    hash: service.hash,
+                    startDate: service.startDate,
+                    endDate: service.endDate
+                }));
+            }
         };
 
         service.initialize = function(hash) {
+            service.hash = hash;
             service.CHAT_TOPIC = "/topic/metrics/" + hash;
             service.CHAT_BROKER = "/app/metrics/" + hash;
             socket.client = new SockJS(service.SOCKET_URL);
             socket.stomp = Stomp.over(socket.client);
             socket.stomp.connect({}, startListener);
-            socket.stomp.onclose = reconnect;
+            socket.stomp.onclose = service.reconnect;
         };
 
         return service;
@@ -111,6 +112,51 @@ angular.module("UrlShortenerApp.services")
                 deferred.reject(err);
             });
             return deferred.promise;
+        };
+
+        return service;
+    })
+    .service("UserLinksService", function($q, $http) {
+        var service = {};
+
+        service.getRules = function(hash) {
+            var deferred = $q.defer();
+            $http.get("/" + hash + "/rules").then(function(data) {
+                deferred.resolve(data.data);
+            }, function(err) {
+                deferred.reject(err);
+            });
+            return deferred.promise;
+        };
+
+        service.addRule = function(hash, rule) {
+            var deferred = $q.defer();
+            $http.post("/" + hash + "/rules", rule).then(function(data) {
+                deferred.resolve(data.data);
+            }, function(err) {
+                deferred.reject(err);
+            });
+            return deferred.promise;
+        };
+
+        service.updateRule = function(hash, rule) {
+            var deferred = $q.defer();
+            $http.put("/" + hash + "/rules/" + rule.id, rule).then(function() {
+                deferred.resolve();
+            }, function(err) {
+                deferred.error(err);
+            });
+            return deferred.promise;
+        };
+
+        service.deleteRule = function(hash, rule) {
+            var deferred = $q.defer();
+            $http.delete("/" + hash + "/rules/" + rule.id).then(function() {
+                deferred.resolve();
+            }, function(err) {
+                deferred.error(err);
+            });
+            return deferred.promise();
         };
 
         return service;

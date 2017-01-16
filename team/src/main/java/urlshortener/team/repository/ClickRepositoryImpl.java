@@ -33,7 +33,7 @@ public class ClickRepositoryImpl extends urlshortener.common.repository.ClickRep
         try {
             return jdbc.queryForObject(query, args.toArray(), Long.class);
         } catch (Exception e) {
-            log.debug("When counting unique visitors for hash" + hash, e);
+            log.error("When counting unique visitors for hash" + hash, e);
         }
         return -1L;
     }
@@ -50,7 +50,7 @@ public class ClickRepositoryImpl extends urlshortener.common.repository.ClickRep
         try {
             return jdbc.queryForObject(query, args.toArray(), Long.class);
         } catch (Exception e) {
-            log.debug("When counting unique visitors for hash" + hash, e);
+            log.error("When counting unique visitors for hash" + hash, e);
         }
         return -1L;
     }
@@ -76,7 +76,7 @@ public class ClickRepositoryImpl extends urlshortener.common.repository.ClickRep
                 return res;
             });
         } catch (Exception e) {
-            log.debug("When counting unique visitors for hash" + hash, e);
+            log.error("When counting unique visitors for hash" + hash, e);
         }
         return null;
     }
@@ -102,7 +102,18 @@ public class ClickRepositoryImpl extends urlshortener.common.repository.ClickRep
                 return res;
             });
         } catch (Exception e) {
-            log.debug("When counting unique visitors for hash" + hash, e);
+            log.error("When counting unique visitors for hash" + hash, e);
+        }
+        return null;
+    }
+
+    @Override
+    public Date lastVisitDate(String ip) {
+        String query = "select created from click where ip = ? order by created desc limit 1";
+        try {
+            return jdbc.queryForObject(query, new String[] { ip }, Date.class);
+        } catch (Exception e) {
+            log.error("When finding last visit of " + ip, e);
         }
         return null;
     }
