@@ -9,6 +9,12 @@ buildscript {
 }
 apply plugin: "spring-boot"
 apply plugin: 'eclipse-wtp'
+apply plugin: 'war'
+
+war {
+    baseName = 'urlshortener'
+    version = '1.0-RELEASE'
+}
 
 eclipse {
     project {
