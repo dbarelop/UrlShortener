@@ -63,15 +63,10 @@ angular.module("UrlShortenerApp.services")
         service.SOCKET_URL = "/suggest";
         service.connected = false;
         
-        service.receive = function() {
-            return listener.promise;
-        };
-
-        service.send = function() {
+        service.getSuggestions = function(shortName) {
             if (service.connected) {
-                socket.stomp.send(service.CHAT_BROKER, { priority: 9 }, 
-                		JSON.stringify({id: branded
-                }));
+                socket.stomp.send(service.CHAT_BROKER, { priority: 9 }, JSON.stringify({ shortName: shortName }));
+                return listener.promise;
             }
         };
         
@@ -80,13 +75,11 @@ angular.module("UrlShortenerApp.services")
                 listener.notify(JSON.parse(data.body));
             });
             service.connected = true;
-            service.send();
         };
                         
-        service.initialize = function(brandedLink) {
-        	branded = brandedLink;
-            service.CHAT_TOPIC = "/topic/suggest";
-            service.CHAT_BROKER = "/app/suggest";
+        service.initialize = function() {
+            service.CHAT_TOPIC = "/topic/suggestions";
+            service.CHAT_BROKER = "/app/suggestions";
             socket.client = new SockJS(service.SOCKET_URL);
             socket.stomp = Stomp.over(socket.client);
             socket.stomp.connect({}, startListener);
@@ -98,12 +91,12 @@ angular.module("UrlShortenerApp.services")
     .service("URLShortenerService", function($q, $http) {
         var service = {};
 
-        service.shortenUrl = function(url, brandedLink, vcard, qrErrorLevel) {
+        service.shortenUrl = function(url, shortName, vcard, qrErrorLevel) {
             var deferred = $q.defer();
             var path = "/link", params = { params: { url: url, error: qrErrorLevel }};
-            if (brandedLink) {
+            if (shortName) {
                 path = "/brandedLink";
-                params.params.shortName = brandedLink;
+                params.params.shortName = shortName;
             }
             if (vcard.vcardName)  {
                 params.params.vcardname = vcard.vcardName;

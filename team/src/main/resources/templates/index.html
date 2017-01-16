@@ -41,7 +41,7 @@
 				<br />
 				<div class="col-sm-offset-4 col-sm-4">
 					<input type="text" class="center-block form-control input-lg " title="Enter a Short Name" 	
-					placeholder="Enter a Short Name" ng-model="brandedLink" ng-keydown="suggestion()"/>     					
+					placeholder="Enter a Short Name" ng-model="shortName" ng-keypress="getSuggestions($event)" ng-keyup="backspaceEvent($event)" />
      				<div ng-model="noResults">{{noResults}}</div>
 				</div>
 				<div class="col-sm-offset-4 col-sm-4">
@@ -56,7 +56,7 @@
 				</div>
 				<div class="col-sm-offset-4 col-sm-4">
 					<br />
-					<button class="btn btn-lg btn-primary" type="button" ng-click="showVcard = !showVCard">vCard</button>
+					<button class="btn btn-lg btn-primary" type="button" ng-click="showVcard = !showVcard">vCard</button>
 				</div>
 				<div class="col-lg-12 text-center" ng-show="showVcard">
 					<div class="col-sm-offset-4 col-sm-4">
@@ -93,24 +93,17 @@
 	</div>
 	<div class="row">
 		<br />
-		<div class="col-sm-offset-4 col-sm-4 text-center">
-			<div class="col-sm-6 text-center">
-				<div ng-if="suggestResp">
-	    			<div class="">{{suggestResp}}</div>	
-	    			<br />
-	      			<div ng-repeat="su in CollectionSuggest">
-	        			<div><button class="btn btn-primary" style="margin-bottom:5px;" ng-click="add(su.sug)">{{su.sug}}</button></div>
-	      			</div>
-	    		</div>
+		<div class="col-lg-12 text-center">
+			<div class="col-sm-offset-4 col-sm-4 text-center" ng-if="suggestions">
+				<h5>Suggestions</h5>
+				<br />
+				<div ng-repeat="s in suggestions">
+					<div><button class="btn btn-default" style="margin-bottom:5px;" ng-click="setShortName(s)">{{s}}</button></div>
+				</div>
 	    	</div>
-	    	<div class="col-sm-6 text-center">
-	    		<div ng-if="synonymResp">
-	   				<div class="">{{synonymResp}}</div>	
-	   				<br />
-	      			<div ng-repeat="sy in CollectionSynonyms">
-	        			<div><button class="btn btn-primary" style="margin-bottom:5px;" ng-click="add(sy.syn)">{{sy.syn}}</button></div>
-	      			</div>
-	   			</div>  				
+			<div class="col-sm-offset-4 col-sm-4 text-center" ng-if="suggestions_err">
+				<h5>No suggestions found for {{shortName}}</h5>
+				<br />
 			</div>
 		</div>
 	</div>

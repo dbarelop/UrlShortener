@@ -20,15 +20,15 @@ import com.google.gson.reflect.TypeToken;
 import urlshortener.team.repository.ShortURLRepository;
 
 @Service
-public class SuggestSynonymServiceImpl implements SuggestSynonymService {
+public class SynonymServiceImpl implements SynonymService {
 
-	private static final Logger LOG = LoggerFactory.getLogger(SuggestSynonymServiceImpl.class);
+	private static final Logger logger = LoggerFactory.getLogger(SynonymServiceImpl.class);
 	
 	@Autowired
 	protected ShortURLRepository shortURLRepository;
 	
 	@Override
-	public List<String> suggestSynonym(String userWord) {
+	public List<String> getSynonyms(String userWord) {
 
 		List<String> suggestSynonym  = new LinkedList<String>();
 		
@@ -50,7 +50,7 @@ public class SuggestSynonymServiceImpl implements SuggestSynonymService {
 				con.setRequestProperty("User-Agent", "Mozilla/5.0");
 
 				int responseCode = con.getResponseCode();
-				LOG.info("response code: " + responseCode);
+				logger.info("response code: " + responseCode);
 
 				if (responseCode == 200) {
 					BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
@@ -85,12 +85,12 @@ public class SuggestSynonymServiceImpl implements SuggestSynonymService {
 								suggestSynonym.add(fromJson.get(i));
 							}
 						}
-						LOG.info("list of synonyms: " + suggestSynonym.toString());
+						logger.info("list of synonyms: " + suggestSynonym.toString());
 					}
 				}
 
-			}catch (Exception e) {
-				e.printStackTrace();
+			} catch (Exception e) {
+				logger.error(e.getMessage(), e);
 			}
 		}
 		return suggestSynonym;

@@ -29,9 +29,9 @@ angular.module("UrlShortenerApp.controllers", ["chart.js","ui.bootstrap"] )
         }
     })
     .controller("URLShortenerCtrl", function($scope, $location, URLShortenerService, SuggestService) {
-    	var needSuggest;
+    	var needsSuggestion;
     	$scope.url = "";
-        $scope.brandedLink = "";
+        $scope.shortName = "";
         $scope.vcard = {
             vcardName: "",
             vcardSurname: "",
@@ -40,76 +40,64 @@ angular.module("UrlShortenerApp.controllers", ["chart.js","ui.bootstrap"] )
             vcardEmail: ""
         };
         $scope.qrErrorLevel = "";
+        $scope.showVcard = false;
+        $scope.showQr = false;
+
         $scope.shorten = function() {
             $scope.shortURL = "";
             $scope.error = "";
-            URLShortenerService.shortenUrl($scope.url, $scope.brandedLink, $scope.vcard, $scope.qrErrorLevel).then(function(data) {
+            URLShortenerService.shortenUrl($scope.url, $scope.shortName, $scope.vcard, $scope.qrErrorLevel).then(function(data) {
                 $scope.shortURL = data;
-                needSuggest = false;
+                needsSuggestion = false;
                 $scope.suggestResp = "";
 				$scope.synonymResp = "";
 				$scope.noResults = "";
             }, function(err) {                                
                 if (true) { // TODO compare error receive is for name or url                	
-                	needSuggest = true;
-					suggest();
+                	needsSuggestion = true;
+					getSuggestions($scope.shortName);
 					$scope.noResults = "Short Name Already Exist";
-				}else{
+				} else {
 					$scope.error = "Unexpected error: " + err.data;
 				}
                 
             });
         };
-        $scope.showVcard = false;
-        $scope.showQr = false;
-        
-      
-        $scope.suggestion = function() {
-        	if (needSuggest) {
-        		suggest();
+
+        $scope.getSuggestions = function(e) {
+        	if (needsSuggestion) {
+        		getSuggestions($scope.shortName + e.key);
         	}        	
-        }
+        };
+
+        $scope.backspaceEvent = function(e) {
+            if (e.keyCode === 8 && needsSuggestion) {
+                var x = $scope.shortName.substr(0, $scope.shortName.length);
+                getSuggestions($scope.shortName.substr(0, $scope.shortName.length));
+            }
+        };
+
+        $scope.setShortName = function(shortName) {
+            $scope.shortName = shortName;
+        };
+
+        var getSuggestions = function(shortName) {
+            if (shortName) {
+                SuggestService.getSuggestions(shortName).then(null, null, function (suggestions) {
+                    if (suggestions.error) {
+                        $scope.suggestions_err = suggestions.error;
+                        $scope.suggestions = "";
+                    } else {
+                        $scope.suggestions_err = "";
+                        $scope.suggestions = suggestions;
+                    }
+                });
+            } else {
+                $scope.suggestions = "";
+                $scope.suggestions_err = "";
+            }
+        };
+
+        SuggestService.initialize();
         
-        $scope.add = function(val) {
-        	$scope.brandedLink = val;    	
-        }
-        
-        $scope.CollectionSuggest= {0: {su: ""} };
-        $scope.CollectionSynonyms= {0: {sy: ""} };
-              
-        var suggest = function() {
-        	if ($scope.brandedLink !== "") { 		
-        		SuggestService.initialize($scope.brandedLink);
-        		SuggestService.receive().then(null, null, function (data) {
-        			if (data.error) {
-        				$scope.noResults = "No Results Found";
-        				$scope.suggestResp = "";
-        				$scope.synonymResp = "";
-        			} else {
-        				$scope.noResults = "";
-        				if (data.suggestion.length>0) {
-							$scope.suggestResp = "Suggests";
-							angular.forEach(data.suggestion, function(value, key){        				           				     
-        				    $scope.CollectionSuggest[key] = { "sug": value };    				             				    
-							});
-						}else{
-							$scope.suggestResp = "";
-						}
-        				if (data.synonyms.length>0) {
-        					$scope.synonymResp = "Synonyms";
-        					angular.forEach(data.synonyms, function(value, key){
-            					$scope.CollectionSynonyms[key] = { "syn": value };
-            				});
-						}else{
-							$scope.synonymResp = "";
-						} 				 
-        			}
-        		});
-        	}else{
-        		$scope.suggestResp = "";
-				$scope.synonymResp = "";
-				$scope.noResults = "";
-        	}
-        } 
-               
     });
