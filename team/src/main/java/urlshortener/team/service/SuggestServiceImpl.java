@@ -49,7 +49,7 @@ public class SuggestServiceImpl implements SuggestService {
 					if (userWord.length() < word.length()) {
 						if (uniqueId(word)) {
 							suggest.add(word);
-							if (suggest.size() > 5) {
+							if (suggest.size() > 3) {
 								return suggest;
 							}
 						}					

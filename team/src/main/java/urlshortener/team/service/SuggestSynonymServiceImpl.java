@@ -75,9 +75,8 @@ public class SuggestSynonymServiceImpl implements SuggestSynonymService {
 
 					if (!fromJson.isEmpty()) {
 
-						int index = 6;
-
-						if (fromJson.size() < 6) {
+						int index = 4;
+						if (fromJson.size() < 4) {
 							index = fromJson.size();
 						}
 

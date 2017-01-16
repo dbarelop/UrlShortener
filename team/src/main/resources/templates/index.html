@@ -24,28 +24,6 @@
 	<script type="text/javascript" th:src="@{/app/services.js}"></script>
 </head>
 <body ng-app="UrlShortenerApp" style="padding-top: 70px;">
-
-
-<!-- Este script es el que genera problemas 
-
-<script type="text/ng-template" id="customPopupTemplate.html">
-  <div class="custom-popup-wrapper"
-     ng-style="{top: position().top+'px', left: position().left+'px'}"
-     style="display: block;"
-     ng-show="isOpen() && !moveInProgress"
-     aria-hidden="{{!isOpen()}}">
-    <p class="message">select location from drop down.</p>
-
-    <ul class="dropdown-menu" role="listbox">
-      <li class="uib-typeahead-match" ng-repeat="match in matches track by $index" ng-class="{active: isActive($index) }"
-        ng-mouseenter="selectActive($index)" ng-click="selectMatch($index)" role="option" id="{{::match.id}}">
-        <div uib-typeahead-match index="$index" match="match" query="query" template-url="templateUrl"></div>
-      </li>
-    </ul>
-  </div>
-</script>
--->
-
 <div th:replace="fragments/header :: header"></div>
 <div ng-controller="URLShortenerCtrl" class="container-full">
 	<div class="row">
@@ -61,24 +39,11 @@
 					</span>
 				</div>
 				<br />
-				<!-- ng-keydown="suggest()" con este evento se llamaba inicialmente para probar-->
 				<div class="col-sm-offset-4 col-sm-4">
-					<input type="text" 
-					class="center-block form-control input-lg " 
-					title="Enter a Short Name" 
-					placeholder="Enter a Short Name"					
-					ng-model="brandedLink"
-					ng-keydown="suggest()"
-					uib-typeahead="address for address in getSuggest($viewValue)"
-        			typeahead-loading="loadingSuggest" 
-        			typeahead-no-results="noResults"/>     					
-     					<i ng-show="loadingSuggest" class="glyphicon glyphicon-refresh"></i>
-    				<div ng-show="noResults">
-      					<i class="glyphicon glyphicon-remove"></i> No Results Found
-    				</div>
-     					
+					<input type="text" class="center-block form-control input-lg " title="Enter a Short Name" 	
+					placeholder="Enter a Short Name" ng-model="brandedLink" ng-keydown="suggestion()"/>     					
+     				<div ng-model="noResults">{{noResults}}</div>
 				</div>
-				
 				<div class="col-sm-offset-4 col-sm-4">
 					<br />
 					<select class="form-control" ng-model="qrErrorLevel">
@@ -124,6 +89,24 @@
 				<br />
 				<div class='alert alert-danger lead'>{{error}}</div>
 			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-lg-12 text-center">
+			<div ng-if="suggestResp">
+    			<div class="">{{suggestResp}}</div>	
+      			<div ng-repeat="su in CollectionSuggest">
+        			<div><button class="btn btn-lg btn-primary"  ng-click="add(su.sug)">{{su.sug}}</button></div>
+      			</div>
+    		</div>
+    	</div>
+    	<div class="col-lg-12 text-center">
+    		<div ng-if="synonymResp">
+   				<div class="">{{synonymResp}}</div>	
+      			<div ng-repeat="sy in CollectionSynonyms">
+        			<div><button class="btn btn-lg btn-primary"  ng-click="add(sy.syn)">{{sy.syn}}</button></div>
+      			</div>
+   			</div>  				
 		</div>
 	</div>
 	<div class="row" ng-if="shortURL">

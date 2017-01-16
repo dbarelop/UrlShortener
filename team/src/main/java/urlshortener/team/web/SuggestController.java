@@ -74,7 +74,7 @@ public class SuggestController {
 		suggestions.put("suggestion", sug);
 		suggestions.put("synonyms", synonym);
 		
-		if (suggestions.isEmpty()) {			
+		if (sug.isEmpty()&&synonym.isEmpty()) {
 			return new ErrorMessage("Suggest for word " + message.getId() + " not found");
 		}
 		return suggestions;

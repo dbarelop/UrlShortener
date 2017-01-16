@@ -18,9 +18,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import urlshortener.team.domain.ShortURL;
 import urlshortener.team.domain.VCard;
+import urlshortener.team.message.ErrorMessage;
 import urlshortener.team.repository.ShortURLRepository;
-import urlshortener.team.service.CacheService;
-import urlshortener.team.service.ShortNameService;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
@@ -40,8 +39,6 @@ public class UrlShortenerController {
 
     @Autowired
     private ShortURLRepository shortURLRepository;
-    @Autowired
-    private ShortNameService shortNameService;
 
     @RequestMapping(value = "/link", method = RequestMethod.POST)
     public ResponseEntity<ShortURL> shorten(@RequestParam("url") String url,
@@ -66,7 +63,7 @@ public class UrlShortenerController {
     }
 
     @RequestMapping(value = "/brandedLink", method = RequestMethod.POST)
-    public ResponseEntity<ShortURL> shorten(@RequestParam("url") String url,
+    public ResponseEntity<?> shorten(@RequestParam("url") String url,
                                             @RequestParam(value = "shortName", required = false) String shortName,
                                             @RequestParam(value = "sponsor", required = false) String sponsor,
                                             @RequestParam(value="error", defaultValue = "L") String error,
@@ -84,12 +81,13 @@ public class UrlShortenerController {
                 HttpHeaders h = new HttpHeaders();
                 h.setLocation(su.getUri());
                 return new ResponseEntity<>(su, h, HttpStatus.CREATED);
+            }else{
+            	return new ResponseEntity<>("url no valid",HttpStatus.BAD_REQUEST);
             }
-        } else {
+        } else {        	
             logger.info("Requested short name already exists");
-            shortNameService.suggest(shortName);
+            return new ResponseEntity<>(new ErrorMessage("Requested shortname already exists"),HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     private ShortURL createAndSaveIfValid(String id, String url, String sponsor, String error, VCard vcard, String owner, String ip) {
