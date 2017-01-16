@@ -1,9 +1,6 @@
 package urlshortener.team.service;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -24,7 +21,7 @@ public class SuggestionServiceImpl implements SuggestionService {
 
 	private static final Logger logger = LoggerFactory.getLogger(SuggestionServiceImpl.class);
 
-	private File dictionary;
+	private InputStream dictionary;
 	
 	@Autowired
 	protected ShortURLRepository shortURLRepository;
@@ -34,7 +31,7 @@ public class SuggestionServiceImpl implements SuggestionService {
 	private List<String> words;	
 	
 	public SuggestionServiceImpl() throws IOException {
-		dictionary = ResourceUtils.getFile("classpath:wordsEn.txt");
+		dictionary = getClass().getResourceAsStream("/wordsEn.txt");
 		fillDictionary();
 	}
 
@@ -81,7 +78,7 @@ public class SuggestionServiceImpl implements SuggestionService {
 	
 	private void fillDictionary() throws IOException {
 		words = new ArrayList<>();
-		try (FileReader fr = new FileReader(dictionary)) {
+		try (InputStreamReader fr = new InputStreamReader(dictionary)) {
 			BufferedReader br = new BufferedReader(fr);
 			String line;
 			while((line = br.readLine()) != null)
