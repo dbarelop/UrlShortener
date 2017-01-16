@@ -92,21 +92,26 @@
 		</div>
 	</div>
 	<div class="row">
-		<div class="col-lg-12 text-center">
-			<div ng-if="suggestResp">
-    			<div class="">{{suggestResp}}</div>	
-      			<div ng-repeat="su in CollectionSuggest">
-        			<div><button class="btn btn-lg btn-primary"  ng-click="add(su.sug)">{{su.sug}}</button></div>
-      			</div>
-    		</div>
-    	</div>
-    	<div class="col-lg-12 text-center">
-    		<div ng-if="synonymResp">
-   				<div class="">{{synonymResp}}</div>	
-      			<div ng-repeat="sy in CollectionSynonyms">
-        			<div><button class="btn btn-lg btn-primary"  ng-click="add(sy.syn)">{{sy.syn}}</button></div>
-      			</div>
-   			</div>  				
+		<br />
+		<div class="col-sm-offset-4 col-sm-4 text-center">
+			<div class="col-sm-6 text-center">
+				<div ng-if="suggestResp">
+	    			<div class="">{{suggestResp}}</div>	
+	    			<br />
+	      			<div ng-repeat="su in CollectionSuggest">
+	        			<div><button class="btn btn-primary" style="margin-bottom:5px;" ng-click="add(su.sug)">{{su.sug}}</button></div>
+	      			</div>
+	    		</div>
+	    	</div>
+	    	<div class="col-sm-6 text-center">
+	    		<div ng-if="synonymResp">
+	   				<div class="">{{synonymResp}}</div>	
+	   				<br />
+	      			<div ng-repeat="sy in CollectionSynonyms">
+	        			<div><button class="btn btn-primary" style="margin-bottom:5px;" ng-click="add(sy.syn)">{{sy.syn}}</button></div>
+	      			</div>
+	   			</div>  				
+			</div>
 		</div>
 	</div>
 	<div class="row" ng-if="shortURL">
